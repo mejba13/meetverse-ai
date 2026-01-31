@@ -1,0 +1,227 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 239 84% 67%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 263 70% 66%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 330 80% 60%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 239 84% 67%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 243 75% 15%;
+    --foreground: 210 40% 98%;
+
+    --card: 243 75% 12%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 243 75% 12%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 239 84% 67%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 263 70% 66%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 243 50% 20%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 330 80% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 243 50% 25%;
+    --input: 243 50% 25%;
+    --ring: 239 84% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection color */
+  ::selection {
+    @apply bg-primary/20;
+  }
+}
+
+@layer components {
+  /* Glass effect for cards */
+  .glass {
+    @apply bg-background/80 backdrop-blur-lg border border-border/50;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent;
+  }
+
+  /* Gradient background */
+  .gradient-bg {
+    @apply bg-gradient-to-br from-primary/20 via-purple-500/20 to-pink-500/20;
+  }
+
+  /* Video grid item */
+  .video-tile {
+    @apply relative aspect-video rounded-xl overflow-hidden bg-muted;
+  }
+
+  /* Meeting control button */
+  .control-button {
+    @apply flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200;
+    @apply hover:scale-105 active:scale-95;
+  }
+
+  .control-button-default {
+    @apply bg-muted hover:bg-muted/80;
+  }
+
+  .control-button-active {
+    @apply bg-primary text-primary-foreground;
+  }
+
+  .control-button-danger {
+    @apply bg-destructive text-destructive-foreground hover:bg-destructive/90;
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+
+  /* Bento grid */
+  .bento-grid {
+    @apply grid gap-4;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+
+  /* Bento card */
+  .bento-card {
+    @apply p-6 rounded-2xl border bg-card;
+    @apply transition-all duration-200 hover:shadow-lg hover:border-primary/20;
+  }
+
+  /* Sidebar item */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg transition-colors;
+    @apply hover:bg-muted text-muted-foreground hover:text-foreground;
+  }
+
+  .sidebar-item-active {
+    @apply bg-primary/10 text-primary hover:bg-primary/15;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+
+  /* Animation delays */
+  .delay-75 { animation-delay: 75ms; }
+  .delay-100 { animation-delay: 100ms; }
+  .delay-150 { animation-delay: 150ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-500 { animation-delay: 500ms; }
+}
+
+/* LiveKit video styles */
+.lk-participant-tile {
+  @apply rounded-xl overflow-hidden;
+}
+
+.lk-focus-layout {
+  @apply gap-2;
+}
+
+/* Transcript highlight animation */
+@keyframes highlight-fade {
+  0% {
+    background-color: hsl(var(--primary) / 0.3);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.transcript-highlight {
+  animation: highlight-fade 2s ease-out;
+}
