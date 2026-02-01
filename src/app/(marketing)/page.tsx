@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,50 +17,97 @@ import {
   CheckCircle2,
   Play,
   Star,
-  Layers,
   Target,
   TrendingUp,
   Clock,
   Globe,
   Award,
-  Flame,
   BadgeCheck,
   Rocket,
-  Timer,
-  Activity,
   Menu,
   X,
+  Wand2,
+  FileText,
+  BarChart3,
+  Headphones,
+  Calendar,
+  MousePointer,
 } from "lucide-react";
 
-// Animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
-
-const staggerContainer = {
+// ============================================
+// ANIMATION VARIANTS
+// ============================================
+const orchestratedReveal = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
   },
 };
 
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1 },
+const slideUp = {
+  hidden: { opacity: 0, y: 60 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
 };
 
-// Live activity simulation
-const recentSignups = [
-  { name: "Sarah from Google", time: "just now", avatar: "SG" },
-  { name: "Team at Stripe", time: "2 min ago", avatar: "TS" },
-  { name: "Michael from Meta", time: "5 min ago", avatar: "MM" },
-  { name: "Enterprise deal closed", time: "12 min ago", avatar: "ED" },
-  { name: "Alex from Shopify", time: "18 min ago", avatar: "AS" },
-];
+const scaleReveal = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+  },
+};
 
-// Counter animation hook
+// ============================================
+// MAGNETIC BUTTON COMPONENT
+// ============================================
+function MagneticButton({ children, className = "", href }: { children: React.ReactNode; className?: string; href?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 150, damping: 15 });
+  const springY = useSpring(y, { stiffness: 150, damping: 15 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    x.set((e.clientX - centerX) * 0.15);
+    y.set((e.clientY - centerY) * 0.15);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const content = (
+    <motion.div
+      ref={ref}
+      style={{ x: springX, y: springY }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+
+  return href ? <Link href={href}>{content}</Link> : content;
+}
+
+// ============================================
+// ANIMATED COUNTER HOOK
+// ============================================
 function useCounter(end: number, duration: number = 2000) {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -68,7 +115,6 @@ function useCounter(end: number, duration: number = 2000) {
   const startAnimation = () => {
     if (hasAnimated) return;
     setHasAnimated(true);
-
     let start = 0;
     const increment = end / (duration / 16);
     const timer = setInterval(() => {
@@ -85,213 +131,268 @@ function useCounter(end: number, duration: number = 2000) {
   return { count, startAnimation };
 }
 
+// ============================================
+// LIVE ACTIVITY DATA
+// ============================================
+const liveActivities = [
+  { name: "Acme Corp", action: "started a meeting", time: "just now" },
+  { name: "TechStart Inc", action: "generated summary", time: "12s ago" },
+  { name: "GlobalTeam", action: "detected 8 action items", time: "34s ago" },
+  { name: "InnovateCo", action: "joined enterprise plan", time: "1m ago" },
+];
+
+// ============================================
+// MAIN LANDING PAGE COMPONENT
+// ============================================
 export default function LandingPage() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
   });
 
-  // Adjusted parallax - slower fade for better visibility
-  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 0.6], [1, 0.95]);
 
-  // Mobile menu state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activityIndex, setActivityIndex] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Live activity notification
-  const [currentNotification, setCurrentNotification] = useState(0);
-  const [showNotification, setShowNotification] = useState(true);
-
+  // Live activity rotation
   useEffect(() => {
     const interval = setInterval(() => {
-      setShowNotification(false);
-      setTimeout(() => {
-        setCurrentNotification((prev) => (prev + 1) % recentSignups.length);
-        setShowNotification(true);
-      }, 500);
-    }, 4000);
+      setActivityIndex((prev) => (prev + 1) % liveActivities.length);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  // Live stats counters
-  const meetingsCounter = useCounter(847);
-  const usersCounter = useCounter(2847);
-
-  // Close mobile menu on resize
+  // Mouse tracking for gradient effect
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setMobileMenuOpen(false);
-      }
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
     };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  return (
-    <div className="relative min-h-screen bg-ink text-snow overflow-hidden">
-      {/* Animated Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(6,182,212,0.15),rgba(255,255,255,0))]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_80%_20%,rgba(6,182,212,0.08),transparent)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_20%_80%,rgba(8,51,68,0.4),transparent)]" />
+  // Stats counters
+  const teamsCounter = useCounter(50000);
+  const hoursCounter = useCounter(2500000);
 
+  return (
+    <div ref={containerRef} className="relative min-h-screen bg-ink text-snow overflow-hidden selection:bg-cyan-500/30">
+      {/* ============================================ */}
+      {/* CINEMATIC BACKGROUND */}
+      {/* ============================================ */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        {/* Base gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-30%,rgba(6,182,212,0.12),transparent_60%)]" />
+
+        {/* Animated gradient orbs */}
         <motion.div
-          className="absolute top-1/4 left-1/4 w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full"
-          style={{
-            background: "radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%)",
-            filter: "blur(40px)",
-          }}
-          animate={{ x: [0, 100, 0], y: [0, -50, 0], scale: [1, 1.2, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] md:w-[600px] md:h-[600px] rounded-full"
+          className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full"
           style={{
             background: "radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)",
-            filter: "blur(60px)",
+            filter: "blur(80px)",
           }}
-          animate={{ x: [0, -80, 0], y: [0, 80, 0], scale: [1, 1.1, 1] }}
+          animate={{
+            x: [0, 100, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.1, 1],
+          }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
         />
+        <motion.div
+          className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%)",
+            filter: "blur(100px)",
+          }}
+          animate={{
+            x: [0, -80, 0],
+            y: [0, -60, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+        />
 
+        {/* Gold accent orb */}
+        <motion.div
+          className="absolute top-[40%] right-[20%] w-[30vw] h-[30vw] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(245,158,11,0.04) 0%, transparent 70%)",
+            filter: "blur(60px)",
+          }}
+          animate={{
+            x: [0, 40, 0],
+            y: [0, -40, 0],
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {/* Noise texture overlay */}
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }}
+        />
+
+        {/* Grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "50px 50px md:100px md:100px",
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+            backgroundSize: "80px 80px",
+          }}
+        />
+
+        {/* Mouse-following gradient */}
+        <div
+          className="pointer-events-none fixed inset-0 transition-opacity duration-300"
+          style={{
+            background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(6,182,212,0.04), transparent 60%)`,
           }}
         />
       </div>
 
-      {/* Live Activity Notification - Responsive positioning */}
-      <AnimatePresence>
-        {showNotification && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-4 left-4 right-4 sm:left-6 sm:right-auto sm:bottom-6 z-50"
-          >
-            <div className="flex items-center gap-3 rounded-full bg-charcoal/80 backdrop-blur-xl border border-graphite px-4 py-3 shadow-2xl max-w-[320px] mx-auto sm:mx-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-success to-success-600 flex items-center justify-center text-xs sm:text-sm font-bold text-white flex-shrink-0">
-                {recentSignups[currentNotification].avatar}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate text-snow">{recentSignups[currentNotification].name}</p>
-                <p className="text-xs text-silver">signed up {recentSignups[currentNotification].time}</p>
-              </div>
-              <Activity className="w-4 h-4 text-green-400 animate-pulse flex-shrink-0" />
+      {/* ============================================ */}
+      {/* LIVE ACTIVITY BADGE */}
+      {/* ============================================ */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activityIndex}
+          initial={{ opacity: 0, y: 50, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.9 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed bottom-6 left-6 z-50 hidden lg:block"
+        >
+          <div className="flex items-center gap-3 rounded-full bg-charcoal/90 backdrop-blur-2xl border border-graphite/50 px-5 py-3 shadow-2xl shadow-black/20">
+            <div className="relative">
+              <div className="w-2 h-2 rounded-full bg-emerald-400" />
+              <div className="absolute inset-0 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             </div>
-          </motion.div>
-        )}
+            <div className="text-sm">
+              <span className="font-semibold text-snow">{liveActivities[activityIndex].name}</span>
+              <span className="text-silver"> {liveActivities[activityIndex].action}</span>
+            </div>
+            <span className="text-xs text-slate">{liveActivities[activityIndex].time}</span>
+          </div>
+        </motion.div>
       </AnimatePresence>
 
-      {/* Header - Fully Responsive */}
+      {/* ============================================ */}
+      {/* NAVIGATION HEADER */}
+      {/* ============================================ */}
       <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
         className="fixed top-0 left-0 right-0 z-50"
       >
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex items-center justify-between rounded-2xl border border-graphite bg-charcoal/60 backdrop-blur-xl px-4 sm:px-6 py-3">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
+          <nav className="flex items-center justify-between rounded-2xl border border-graphite/40 bg-ink/80 backdrop-blur-2xl px-6 py-3 shadow-2xl shadow-black/10">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary/70 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-                <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/70">
-                  <Video className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl blur-xl opacity-40 group-hover:opacity-60"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 shadow-lg shadow-cyan-500/25">
+                  <Video className="h-5 w-5 text-white" />
                 </div>
               </div>
-              <span className="text-lg sm:text-xl font-bold tracking-tight">
-                MeetVerse<span className="text-primary">AI</span>
+              <span className="text-xl font-display font-bold tracking-tight">
+                MeetVerse<span className="text-cyan-400">AI</span>
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-1">
-              {["Features", "Pricing", "Customers", "Enterprise"].map((item) => (
+            <div className="hidden lg:flex items-center gap-1">
+              {[
+                { label: "Features", href: "#features" },
+                { label: "Solutions", href: "#solutions" },
+                { label: "Pricing", href: "#pricing" },
+                { label: "Enterprise", href: "#enterprise" },
+              ].map((item) => (
                 <Link
-                  key={item}
-                  href={`#${item.toLowerCase()}`}
-                  className="px-4 py-2 text-sm text-silver hover:text-snow transition-colors rounded-lg hover:bg-graphite/50"
+                  key={item.label}
+                  href={item.href}
+                  className="px-4 py-2 text-sm text-silver hover:text-snow transition-colors duration-200 rounded-lg hover:bg-graphite/30"
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
-            </nav>
+            </div>
 
-            {/* Desktop Right Actions */}
-            <div className="hidden md:flex items-center gap-3">
-              {/* Live Users Indicator */}
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
+            {/* Desktop Actions */}
+            <div className="hidden md:flex items-center gap-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                 </span>
-                <span className="text-xs text-success font-medium">2,847 online</span>
+                <span className="text-xs text-emerald-400 font-medium">3,847 meetings now</span>
               </div>
-
-              <Link href="/sign-in" className="px-4 py-2 text-sm text-pearl hover:text-snow transition-colors">
-                Sign In
+              <Link href="/sign-in" className="text-sm text-silver hover:text-snow transition-colors">
+                Sign in
               </Link>
-              <Link href="/sign-up">
-                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 border-0 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-300">
+              <MagneticButton href="/sign-up">
+                <Button className="bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white border-0 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all duration-300 rounded-xl px-5">
                   Start Free
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </Link>
+              </MagneticButton>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-graphite/50 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="md:hidden p-2 rounded-xl hover:bg-graphite/50 transition-colors"
               aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
-          </div>
+          </nav>
 
           {/* Mobile Menu */}
           <AnimatePresence>
             {mobileMenuOpen && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden mt-2 rounded-2xl border border-graphite bg-charcoal/90 backdrop-blur-xl overflow-hidden"
+                initial={{ opacity: 0, height: 0, y: -10 }}
+                animate={{ opacity: 1, height: "auto", y: 0 }}
+                exit={{ opacity: 0, height: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="md:hidden mt-3 rounded-2xl border border-graphite/40 bg-ink/95 backdrop-blur-2xl overflow-hidden shadow-2xl"
               >
-                <nav className="p-4 space-y-2">
-                  {["Features", "Pricing", "Customers", "Enterprise"].map((item) => (
+                <nav className="p-4 space-y-1">
+                  {["Features", "Solutions", "Pricing", "Enterprise"].map((item) => (
                     <Link
                       key={item}
                       href={`#${item.toLowerCase()}`}
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-base text-pearl hover:text-snow hover:bg-graphite/50 rounded-xl transition-colors"
+                      className="block px-4 py-3 text-base text-silver hover:text-snow hover:bg-graphite/30 rounded-xl transition-colors"
                     >
                       {item}
                     </Link>
                   ))}
-                  <div className="pt-4 border-t border-graphite space-y-3">
+                  <div className="pt-4 mt-4 border-t border-graphite/50 space-y-3">
                     <Link
                       href="/sign-in"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block px-4 py-3 text-center text-pearl hover:text-snow hover:bg-graphite/50 rounded-xl transition-colors"
+                      className="block px-4 py-3 text-center text-silver hover:text-snow rounded-xl transition-colors"
                     >
-                      Sign In
+                      Sign in
                     </Link>
-                    <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)} className="block">
-                      <Button className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 py-3">
-                        Start Free
+                    <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-white rounded-xl py-3">
+                        Start Free Trial
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
@@ -303,367 +404,371 @@ export default function LandingPage() {
         </div>
       </motion.header>
 
-      <main role="main">
-        {/* Hero Section - Responsive */}
+      <main>
+        {/* ============================================ */}
+        {/* HERO SECTION */}
+        {/* ============================================ */}
         <section
           ref={heroRef}
-          aria-label="Hero - AI Meeting Platform Introduction"
-          className="relative min-h-screen flex items-center justify-center pt-28 sm:pt-32 pb-16 sm:pb-20"
+          className="relative min-h-[100vh] flex items-center pt-32 pb-20 lg:pt-40 lg:pb-32"
+          aria-label="AI-Powered Meeting Platform - Transform Your Team Collaboration"
         >
-          <motion.div style={{ y: heroY, opacity: heroOpacity }} className="container max-w-7xl px-4 sm:px-6">
-            <div className="flex flex-col items-center text-center">
-              {/* Urgency Badge - Responsive text */}
+          <motion.div
+            style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+            className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+          >
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+              {/* Left Column - Content */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-orange-500/30 bg-orange-500/10 px-3 sm:px-5 py-2 text-xs sm:text-sm mb-4 backdrop-blur-sm"
+                initial="hidden"
+                animate="visible"
+                variants={orchestratedReveal}
+                className="text-center lg:text-left"
               >
-                <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400 flex-shrink-0" />
-                <span className="text-orange-200 font-medium">Limited Time: 3 months free</span>
-                <Timer className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400 flex-shrink-0 hidden sm:block" />
-              </motion.div>
+                {/* Award Badges */}
+                <motion.div variants={slideUp} className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 backdrop-blur-sm">
+                    <Award className="h-4 w-4 text-amber-400" />
+                    <span className="text-sm text-amber-200 font-medium">#1 Product Hunt</span>
+                  </div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-sm">
+                    <Star className="h-4 w-4 text-cyan-400 fill-cyan-400" />
+                    <span className="text-sm text-cyan-200 font-medium">4.9/5 Rating</span>
+                  </div>
+                </motion.div>
 
-              {/* Product Hunt & Awards - Responsive stacking */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mb-6 sm:mb-8"
-              >
-                <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-[#ff6154]/10 border border-[#ff6154]/30">
-                  <span className="text-[#ff6154] font-bold text-sm">#1</span>
-                  <span className="text-white/80 text-xs sm:text-sm">Product of the Day</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-yellow-500/10 border border-yellow-500/30">
-                  <Award className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400" />
-                  <span className="text-white/80 text-xs sm:text-sm">G2 Leader 2024</span>
-                </div>
-                <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/10 border border-primary/30">
-                  <BadgeCheck className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                  <span className="text-white/80 text-xs sm:text-sm">4.9/5 Capterra</span>
-                </div>
-              </motion.div>
-
-              {/* Main Heading - Responsive sizing */}
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="max-w-5xl text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1] sm:leading-[0.9]"
-              >
-                <span className="block text-snow">The #1 AI Meeting</span>
-                <span className="relative inline-block mt-1 sm:mt-2">
-                  <span className="relative z-10 bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 bg-clip-text text-transparent">
-                    Platform for Teams
+                {/* Main Headline */}
+                <motion.h1
+                  variants={slideUp}
+                  className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05]"
+                >
+                  <span className="block text-snow">Meetings That</span>
+                  <span className="relative inline-block">
+                    <span className="relative z-10 bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500 bg-clip-text text-transparent">
+                      Work For You
+                    </span>
+                    <motion.span
+                      className="absolute -inset-2 bg-gradient-to-r from-cyan-500/20 to-cyan-400/10 blur-2xl rounded-full"
+                      animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.05, 1] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                    />
                   </span>
-                  <motion.span
-                    className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-cyan-500/15 to-cyan-500/10 blur-2xl"
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  />
-                </span>
-              </motion.h1>
+                </motion.h1>
 
-              {/* Social Proof Counter - Responsive */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.5 }}
-                className="mt-5 sm:mt-6 flex items-center gap-3"
-              >
-                <div className="flex -space-x-2 sm:-space-x-3">
-                  {["bg-cyan-500", "bg-cyan-600", "bg-cyan-700", "bg-cyan-400", "bg-cyan-500"].map((bg, i) => (
-                    <div key={i} className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full ${bg} border-2 border-ink flex items-center justify-center text-[10px] sm:text-xs font-bold text-white`}>
-                      {String.fromCharCode(65 + i)}
+                {/* Subheadline */}
+                <motion.p
+                  variants={slideUp}
+                  className="mt-6 text-lg sm:text-xl text-silver leading-relaxed max-w-xl mx-auto lg:mx-0"
+                >
+                  The AI meeting platform that captures every detail, generates instant summaries,
+                  and ensures no action item falls through the cracks.{" "}
+                  <span className="text-snow font-medium">Trusted by 50,000+ teams worldwide.</span>
+                </motion.p>
+
+                {/* CTA Buttons */}
+                <motion.div variants={slideUp} className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <MagneticButton href="/sign-up">
+                    <Button
+                      size="lg"
+                      className="w-full sm:w-auto group relative bg-snow text-ink hover:bg-pearl px-8 py-6 text-base font-semibold rounded-2xl shadow-2xl shadow-white/10 overflow-hidden"
+                    >
+                      <span className="relative z-10 flex items-center">
+                        <Rocket className="mr-2 h-5 w-5" />
+                        Start Free — No Credit Card
+                        <motion.span
+                          className="ml-2"
+                          animate={{ x: [0, 4, 0] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        >
+                          <ArrowRight className="h-5 w-5" />
+                        </motion.span>
+                      </span>
+                    </Button>
+                  </MagneticButton>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full sm:w-auto group border-graphite/50 bg-charcoal/30 hover:bg-charcoal/50 backdrop-blur-sm px-8 py-6 text-base rounded-2xl text-snow"
+                  >
+                    <Play className="mr-2 h-5 w-5 text-cyan-400 group-hover:scale-110 transition-transform" />
+                    Watch Demo
+                  </Button>
+                </motion.div>
+
+                {/* Trust Indicators */}
+                <motion.div variants={slideUp} className="mt-10 flex flex-wrap justify-center lg:justify-start gap-6 text-sm text-slate">
+                  {[
+                    { icon: Clock, text: "2-min setup" },
+                    { icon: Shield, text: "SOC 2 Certified" },
+                    { icon: Globe, text: "100+ languages" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <item.icon className="h-4 w-4 text-emerald-400" />
+                      <span>{item.text}</span>
                     </div>
                   ))}
-                </div>
-                <div className="text-left">
-                  <div className="text-base sm:text-lg font-bold text-snow">50,000+ teams</div>
-                  <div className="text-xs sm:text-sm text-silver">already switched to MeetVerse</div>
-                </div>
+                </motion.div>
               </motion.div>
 
-              {/* Subheading - Responsive */}
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="mt-6 sm:mt-8 max-w-2xl text-base sm:text-lg md:text-xl text-silver leading-relaxed px-2"
-              >
-                Join <span className="text-snow font-semibold">Google, Stripe, and Shopify</span> in
-                transforming meetings with AI transcription, instant summaries, and smart action items.
-                <span className="text-cyan-400 font-medium"> Save 5+ hours every week.</span>
-              </motion.p>
-
-              {/* CTA Buttons - Responsive */}
+              {/* Right Column - Hero Visual */}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.7 }}
-                className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0"
+                initial={{ opacity: 0, x: 60, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="relative"
               >
-                <Link href="/sign-up" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto group relative overflow-hidden bg-snow text-ink hover:bg-pearl px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-2xl shadow-snow/10">
-                    <span className="relative z-10 flex items-center justify-center">
-                      <Rocket className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                      Start Free — No Credit Card
-                      <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </Button>
-                </Link>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto group border-graphite bg-charcoal/50 hover:bg-graphite/50 backdrop-blur-sm px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base rounded-xl text-snow"
-                >
-                  <Play className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-cyan-400 group-hover:scale-110 transition-transform" />
-                  Watch 2-Min Demo
-                </Button>
-              </motion.div>
+                {/* Floating Glow Effects */}
+                <div className="absolute -inset-8 bg-gradient-to-br from-cyan-500/20 via-transparent to-amber-500/10 rounded-[3rem] blur-3xl" />
 
-              {/* Trust Signals - Responsive grid */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.9 }}
-                className="mt-8 sm:mt-12 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-3xl w-full"
-              >
-                {[
-                  { icon: Clock, text: "Setup in 2 min" },
-                  { icon: Shield, text: "SOC 2 Type II" },
-                  { icon: Zap, text: "99.9% Uptime" },
-                  { icon: Globe, text: "100+ Languages" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-center gap-2 text-slate">
-                    <item.icon className="h-3 w-3 sm:h-4 sm:w-4 text-success flex-shrink-0" />
-                    <span className="text-xs sm:text-sm">{item.text}</span>
-                  </div>
-                ))}
-              </motion.div>
-
-              {/* Hero Visual - Responsive with simplified mobile view */}
-              <motion.div
-                initial={{ opacity: 0, y: 60, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 1, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-                className="mt-12 sm:mt-16 w-full max-w-6xl"
-              >
-                <div className="relative">
-                  <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-cyan-500/30 via-cyan-600/20 to-cyan-700/20 rounded-2xl sm:rounded-3xl blur-xl sm:blur-2xl" />
-
-                  <div className="relative rounded-xl sm:rounded-2xl border border-graphite bg-gradient-to-b from-charcoal/80 to-charcoal/60 backdrop-blur-xl p-1.5 sm:p-2 shadow-2xl">
-                    <div className="rounded-lg sm:rounded-xl bg-ink/90 overflow-hidden">
-                      {/* Window Controls */}
-                      <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 border-b border-graphite bg-ink/60">
-                        <div className="flex gap-1 sm:gap-1.5">
-                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-error/80" />
-                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-warning/80" />
-                          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-success/80" />
-                        </div>
-                        <div className="flex items-center gap-1.5 sm:gap-2">
-                          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-error"></span>
-                          </span>
-                          <span className="text-[10px] sm:text-xs text-silver">Recording • 00:32:15</span>
-                        </div>
-                        <div className="hidden sm:flex items-center gap-2 text-xs text-slate">
-                          <Users className="w-3 h-3" />
-                          <span>12 participants</span>
-                        </div>
+                {/* Main Visual Container */}
+                <div className="relative rounded-3xl border border-graphite/40 bg-gradient-to-br from-charcoal/80 to-ink/90 backdrop-blur-xl p-2 shadow-2xl shadow-black/30">
+                  <div className="rounded-2xl bg-ink/80 overflow-hidden">
+                    {/* Window Chrome */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-graphite/40 bg-charcoal/40">
+                      <div className="flex gap-2">
+                        <div className="w-3 h-3 rounded-full bg-rose-500/80" />
+                        <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+                        <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
                       </div>
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute h-full w-full rounded-full bg-rose-400 opacity-75" />
+                          <span className="relative h-2 w-2 rounded-full bg-rose-500" />
+                        </span>
+                        <span className="text-xs text-silver">Recording • 23:45</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate">
+                        <Users className="w-3.5 h-3.5" />
+                        <span>8 participants</span>
+                      </div>
+                    </div>
 
-                      {/* Video Grid - Responsive */}
-                      <div className="aspect-[16/10] sm:aspect-video relative bg-gradient-to-br from-ink to-charcoal p-3 sm:p-6">
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 p-2 sm:p-4 w-full max-w-3xl">
-                            {[1, 2, 3, 4, 5, 6].map((i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: 1.3 + i * 0.1 }}
-                                className={`aspect-video sm:aspect-video bg-gradient-to-br from-cyan-500/15 to-cyan-700/10 border border-graphite rounded-lg flex items-center justify-center overflow-hidden relative ${
-                                  i > 4 ? "hidden sm:flex" : ""
-                                }`}
-                              >
-                                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center text-white font-semibold text-xs sm:text-base">
-                                  {String.fromCharCode(64 + i)}
-                                </div>
-                                {i === 1 && (
-                                  <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 px-1.5 sm:px-2 py-0.5 rounded bg-success/20 text-success text-[8px] sm:text-[10px] flex items-center gap-0.5 sm:gap-1">
-                                    <Mic className="w-1.5 h-1.5 sm:w-2 sm:h-2" />
-                                    Speaking
-                                  </div>
-                                )}
-                              </motion.div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* AI Panel - Hidden on mobile, visible on lg+ */}
-                        <motion.div
-                          initial={{ x: 100, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 2, duration: 0.6 }}
-                          className="absolute right-2 sm:right-4 top-2 sm:top-4 bottom-2 sm:bottom-4 w-48 sm:w-56 md:w-64 lg:w-72 rounded-lg sm:rounded-xl bg-ink/80 backdrop-blur-xl border border-graphite p-2 sm:p-3 md:p-4 overflow-hidden hidden md:block"
-                        >
-                          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                            <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
-                              <Brain className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                    {/* Meeting Content */}
+                    <div className="aspect-[4/3] relative bg-gradient-to-br from-charcoal to-ink p-6">
+                      {/* Video Grid */}
+                      <div className="grid grid-cols-3 gap-3 h-full">
+                        {[
+                          { name: "Sarah", speaking: true },
+                          { name: "Mike", speaking: false },
+                          { name: "Emma", speaking: false },
+                          { name: "James", speaking: false },
+                          { name: "Lisa", speaking: false },
+                          { name: "+3", speaking: false },
+                        ].map((participant, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.6 + i * 0.1 }}
+                            className={`relative rounded-xl bg-gradient-to-br from-graphite/60 to-graphite/30 border ${
+                              participant.speaking ? "border-cyan-500/50" : "border-graphite/30"
+                            } flex items-center justify-center overflow-hidden`}
+                          >
+                            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-sm font-semibold ${
+                              participant.name === "+3"
+                                ? "bg-graphite/60 text-silver"
+                                : "bg-gradient-to-br from-cyan-500 to-cyan-600 text-white"
+                            }`}>
+                              {participant.name.charAt(0)}
+                              {participant.name === "+3" && "3"}
                             </div>
-                            <span className="font-semibold text-xs sm:text-sm text-snow">AI Co-Pilot</span>
-                            <motion.div
-                              animate={{ opacity: [1, 0.5, 1] }}
-                              transition={{ duration: 1.5, repeat: Infinity }}
-                              className="ml-auto w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-success"
-                            />
-                          </div>
-
-                          {/* Live Transcription */}
-                          <div className="mb-3 sm:mb-4 p-2 sm:p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-                            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                            {participant.speaking && (
                               <motion.div
-                                animate={{ scale: [1, 1.2, 1] }}
+                                className="absolute bottom-2 left-2 flex items-center gap-1 px-2 py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30"
+                                animate={{ opacity: [1, 0.6, 1] }}
                                 transition={{ duration: 1, repeat: Infinity }}
-                                className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-500"
-                              />
-                              <span className="text-[10px] sm:text-xs text-cyan-400">Live Transcribing</span>
-                            </div>
-                            <p className="text-[10px] sm:text-xs text-silver line-clamp-2">"...and that's why we should prioritize the Q2 roadmap..."</p>
-                          </div>
-
-                          <div className="space-y-1.5 sm:space-y-2">
-                            {[
-                              { icon: Target, text: "Action item detected", color: "text-warning bg-warning/10" },
-                              { icon: CheckCircle2, text: "Decision captured", color: "text-success bg-success/10" },
-                              { icon: Sparkles, text: "Key insight found", color: "text-info bg-info/10" },
-                            ].map((item, i) => (
-                              <motion.div
-                                key={i}
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: 2.3 + i * 0.2 }}
-                                className={`flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs p-1.5 sm:p-2 rounded-lg ${item.color}`}
                               >
-                                <item.icon className="w-2.5 h-2.5 sm:w-3 sm:h-3 flex-shrink-0" />
-                                <span className="truncate">{item.text}</span>
+                                <Mic className="w-2.5 h-2.5 text-cyan-400" />
+                                <span className="text-[10px] text-cyan-300">Speaking</span>
                               </motion.div>
-                            ))}
-                          </div>
-                        </motion.div>
-
-                        {/* Control Bar - Responsive */}
-                        <motion.div
-                          initial={{ y: 50, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 1.8 }}
-                          className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 sm:gap-2 bg-ink/80 backdrop-blur-xl rounded-full px-3 sm:px-6 py-2 sm:py-3 border border-graphite"
-                        >
-                          {[Mic, Video, Users, MessageSquare].map((Icon, i) => (
-                            <button key={i} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-graphite hover:bg-steel flex items-center justify-center transition-colors">
-                              <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-pearl" />
-                            </button>
-                          ))}
-                          <div className="w-px h-4 sm:h-6 bg-graphite mx-1 sm:mx-2" />
-                          <button className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-error hover:bg-error-600 text-white text-xs sm:text-sm font-medium transition-colors">
-                            End
-                          </button>
-                        </motion.div>
+                            )}
+                          </motion.div>
+                        ))}
                       </div>
+
+                      {/* AI Panel Overlay */}
+                      <motion.div
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ delay: 1.2, duration: 0.6 }}
+                        className="absolute top-4 right-4 bottom-4 w-56 rounded-xl bg-ink/95 backdrop-blur-xl border border-graphite/40 p-4 shadow-2xl hidden sm:block"
+                      >
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
+                            <Brain className="w-4 h-4 text-white" />
+                          </div>
+                          <span className="font-semibold text-sm text-snow">AI Co-Pilot</span>
+                          <motion.div
+                            animate={{ opacity: [1, 0.4, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity }}
+                            className="ml-auto w-2 h-2 rounded-full bg-emerald-400"
+                          />
+                        </div>
+
+                        {/* Live Transcript */}
+                        <div className="mb-4 p-3 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
+                          <div className="flex items-center gap-2 mb-2">
+                            <motion.div
+                              animate={{ scale: [1, 1.3, 1] }}
+                              transition={{ duration: 1, repeat: Infinity }}
+                              className="w-2 h-2 rounded-full bg-cyan-400"
+                            />
+                            <span className="text-xs text-cyan-300">Live Transcript</span>
+                          </div>
+                          <p className="text-xs text-silver leading-relaxed line-clamp-2">
+                            "...the Q2 targets look achievable if we focus on enterprise..."
+                          </p>
+                        </div>
+
+                        {/* AI Insights */}
+                        <div className="space-y-2">
+                          {[
+                            { icon: Target, text: "Action item detected", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+                            { icon: CheckCircle2, text: "Decision logged", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+                            { icon: Sparkles, text: "Key insight", color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
+                          ].map((item, i) => (
+                            <motion.div
+                              key={i}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 1.5 + i * 0.2 }}
+                              className={`flex items-center gap-2 text-xs p-2 rounded-lg border ${item.color}`}
+                            >
+                              <item.icon className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate">{item.text}</span>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+
+                      {/* Control Bar */}
+                      <motion.div
+                        initial={{ y: 40, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-ink/90 backdrop-blur-xl rounded-full px-4 py-2.5 border border-graphite/40 shadow-xl"
+                      >
+                        {[Mic, Video, Users, MessageSquare].map((Icon, i) => (
+                          <button key={i} className="w-9 h-9 rounded-full bg-graphite/60 hover:bg-graphite flex items-center justify-center transition-colors">
+                            <Icon className="w-4 h-4 text-pearl" />
+                          </button>
+                        ))}
+                        <div className="w-px h-5 bg-graphite/60 mx-1" />
+                        <button className="px-4 py-1.5 rounded-full bg-rose-500 hover:bg-rose-600 text-white text-sm font-medium transition-colors">
+                          End
+                        </button>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
+
+                {/* Floating Stats Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4 }}
+                  className="absolute -bottom-6 -left-6 p-4 rounded-2xl bg-charcoal/90 backdrop-blur-xl border border-graphite/40 shadow-2xl hidden lg:block"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-snow">73%</div>
+                      <div className="text-xs text-silver">Less time on notes</div>
+                    </div>
+                  </div>
+                </motion.div>
               </motion.div>
             </div>
           </motion.div>
 
-          {/* Scroll Indicator - Hidden on mobile */}
+          {/* Scroll Indicator */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 2.5 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden sm:block"
+            transition={{ delay: 2 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2"
           >
+            <span className="text-xs text-slate">Scroll to explore</span>
             <motion.div
-              animate={{ y: [0, 8, 0] }}
+              animate={{ y: [0, 6, 0] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="w-6 h-10 rounded-full border-2 border-graphite flex items-start justify-center p-1.5"
+              className="w-5 h-8 rounded-full border border-graphite flex items-start justify-center p-1.5"
             >
-              <motion.div
-                animate={{ height: ["20%", "40%", "20%"] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="w-1 bg-slate rounded-full"
-              />
+              <motion.div className="w-1 h-2 bg-slate rounded-full" />
             </motion.div>
           </motion.div>
         </section>
 
-        {/* Logos Section - Responsive */}
-        <section aria-label="Trusted by leading companies" className="py-12 sm:py-16 border-y border-graphite/50">
-          <div className="container max-w-7xl px-4 sm:px-6">
+        {/* ============================================ */}
+        {/* LOGOS / SOCIAL PROOF - INFINITE MARQUEE */}
+        {/* ============================================ */}
+        <section className="py-16 border-y border-graphite/30 overflow-hidden" aria-label="Trusted by leading companies">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-6 sm:mb-8"
+              className="text-center mb-10"
             >
-              <p className="text-xs sm:text-sm text-slate mb-1 sm:mb-2">TRUSTED BY 50,000+ TEAMS WORLDWIDE</p>
-              <p className="text-[10px] sm:text-xs text-steel">From startups to Fortune 500 companies</p>
+              <p className="text-sm text-slate uppercase tracking-wider font-medium">
+                Trusted by 50,000+ teams at companies like
+              </p>
             </motion.div>
+          </div>
+
+          {/* Infinite scrolling marquee */}
+          <div className="relative">
+            {/* Gradient masks */}
+            <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-ink to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-ink to-transparent z-10 pointer-events-none" />
+
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="flex flex-wrap items-center justify-center gap-x-8 sm:gap-x-12 md:gap-x-16 gap-y-4 sm:gap-y-6 md:gap-y-8"
+              className="flex gap-16"
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
             >
-              {[
-                { name: "Google", highlight: true },
-                { name: "Microsoft", highlight: false },
-                { name: "Stripe", highlight: true },
-                { name: "Shopify", highlight: false },
-                { name: "Airbnb", highlight: true },
-                { name: "Notion", highlight: false },
-              ].map((company, i) => (
-                <motion.div
-                  key={company.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className={`text-lg sm:text-xl md:text-2xl font-bold transition-colors cursor-default ${
-                    company.highlight ? "text-slate hover:text-silver" : "text-steel hover:text-slate"
-                  }`}
-                >
-                  {company.name}
-                </motion.div>
+              {/* Double the logos for seamless loop */}
+              {[...Array(2)].map((_, setIndex) => (
+                <div key={setIndex} className="flex gap-16 shrink-0">
+                  {["Google", "Microsoft", "Stripe", "Shopify", "Airbnb", "Notion", "Slack", "Figma", "Dropbox", "Adobe", "Spotify", "Netflix"].map((company) => (
+                    <div
+                      key={`${setIndex}-${company}`}
+                      className="text-2xl sm:text-3xl font-bold text-steel/60 hover:text-silver transition-colors duration-300 cursor-default whitespace-nowrap select-none"
+                    >
+                      {company}
+                    </div>
+                  ))}
+                </div>
               ))}
             </motion.div>
           </div>
         </section>
 
-        {/* Why Teams Are Switching Section - Responsive */}
-        <section aria-label="Benefits and statistics" className="py-16 sm:py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 to-transparent" />
-          <div className="container max-w-7xl px-4 sm:px-6 relative">
+        {/* ============================================ */}
+        {/* PROBLEM / STATS SECTION */}
+        {/* ============================================ */}
+        <section className="py-24 lg:py-32 relative overflow-hidden" aria-label="Meeting productivity statistics">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent" />
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
-              variants={staggerContainer}
-              className="text-center mb-10 sm:mb-16"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="text-center mb-16"
             >
-              <motion.span variants={fadeInUp} className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-cyan-400 mb-3 sm:mb-4">
-                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
-                WHY TEAMS ARE SWITCHING
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <BarChart3 className="w-4 h-4" />
+                THE MEETING CRISIS
               </motion.span>
-              <motion.h2 variants={fadeInUp} className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-snow">
-                The meetings revolution is here
+              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Your team deserves better meetings
               </motion.h2>
-              <motion.p variants={fadeInUp} className="text-base sm:text-lg text-silver max-w-2xl mx-auto px-4">
-                Teams waste 31 hours per month in unproductive meetings. MeetVerse AI changes that.
+              <motion.p variants={slideUp} className="text-lg text-silver max-w-2xl mx-auto">
+                Professionals waste an average of 31 hours per month in unproductive meetings.
+                MeetVerse AI transforms this lost time into focused, actionable outcomes.
               </motion.p>
             </motion.div>
 
@@ -671,41 +776,29 @@ export default function LandingPage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8"
+              onViewportEnter={() => {
+                teamsCounter.startAnimation();
+                hoursCounter.startAnimation();
+              }}
+              variants={orchestratedReveal}
+              className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
             >
               {[
-                {
-                  stat: "73%",
-                  label: "Less time on notes",
-                  description: "AI captures everything so you can focus on the conversation",
-                  color: "from-cyan-400 to-cyan-600",
-                },
-                {
-                  stat: "5h",
-                  label: "Saved per week",
-                  description: "Average time saved by teams using MeetVerse AI",
-                  color: "from-cyan-500 to-cyan-700",
-                },
-                {
-                  stat: "2x",
-                  label: "More action items completed",
-                  description: "Automatic tracking ensures nothing falls through the cracks",
-                  color: "from-warning to-error",
-                },
-              ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className="relative group"
-                >
-                  <div className="relative rounded-2xl sm:rounded-3xl border border-graphite bg-charcoal/50 p-6 sm:p-8 hover:border-graphite transition-all overflow-hidden">
-                    <div className={`absolute -top-16 sm:-top-20 -right-16 sm:-right-20 w-32 sm:w-40 h-32 sm:h-40 rounded-full bg-gradient-to-br ${item.color} opacity-10 blur-3xl group-hover:opacity-20 transition-opacity`} />
-                    <div className={`text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r ${item.color} bg-clip-text text-transparent mb-2`}>
-                      {item.stat}
+                { value: "73%", label: "Less time on meeting notes", description: "AI captures everything automatically", gradient: "from-cyan-400 to-cyan-600" },
+                { value: "5h+", label: "Saved per week", description: "Average time saved per team member", gradient: "from-emerald-400 to-emerald-600" },
+                { value: "98%", label: "Action item accuracy", description: "Never miss a commitment again", gradient: "from-amber-400 to-amber-600" },
+                { value: "2x", label: "Meeting follow-through", description: "Double your team's execution rate", gradient: "from-rose-400 to-rose-600" },
+              ].map((stat, i) => (
+                <motion.div key={i} variants={scaleReveal}>
+                  <div className="relative group h-full">
+                    <div className="absolute inset-0 bg-gradient-to-br from-graphite/30 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative h-full rounded-3xl border border-graphite/40 bg-charcoal/30 p-8 text-center backdrop-blur-sm hover:border-graphite/60 transition-colors">
+                      <div className={`text-5xl lg:text-6xl font-display font-bold bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent mb-3`}>
+                        {stat.value}
+                      </div>
+                      <div className="text-lg font-semibold text-snow mb-2">{stat.label}</div>
+                      <p className="text-sm text-silver">{stat.description}</p>
                     </div>
-                    <div className="text-lg sm:text-xl font-semibold mb-2 text-snow">{item.label}</div>
-                    <p className="text-sm sm:text-base text-silver">{item.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -713,155 +806,159 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Features Section - Responsive Bento Grid */}
-        <section id="features" aria-labelledby="features-heading" className="py-20 sm:py-32">
-          <div className="container max-w-7xl px-4 sm:px-6">
+        {/* ============================================ */}
+        {/* FEATURES BENTO GRID */}
+        {/* ============================================ */}
+        <section id="features" className="py-24 lg:py-32" aria-labelledby="features-heading">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="text-center mb-12 sm:mb-20"
+              variants={orchestratedReveal}
+              className="text-center mb-16"
             >
-              <motion.span variants={fadeInUp} className="inline-block text-xs sm:text-sm font-medium text-cyan-400 mb-3 sm:mb-4">
-                POWERFUL FEATURES
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <Wand2 className="w-4 h-4" />
+                POWERFUL CAPABILITIES
               </motion.span>
-              <motion.h2 id="features-heading" variants={fadeInUp} className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-snow">
+              <motion.h2 id="features-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
                 Everything you need for
                 <br />
-                <span className="bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent">
-                  intelligent meetings
+                <span className="bg-gradient-to-r from-cyan-300 to-cyan-500 bg-clip-text text-transparent">
+                  smarter meetings
                 </span>
               </motion.h2>
             </motion.div>
 
-            {/* Bento Grid - Responsive */}
+            {/* Bento Grid */}
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+              variants={orchestratedReveal}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto"
             >
-              {/* Large Feature Card - AI Co-Pilot */}
-              <motion.div variants={fadeInUp} className="md:col-span-2 lg:col-span-2 lg:row-span-2 group">
-                <div className="relative h-full rounded-2xl sm:rounded-3xl border border-graphite bg-gradient-to-br from-cyan-500/10 to-cyan-700/5 p-5 sm:p-8 overflow-hidden hover:border-cyan-500/30 transition-colors min-h-[300px] sm:min-h-[400px]">
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  <div className="relative z-10">
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                      <div className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600">
-                        <Brain className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+              {/* Large Feature - AI Co-Pilot */}
+              <motion.div variants={scaleReveal} className="md:col-span-2 lg:col-span-2 lg:row-span-2">
+                <div className="relative h-full rounded-3xl border border-graphite/40 bg-gradient-to-br from-cyan-500/10 via-charcoal/50 to-ink overflow-hidden group min-h-[400px]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative h-full p-8 lg:p-10 flex flex-col">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <Brain className="w-7 h-7 text-white" />
                       </div>
-                      <div className="px-2 sm:px-3 py-1 rounded-full bg-success/10 border border-success/20 text-success text-[10px] sm:text-xs font-medium">
-                        Most Popular Feature
+                      <div className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+                        Most Popular
                       </div>
                     </div>
-                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 sm:mb-4 text-snow">AI Meeting Co-Pilot</h3>
-                    <p className="text-sm sm:text-base md:text-lg text-silver mb-6 sm:mb-8 max-w-lg">
+                    <h3 className="font-display text-2xl lg:text-3xl font-bold text-snow mb-4">
+                      AI Meeting Co-Pilot
+                    </h3>
+                    <p className="text-silver text-lg mb-8 max-w-md">
                       Your intelligent assistant that listens, understands, and helps in real-time.
-                      Get instant answers, smart suggestions, and proactive insights.
+                      Get instant answers, smart suggestions, and proactive insights during every meeting.
                     </p>
-
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                    <div className="grid sm:grid-cols-2 gap-4 mt-auto">
                       {[
                         { icon: MessageSquare, label: "Real-time Q&A" },
-                        { icon: Target, label: "Smart Suggestions" },
-                        { icon: Layers, label: "Knowledge Search" },
-                        { icon: TrendingUp, label: "Meeting Analytics" },
+                        { icon: Target, label: "Smart suggestions" },
+                        { icon: FileText, label: "Knowledge search" },
+                        { icon: BarChart3, label: "Meeting analytics" },
                       ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 sm:gap-3 text-pearl">
-                          <item.icon className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 flex-shrink-0" />
-                          <span className="text-xs sm:text-sm">{item.label}</span>
+                        <div key={i} className="flex items-center gap-3 text-pearl">
+                          <item.icon className="w-5 h-5 text-cyan-400" />
+                          <span className="text-sm">{item.label}</span>
                         </div>
                       ))}
                     </div>
-                  </div>
 
-                  {/* Decorative Element - Hidden on mobile */}
-                  <div className="absolute right-2 sm:right-4 bottom-2 sm:bottom-4 w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 hidden sm:block">
-                    <motion.div
-                      className="absolute inset-0 sm:border border-cyan-500/20 bg-cyan-500/5 rounded-lg"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    />
-                    <motion.div
-                      className="absolute inset-3 sm:inset-4 border border-cyan-600/20 bg-cyan-600/5 rounded-lg"
-                      animate={{ rotate: -360 }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Brain className="w-10 h-10 sm:w-16 sm:h-16 text-cyan-500/30" />
+                    {/* Decorative Element */}
+                    <div className="absolute right-0 bottom-0 w-64 h-64 hidden lg:block">
+                      <motion.div
+                        className="absolute inset-0 border border-cyan-500/20 rounded-full"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                      />
+                      <motion.div
+                        className="absolute inset-8 border border-cyan-500/10 rounded-full"
+                        animate={{ rotate: -360 }}
+                        transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Brain className="w-16 h-16 text-cyan-500/20" />
+                      </div>
                     </div>
                   </div>
                 </div>
               </motion.div>
 
-              {/* Feature Cards - Responsive */}
+              {/* Feature Cards */}
               {[
                 {
                   icon: MessageSquare,
                   title: "Live Transcription",
-                  description: "99% accurate speech-to-text in 100+ languages with speaker identification",
-                  gradient: "from-info to-cyan-500",
+                  description: "99% accurate speech-to-text in 100+ languages with automatic speaker identification",
+                  gradient: "from-blue-500 to-cyan-500",
                   badge: "Enterprise Ready",
                 },
                 {
                   icon: Sparkles,
-                  title: "Smart Summaries",
-                  description: "AI-generated meeting briefs in executive, detailed, or action-focused formats",
-                  gradient: "from-warning to-error",
-                  badge: "Saves 5+ hrs/week",
+                  title: "Instant Summaries",
+                  description: "AI-generated meeting briefs delivered in seconds, not hours",
+                  gradient: "from-amber-500 to-orange-500",
+                  badge: "5+ hrs saved/week",
                 },
                 {
                   icon: Zap,
                   title: "Action Detection",
                   description: "Automatically capture commitments, deadlines, and owners from conversations",
-                  gradient: "from-success to-success-600",
+                  gradient: "from-emerald-500 to-green-500",
                   badge: "98% Accuracy",
                 },
                 {
                   icon: Video,
-                  title: "4K Video",
-                  description: "Crystal-clear video with adaptive bitrate supporting 200 participants",
-                  gradient: "from-cyan-500 to-cyan-600",
+                  title: "Crystal Clear Video",
+                  description: "4K quality with adaptive bitrate supporting up to 200 participants",
+                  gradient: "from-purple-500 to-pink-500",
                   badge: null,
                 },
               ].map((feature, i) => (
-                <motion.div key={i} variants={fadeInUp} className="group">
-                  <div className="relative h-full rounded-2xl sm:rounded-3xl border border-graphite bg-charcoal/50 p-4 sm:p-6 overflow-hidden hover:border-graphite transition-all hover:bg-charcoal/70">
-                    <div className="flex items-start justify-between mb-3 sm:mb-4">
-                      <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${feature.gradient}`}>
-                        <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                <motion.div key={i} variants={scaleReveal}>
+                  <div className="relative h-full rounded-3xl border border-graphite/40 bg-charcoal/30 p-6 overflow-hidden group hover:border-graphite/60 transition-all duration-300 backdrop-blur-sm">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center shadow-lg`}>
+                        <feature.icon className="w-6 h-6 text-white" />
                       </div>
                       {feature.badge && (
-                        <span className="px-2 py-1 rounded-full bg-graphite text-silver text-[9px] sm:text-[10px] font-medium">
+                        <span className="px-2 py-1 rounded-full bg-graphite/60 text-silver text-[10px] font-medium">
                           {feature.badge}
                         </span>
                       )}
                     </div>
-                    <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2 text-snow">{feature.title}</h3>
-                    <p className="text-silver text-xs sm:text-sm">{feature.description}</p>
+                    <h3 className="text-xl font-semibold text-snow mb-2">{feature.title}</h3>
+                    <p className="text-silver text-sm">{feature.description}</p>
                   </div>
                 </motion.div>
               ))}
 
-              {/* Security Card - Responsive */}
-              <motion.div variants={fadeInUp} className="md:col-span-2 lg:col-span-2 group">
-                <div className="relative h-full rounded-2xl sm:rounded-3xl border border-graphite bg-gradient-to-r from-success/10 to-cyan-700/10 p-5 sm:p-8 overflow-hidden hover:border-success/30 transition-colors">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
-                    <div className="inline-flex items-center justify-center w-10 h-10 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br from-success to-success-600 flex-shrink-0">
-                      <Shield className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+              {/* Security Banner */}
+              <motion.div variants={scaleReveal} className="md:col-span-2 lg:col-span-3">
+                <div className="relative rounded-3xl border border-graphite/40 bg-gradient-to-r from-emerald-500/10 via-charcoal/30 to-cyan-500/10 p-8 overflow-hidden group">
+                  <div className="flex flex-col md:flex-row items-center gap-6">
+                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20 flex-shrink-0">
+                      <Shield className="w-7 h-7 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl sm:text-2xl font-bold mb-1.5 sm:mb-2 text-snow">Enterprise-Grade Security</h3>
-                      <p className="text-sm sm:text-base text-silver">
-                        End-to-end encryption, SSO, and comprehensive audit logs. Your data stays protected.
+                    <div className="text-center md:text-left flex-1">
+                      <h3 className="text-2xl font-bold text-snow mb-2">Enterprise-Grade Security</h3>
+                      <p className="text-silver">
+                        End-to-end encryption, SSO, SCIM provisioning, and comprehensive audit logs.
+                        Your conversations are protected by industry-leading security standards.
                       </p>
                     </div>
-                    <div className="flex gap-2 sm:gap-3 flex-wrap">
+                    <div className="flex flex-wrap justify-center gap-3">
                       {["SOC 2", "GDPR", "HIPAA", "ISO 27001"].map((badge) => (
-                        <span key={badge} className="px-2 sm:px-3 py-1 rounded-full border border-success/30 bg-success/10 text-success text-xs sm:text-sm font-medium">
+                        <span key={badge} className="px-4 py-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-sm font-medium">
                           {badge}
                         </span>
                       ))}
@@ -873,54 +970,150 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Live Stats Section - Responsive */}
-        <section aria-label="Platform statistics" className="py-16 sm:py-24 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 to-transparent" />
-          <div className="container max-w-7xl px-4 sm:px-6 relative">
+        {/* ============================================ */}
+        {/* WHY MEETVERSE - COMPARISON */}
+        {/* ============================================ */}
+        <section className="py-24 lg:py-32 relative overflow-hidden" aria-label="Why choose MeetVerse AI">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/3 to-transparent" />
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              onViewportEnter={() => {
-                meetingsCounter.startAnimation();
-                usersCounter.startAnimation();
-              }}
-              viewport={{ once: true }}
-              className="text-center mb-8 sm:mb-12"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="text-center mb-16"
             >
-              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-success/10 border border-success/20 mb-4 sm:mb-6">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
-                </span>
-                <span className="text-xs sm:text-sm text-success">Live Platform Statistics</span>
-              </div>
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <Award className="w-4 h-4" />
+                THE DIFFERENCE
+              </motion.span>
+              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Not just another meeting tool
+              </motion.h2>
+              <motion.p variants={slideUp} className="text-lg text-silver max-w-2xl mx-auto">
+                See how MeetVerse AI compares to traditional meeting solutions
+              </motion.p>
             </motion.div>
 
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true }}
-              variants={staggerContainer}
-              className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="max-w-4xl mx-auto"
+            >
+              {/* Comparison Table */}
+              <div className="rounded-3xl border border-graphite/40 bg-charcoal/30 backdrop-blur-sm overflow-hidden">
+                {/* Header */}
+                <div className="grid grid-cols-3 bg-graphite/30 border-b border-graphite/40">
+                  <div className="p-6 font-semibold text-silver">Feature</div>
+                  <div className="p-6 font-semibold text-slate text-center border-x border-graphite/40">Traditional Tools</div>
+                  <div className="p-6 font-semibold text-snow text-center bg-cyan-500/10">
+                    <span className="inline-flex items-center gap-2">
+                      <Video className="w-4 h-4 text-cyan-400" />
+                      MeetVerse AI
+                    </span>
+                  </div>
+                </div>
+
+                {/* Rows */}
+                {[
+                  { feature: "Transcription Accuracy", old: "70-80%", new: "99%+", highlight: true },
+                  { feature: "Action Item Detection", old: "Manual", new: "Automatic AI", highlight: true },
+                  { feature: "Setup Time", old: "30+ minutes", new: "2 minutes", highlight: false },
+                  { feature: "Meeting Summaries", old: "Write yourself", new: "Instant AI-generated", highlight: true },
+                  { feature: "Language Support", old: "5-10 languages", new: "100+ languages", highlight: false },
+                  { feature: "Calendar Sync", old: "Limited", new: "Full auto-join", highlight: false },
+                  { feature: "Speaker Identification", old: "Basic", new: "Advanced diarization", highlight: true },
+                  { feature: "Real-time AI Copilot", old: "Not available", new: "Full support", highlight: true },
+                ].map((row, i) => (
+                  <motion.div
+                    key={i}
+                    variants={slideUp}
+                    className={`grid grid-cols-3 border-b border-graphite/30 last:border-b-0 ${i % 2 === 0 ? "bg-transparent" : "bg-graphite/10"}`}
+                  >
+                    <div className="p-5 text-pearl flex items-center">
+                      {row.feature}
+                    </div>
+                    <div className="p-5 text-slate text-center border-x border-graphite/30 flex items-center justify-center">
+                      <span className="flex items-center gap-2">
+                        <X className="w-4 h-4 text-rose-400/60" />
+                        {row.old}
+                      </span>
+                    </div>
+                    <div className="p-5 text-snow text-center bg-cyan-500/5 flex items-center justify-center">
+                      <span className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span className={row.highlight ? "font-semibold text-cyan-300" : ""}>{row.new}</span>
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* HOW IT WORKS */}
+        {/* ============================================ */}
+        <section className="py-24 lg:py-32 relative overflow-hidden" aria-label="How MeetVerse AI works">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-charcoal/30 to-transparent" />
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="text-center mb-16"
+            >
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <MousePointer className="w-4 h-4" />
+                SIMPLE WORKFLOW
+              </motion.span>
+              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Three steps to meeting excellence
+              </motion.h2>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
             >
               {[
-                { value: "99.99%", label: "Uptime SLA", suffix: "", live: false },
-                { value: "50,000", label: "Active Teams", suffix: "+", live: false },
-                { value: "10", label: "Meetings Hosted", suffix: "M+", live: false },
-                { value: "4.9", label: "Customer Rating", suffix: "/5", live: false },
-              ].map((stat, i) => (
-                <motion.div key={i} variants={scaleIn} className="text-center">
-                  <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-snow to-silver bg-clip-text text-transparent">
-                    {stat.value}<span className="text-cyan-400">{stat.suffix}</span>
-                  </div>
-                  <div className="mt-1 sm:mt-2 text-xs sm:text-sm md:text-base text-slate flex items-center justify-center gap-2">
-                    {stat.live && (
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
-                      </span>
-                    )}
-                    {stat.label}
+                {
+                  step: "01",
+                  icon: Calendar,
+                  title: "Connect Your Calendar",
+                  description: "Sync with Google Calendar or Outlook in one click. MeetVerse AI automatically joins your scheduled meetings.",
+                },
+                {
+                  step: "02",
+                  icon: Brain,
+                  title: "Let AI Work",
+                  description: "Our AI transcribes in real-time, identifies speakers, detects action items, and captures key decisions automatically.",
+                },
+                {
+                  step: "03",
+                  icon: Rocket,
+                  title: "Execute Faster",
+                  description: "Receive instant summaries, searchable transcripts, and tracked action items. Never miss a follow-up again.",
+                },
+              ].map((item, i) => (
+                <motion.div key={i} variants={slideUp} className="relative">
+                  {i < 2 && (
+                    <div className="hidden md:block absolute top-16 left-full w-full h-px bg-gradient-to-r from-graphite/60 via-cyan-500/20 to-transparent -translate-x-1/2 z-0" />
+                  )}
+                  <div className="relative text-center">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-charcoal to-graphite border border-graphite/60 mb-6 shadow-xl">
+                      <item.icon className="w-7 h-7 text-cyan-400" />
+                    </div>
+                    <div className="text-xs font-bold text-cyan-400 mb-2 tracking-wider">{item.step}</div>
+                    <h3 className="text-xl font-bold text-snow mb-3">{item.title}</h3>
+                    <p className="text-silver text-sm leading-relaxed">{item.description}</p>
                   </div>
                 </motion.div>
               ))}
@@ -928,24 +1121,27 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Testimonials Section - Responsive */}
-        <section id="customers" aria-labelledby="testimonials-heading" className="py-20 sm:py-32">
-          <div className="container max-w-7xl px-4 sm:px-6">
+        {/* ============================================ */}
+        {/* TESTIMONIALS */}
+        {/* ============================================ */}
+        <section id="customers" className="py-24 lg:py-32" aria-labelledby="testimonials-heading">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={staggerContainer}
-              className="text-center mb-10 sm:mb-16"
+              variants={orchestratedReveal}
+              className="text-center mb-16"
             >
-              <motion.span variants={fadeInUp} className="inline-block text-xs sm:text-sm font-medium text-cyan-400 mb-3 sm:mb-4">
-                CUSTOMER LOVE
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <Star className="w-4 h-4 fill-cyan-400" />
+                CUSTOMER SUCCESS
               </motion.span>
-              <motion.h2 id="testimonials-heading" variants={fadeInUp} className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-snow">
-                Join 50,000+ happy teams
+              <motion.h2 id="testimonials-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Loved by 50,000+ teams
               </motion.h2>
-              <motion.p variants={fadeInUp} className="text-base sm:text-lg text-silver">
-                See why teams at Google, Stripe, and Shopify trust MeetVerse AI
+              <motion.p variants={slideUp} className="text-lg text-silver">
+                See why industry leaders trust MeetVerse AI for their most important meetings
               </motion.p>
             </motion.div>
 
@@ -953,119 +1149,265 @@ export default function LandingPage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={staggerContainer}
-              className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6"
-              role="list"
-              aria-label="Customer testimonials"
+              variants={orchestratedReveal}
+              className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto"
             >
               {[
                 {
-                  quote: "MeetVerse AI has completely transformed how our engineering team collaborates. The AI summaries save us 10+ hours every week. It's not optional anymore — it's essential.",
+                  quote: "MeetVerse AI has completely transformed our engineering standups. What used to take 30 minutes of note-taking now happens automatically. The AI summaries are incredibly accurate.",
                   author: "Sarah Chen",
                   role: "VP of Engineering",
                   company: "Google",
                   avatar: "SC",
-                  companyLogo: "G",
                 },
                 {
-                  quote: "We evaluated 12 different solutions. MeetVerse was the clear winner — the transcription accuracy is unmatched, and the action item detection actually works.",
+                  quote: "We evaluated 12 different solutions. MeetVerse was the clear winner — the transcription accuracy is unmatched, and the action item detection actually works. It's a game-changer.",
                   author: "Michael Roberts",
                   role: "Product Director",
                   company: "Stripe",
                   avatar: "MR",
-                  companyLogo: "S",
                 },
                 {
-                  quote: "After switching to MeetVerse, our meeting follow-through improved by 80%. Nothing falls through the cracks anymore. Our entire company runs on it now.",
+                  quote: "After switching to MeetVerse, our meeting follow-through improved by 80%. Nothing falls through the cracks anymore. Our entire executive team runs on it now.",
                   author: "Emily Watson",
-                  role: "COO",
+                  role: "Chief Operating Officer",
                   company: "Shopify",
                   avatar: "EW",
-                  companyLogo: "SH",
                 },
               ].map((testimonial, i) => (
-                <motion.div key={i} variants={fadeInUp} className="group">
-                  <div className="relative h-full rounded-2xl sm:rounded-3xl border border-graphite bg-charcoal/50 p-5 sm:p-8 hover:border-cyan-500/30 transition-all hover:bg-charcoal/70">
-                    <div className="flex items-center justify-between mb-4 sm:mb-6">
-                      <div className="flex gap-0.5 sm:gap-1">
+                <motion.div key={i} variants={scaleReveal}>
+                  <div className="relative h-full rounded-3xl border border-graphite/40 bg-charcoal/30 p-8 backdrop-blur-sm hover:border-cyan-500/30 transition-all duration-300 group">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex gap-1">
                         {[...Array(5)].map((_, j) => (
-                          <Star key={j} className="w-4 h-4 sm:w-5 sm:h-5 fill-warning text-warning" />
+                          <Star key={j} className="w-5 h-5 fill-amber-400 text-amber-400" />
                         ))}
                       </div>
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-graphite flex items-center justify-center font-bold text-silver text-sm sm:text-base">
-                        {testimonial.companyLogo}
-                      </div>
                     </div>
-                    <p className="text-sm sm:text-base md:text-lg text-pearl mb-6 sm:mb-8 leading-relaxed">"{testimonial.quote}"</p>
-                    <div className="flex items-center gap-3 sm:gap-4">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center font-semibold text-sm sm:text-base text-white">
+                    <blockquote className="text-pearl text-lg leading-relaxed mb-8">
+                      "{testimonial.quote}"
+                    </blockquote>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center font-semibold text-white">
                         {testimonial.avatar}
                       </div>
                       <div>
-                        <div className="font-semibold flex items-center gap-1.5 sm:gap-2 text-sm sm:text-base text-snow">
+                        <div className="font-semibold text-snow flex items-center gap-2">
                           {testimonial.author}
-                          <BadgeCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-info" />
+                          <BadgeCheck className="w-4 h-4 text-cyan-400" />
                         </div>
-                        <div className="text-xs sm:text-sm text-slate">{testimonial.role}, {testimonial.company}</div>
+                        <div className="text-sm text-slate">{testimonial.role}, {testimonial.company}</div>
                       </div>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </motion.div>
+          </div>
+        </section>
 
-            {/* More Testimonials CTA */}
+        {/* ============================================ */}
+        {/* INTEGRATIONS */}
+        {/* ============================================ */}
+        <section className="py-24 lg:py-32 relative overflow-hidden" aria-label="Seamless integrations with your favorite tools">
+          <div className="absolute inset-0 bg-gradient-to-b from-charcoal/30 via-transparent to-transparent" />
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="mt-8 sm:mt-12 text-center"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="text-center mb-16"
             >
-              <Button variant="outline" className="border-graphite hover:bg-graphite/50 text-sm sm:text-base text-pearl">
-                Read more customer stories
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <Zap className="w-4 h-4" />
+                SEAMLESS INTEGRATIONS
+              </motion.span>
+              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Works with your stack
+              </motion.h2>
+              <motion.p variants={slideUp} className="text-lg text-silver max-w-2xl mx-auto">
+                Connect MeetVerse AI with the tools you already use. One-click setup, instant sync.
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={orchestratedReveal}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 max-w-5xl mx-auto"
+            >
+              {[
+                { name: "Google Calendar", icon: Calendar, color: "from-blue-500 to-blue-600" },
+                { name: "Microsoft 365", icon: Globe, color: "from-sky-500 to-sky-600" },
+                { name: "Slack", icon: MessageSquare, color: "from-purple-500 to-purple-600" },
+                { name: "Notion", icon: FileText, color: "from-zinc-400 to-zinc-500" },
+                { name: "Salesforce", icon: Users, color: "from-blue-400 to-blue-500" },
+                { name: "HubSpot", icon: Target, color: "from-orange-500 to-orange-600" },
+                { name: "Jira", icon: BarChart3, color: "from-blue-600 to-blue-700" },
+                { name: "Asana", icon: CheckCircle2, color: "from-rose-500 to-rose-600" },
+                { name: "Linear", icon: Zap, color: "from-indigo-500 to-indigo-600" },
+                { name: "Zoom", icon: Video, color: "from-blue-500 to-blue-600" },
+                { name: "Teams", icon: Users, color: "from-violet-500 to-violet-600" },
+                { name: "Zapier", icon: Sparkles, color: "from-orange-500 to-amber-500" },
+              ].map((integration) => (
+                <motion.div
+                  key={integration.name}
+                  variants={scaleReveal}
+                  className="group"
+                >
+                  <div className="relative rounded-2xl border border-graphite/40 bg-charcoal/30 p-6 backdrop-blur-sm hover:border-cyan-500/30 hover:bg-charcoal/50 transition-all duration-300 text-center cursor-pointer">
+                    <div className={`w-12 h-12 mx-auto rounded-xl bg-gradient-to-br ${integration.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <integration.icon className="w-6 h-6 text-white" />
+                    </div>
+                    <div className="text-sm font-medium text-pearl group-hover:text-snow transition-colors">{integration.name}</div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-12 text-center"
+            >
+              <Link href="#" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+                See all 50+ integrations
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </motion.div>
           </div>
         </section>
 
-        {/* Pricing Section - Responsive */}
-        <section id="pricing" aria-labelledby="pricing-heading" className="py-20 sm:py-32">
-          <div className="container max-w-7xl px-4 sm:px-6">
+        {/* ============================================ */}
+        {/* FAQ SECTION */}
+        {/* ============================================ */}
+        <section className="py-24 lg:py-32" aria-labelledby="faq-heading">
+          <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={orchestratedReveal}
+              className="text-center mb-16"
+            >
+              <motion.span variants={slideUp} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-400 mb-4">
+                <MessageSquare className="w-4 h-4" />
+                FREQUENTLY ASKED QUESTIONS
+              </motion.span>
+              <motion.h2 id="faq-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Got questions?
+              </motion.h2>
+            </motion.div>
+
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={staggerContainer}
-              className="text-center mb-10 sm:mb-16"
+              variants={orchestratedReveal}
+              className="space-y-4"
             >
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-warning/10 border border-warning/30 mb-4 sm:mb-6">
-                <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
-                <span className="text-xs sm:text-sm text-warning">Limited time: 3 months free on annual plans</span>
+              {[
+                {
+                  question: "How accurate is the AI transcription?",
+                  answer: "Our transcription achieves 99%+ accuracy using advanced speech recognition models trained on millions of hours of meeting audio. We support 100+ languages and automatically identify different speakers with speaker diarization technology.",
+                },
+                {
+                  question: "Is my meeting data secure?",
+                  answer: "Absolutely. We use end-to-end encryption for all meetings and transcripts. We're SOC 2 Type II certified, GDPR compliant, and HIPAA ready. Your data is never used to train AI models and you can delete it anytime.",
+                },
+                {
+                  question: "Can I use MeetVerse AI with my existing video platform?",
+                  answer: "Yes! MeetVerse AI integrates seamlessly with Zoom, Google Meet, Microsoft Teams, and other popular platforms. Our AI bot joins as a participant and captures everything automatically—no switching tools required.",
+                },
+                {
+                  question: "How long does setup take?",
+                  answer: "Most teams are up and running in under 2 minutes. Just connect your calendar, and MeetVerse AI will automatically join your scheduled meetings. No complex configuration or IT support needed.",
+                },
+                {
+                  question: "What happens if I exceed my meeting limit?",
+                  answer: "On the free plan, meetings are limited to 45 minutes. If you hit your limit, the recording stops but your meeting continues. Upgrade to Pro for unlimited meeting duration and recordings.",
+                },
+                {
+                  question: "Can I try before committing to a paid plan?",
+                  answer: "Definitely! Our free plan includes all core features with reasonable limits. Plus, all paid plans come with a 30-day money-back guarantee—no questions asked.",
+                },
+              ].map((faq, i) => (
+                <motion.div
+                  key={i}
+                  variants={slideUp}
+                  className="group"
+                >
+                  <details className="rounded-2xl border border-graphite/40 bg-charcoal/30 overflow-hidden hover:border-graphite/60 transition-colors">
+                    <summary className="flex items-center justify-between cursor-pointer px-6 py-5 text-lg font-semibold text-snow list-none select-none">
+                      {faq.question}
+                      <span className="ml-4 flex-shrink-0 w-6 h-6 rounded-full bg-graphite/50 flex items-center justify-center group-open:rotate-45 transition-transform duration-300">
+                        <span className="text-silver text-xl leading-none">+</span>
+                      </span>
+                    </summary>
+                    <div className="px-6 pb-6 text-silver leading-relaxed">
+                      {faq.answer}
+                    </div>
+                  </details>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-12 text-center"
+            >
+              <p className="text-silver mb-4">Still have questions?</p>
+              <Link href="#" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+                <Headphones className="w-4 h-4" />
+                Contact our support team
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* PRICING */}
+        {/* ============================================ */}
+        <section id="pricing" className="py-24 lg:py-32" aria-labelledby="pricing-heading">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={orchestratedReveal}
+              className="text-center mb-16"
+            >
+              <motion.div variants={slideUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6">
+                <Zap className="h-4 w-4 text-amber-400" />
+                <span className="text-sm text-amber-200">Limited time: 3 months free on annual plans</span>
               </motion.div>
-              <motion.h2 id="pricing-heading" variants={fadeInUp} className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-3 sm:mb-4 text-snow">
-                Start free, scale as you grow
+              <motion.h2 id="pricing-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-snow">
+                Start free, scale with confidence
               </motion.h2>
-              <motion.p variants={fadeInUp} className="text-base sm:text-lg text-silver max-w-2xl mx-auto">
-                No credit card required. Start with our free plan and upgrade when you're ready.
+              <motion.p variants={slideUp} className="text-lg text-silver max-w-2xl mx-auto">
+                No credit card required. Start with our free plan and upgrade as your team grows.
               </motion.p>
             </motion.div>
 
-            {/* Pricing Grid - Responsive: 1 col mobile, 2 col tablet, 4 col desktop */}
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              variants={staggerContainer}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto"
+              variants={orchestratedReveal}
+              className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto"
             >
               {[
                 {
                   name: "Free",
                   price: "$0",
                   period: "",
-                  description: "Perfect for trying out",
-                  features: ["45-min meetings", "3 participants", "Basic transcription", "5 recordings/mo"],
+                  description: "For individuals getting started",
+                  features: ["45-minute meetings", "Up to 3 participants", "Basic transcription", "5 recordings/month"],
                   cta: "Get Started",
                   highlighted: false,
                 },
@@ -1073,8 +1415,8 @@ export default function LandingPage() {
                   name: "Pro",
                   price: "$19",
                   period: "/user/mo",
-                  description: "For professionals",
-                  features: ["Unlimited meetings", "50 participants", "Full AI suite", "Unlimited recordings", "Calendar sync"],
+                  description: "For professionals and small teams",
+                  features: ["Unlimited meetings", "Up to 50 participants", "Full AI suite", "Unlimited recordings", "Calendar integrations"],
                   cta: "Start Free Trial",
                   highlighted: true,
                   badge: "Most Popular",
@@ -1083,8 +1425,8 @@ export default function LandingPage() {
                   name: "Business",
                   price: "$39",
                   period: "/user/mo",
-                  description: "For growing teams",
-                  features: ["Everything in Pro", "200 participants", "Admin dashboard", "SSO & analytics", "Priority support"],
+                  description: "For growing organizations",
+                  features: ["Everything in Pro", "Up to 200 participants", "Admin dashboard", "SSO & analytics", "Priority support"],
                   cta: "Start Free Trial",
                   highlighted: false,
                 },
@@ -1092,49 +1434,43 @@ export default function LandingPage() {
                   name: "Enterprise",
                   price: "Custom",
                   period: "",
-                  description: "For large orgs",
-                  features: ["Everything in Business", "Unlimited participants", "Dedicated support", "Custom integrations", "On-premise option"],
+                  description: "For large-scale deployments",
+                  features: ["Everything in Business", "Unlimited participants", "Dedicated success manager", "Custom integrations", "On-premise option"],
                   cta: "Contact Sales",
                   highlighted: false,
                 },
               ].map((plan, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className={`relative group ${plan.highlighted ? "sm:scale-105 sm:z-10" : ""}`}
-                >
+                <motion.div key={i} variants={scaleReveal} className={`relative ${plan.highlighted ? "lg:-translate-y-4" : ""}`}>
                   {plan.badge && (
-                    <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-xs sm:text-sm font-medium z-10 whitespace-nowrap text-white">
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-cyan-600 text-sm font-medium text-white z-10 whitespace-nowrap shadow-lg shadow-cyan-500/20">
                       {plan.badge}
                     </div>
                   )}
-                  <div className={`relative h-full rounded-2xl sm:rounded-3xl border p-5 sm:p-6 transition-all ${
+                  <div className={`relative h-full rounded-3xl border p-6 transition-all duration-300 ${
                     plan.highlighted
-                      ? "border-cyan-500/50 bg-gradient-to-b from-cyan-500/20 to-cyan-700/10 shadow-2xl shadow-cyan-500/20"
-                      : "border-graphite bg-charcoal/50 hover:border-graphite"
+                      ? "border-cyan-500/50 bg-gradient-to-b from-cyan-500/15 via-charcoal/50 to-ink shadow-2xl shadow-cyan-500/10"
+                      : "border-graphite/40 bg-charcoal/30 hover:border-graphite/60"
                   }`}>
-                    <div className="text-base sm:text-lg font-semibold mb-1 text-snow">{plan.name}</div>
-                    <div className="text-xs sm:text-sm text-slate mb-3 sm:mb-4">{plan.description}</div>
-                    <div className="flex items-baseline gap-1 mb-4 sm:mb-6">
-                      <span className="text-3xl sm:text-4xl font-bold text-snow">{plan.price}</span>
+                    <div className="text-lg font-semibold text-snow mb-1">{plan.name}</div>
+                    <div className="text-sm text-slate mb-4">{plan.description}</div>
+                    <div className="flex items-baseline gap-1 mb-6">
+                      <span className="text-4xl font-bold text-snow">{plan.price}</span>
                       {plan.period && <span className="text-slate text-sm">{plan.period}</span>}
                     </div>
-                    <ul className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
+                    <ul className="space-y-3 mb-8">
                       {plan.features.map((feature, j) => (
-                        <li key={j} className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-pearl">
-                          <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-success flex-shrink-0" />
+                        <li key={j} className="flex items-center gap-3 text-sm text-pearl">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                           {feature}
                         </li>
                       ))}
                     </ul>
                     <Link href="/sign-up" className="block">
-                      <Button
-                        className={`w-full py-2.5 sm:py-3 text-sm ${
-                          plan.highlighted
-                            ? "bg-snow text-ink hover:bg-pearl"
-                            : "bg-graphite hover:bg-steel text-pearl"
-                        }`}
-                      >
+                      <Button className={`w-full py-3 rounded-xl transition-all duration-300 ${
+                        plan.highlighted
+                          ? "bg-snow text-ink hover:bg-pearl shadow-lg"
+                          : "bg-graphite/60 hover:bg-graphite text-pearl"
+                      }`}>
                         {plan.cta}
                       </Button>
                     </Link>
@@ -1143,111 +1479,115 @@ export default function LandingPage() {
               ))}
             </motion.div>
 
-            {/* Money Back Guarantee - Responsive */}
             <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="mt-8 sm:mt-12 text-center"
+              className="mt-12 text-center"
             >
-              <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full bg-success/10 border border-success/20">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-success" />
-                <span className="text-xs sm:text-sm text-success">30-day money-back guarantee • No questions asked</span>
+              <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <Shield className="w-5 h-5 text-emerald-400" />
+                <span className="text-emerald-300">30-day money-back guarantee • No questions asked</span>
               </div>
             </motion.div>
           </div>
         </section>
 
-        {/* Final CTA Section - Responsive */}
-        <section aria-label="Get started with MeetVerse AI" className="py-16 sm:py-32">
-          <div className="container max-w-7xl px-4 sm:px-6">
+        {/* ============================================ */}
+        {/* FINAL CTA */}
+        {/* ============================================ */}
+        <section className="py-24 lg:py-32" aria-label="Get started with MeetVerse AI">
+          <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="relative rounded-2xl sm:rounded-[2.5rem] overflow-hidden"
+              className="relative rounded-[2.5rem] overflow-hidden"
             >
+              {/* Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-cyan-600 to-cyan-700" />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent)]" />
               <motion.div
-                className="absolute -top-20 sm:-top-40 -right-20 sm:-right-40 w-40 sm:w-80 h-40 sm:h-80 rounded-full bg-white/10 blur-3xl"
+                className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-white/10 blur-3xl"
                 animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
                 transition={{ duration: 8, repeat: Infinity }}
               />
+              <motion.div
+                className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-cyan-400/20 blur-3xl"
+                animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+                transition={{ duration: 10, repeat: Infinity }}
+              />
 
-              <div className="relative px-5 py-12 sm:px-16 sm:py-24 text-center">
-                {/* Urgency Banner */}
+              {/* Content */}
+              <div className="relative px-8 py-16 sm:px-16 sm:py-24 text-center">
                 <motion.div
-                  initial={{ opacity: 0, y: -20 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-white/20 mb-6 sm:mb-8"
+                  transition={{ delay: 0.2 }}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-8"
                 >
-                  <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
-                  <span className="text-xs sm:text-sm font-medium text-white">Limited time: Get 3 months free</span>
+                  <Rocket className="h-4 w-4 text-white" />
+                  <span className="text-sm font-medium text-white">Join 50,000+ teams transforming meetings</span>
                 </motion.div>
 
                 <motion.h2
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 text-white"
+                  transition={{ delay: 0.3 }}
+                  className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white"
                 >
-                  Join 50,000+ teams already
-                  <br className="hidden sm:block" />
-                  <span className="sm:hidden"> </span>transforming their meetings
+                  Ready to make every
+                  <br />
+                  meeting count?
                 </motion.h2>
+
                 <motion.p
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                  className="text-sm sm:text-base md:text-lg text-white/80 mb-8 sm:mb-10 max-w-2xl mx-auto"
+                  transition={{ delay: 0.4 }}
+                  className="text-lg text-white/80 mb-10 max-w-2xl mx-auto"
                 >
                   Start your free trial today. No credit card required.
                   Setup takes less than 2 minutes.
                 </motion.p>
+
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.4 }}
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4 sm:px-0"
+                  transition={{ delay: 0.5 }}
+                  className="flex flex-col sm:flex-row gap-4 justify-center"
                 >
-                  <Link href="/sign-up" className="w-full sm:w-auto">
-                    <Button size="lg" className="w-full sm:w-auto bg-white text-cyan-600 hover:bg-white/90 px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base font-semibold rounded-xl shadow-xl">
-                      <Rocket className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  <MagneticButton href="/sign-up">
+                    <Button size="lg" className="bg-white text-cyan-600 hover:bg-white/90 px-8 py-6 text-base font-semibold rounded-2xl shadow-xl shadow-black/10">
+                      <Rocket className="mr-2 h-5 w-5" />
                       Start Free Trial
-                      <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                      <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
-                  </Link>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/30 bg-white/10 hover:bg-white/20 px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base rounded-xl text-white">
+                  </MagneticButton>
+                  <Button size="lg" variant="outline" className="border-white/30 bg-white/10 hover:bg-white/20 px-8 py-6 text-base rounded-2xl text-white backdrop-blur-sm">
+                    <Headphones className="mr-2 h-5 w-5" />
                     Talk to Sales
                   </Button>
                 </motion.div>
 
-                {/* Social Proof - Responsive */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: 0.6 }}
-                  className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-white/70 text-xs sm:text-sm"
+                  transition={{ delay: 0.7 }}
+                  className="mt-10 flex flex-wrap items-center justify-center gap-6 text-white/70 text-sm"
                 >
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                    Free forever plan
-                  </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                    No credit card
-                  </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
-                    Cancel anytime
-                  </div>
+                  {["Free forever plan", "No credit card", "Cancel anytime"].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-white" />
+                      {item}
+                    </div>
+                  ))}
                 </motion.div>
               </div>
             </motion.div>
@@ -1255,44 +1595,47 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* Footer - Responsive */}
-      <footer role="contentinfo" aria-label="Site footer" className="border-t border-graphite py-10 sm:py-16">
-        <div className="container max-w-7xl px-4 sm:px-6">
-          {/* Footer Grid - Responsive columns */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 mb-8 sm:mb-12">
-            {/* Brand Column - Full width on mobile */}
-            <div className="col-span-2 sm:col-span-3 md:col-span-2 lg:col-span-2">
-              <Link href="/" className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600">
-                  <Video className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+      {/* ============================================ */}
+      {/* FOOTER */}
+      {/* ============================================ */}
+      <footer className="border-t border-graphite/30 py-16" role="contentinfo">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 mb-12">
+            {/* Brand Column */}
+            <div className="col-span-2">
+              <Link href="/" className="flex items-center gap-3 mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-cyan-600">
+                  <Video className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-lg sm:text-xl font-bold text-snow">MeetVerse<span className="text-cyan-400">AI</span></span>
+                <span className="text-xl font-display font-bold text-snow">
+                  MeetVerse<span className="text-cyan-400">AI</span>
+                </span>
               </Link>
-              <p className="text-xs sm:text-sm text-slate max-w-xs mb-3 sm:mb-4">
+              <p className="text-sm text-slate max-w-xs mb-4">
                 AI-powered video conferencing that makes every meeting count. Trusted by 50,000+ teams worldwide.
               </p>
-              <div className="flex items-center gap-2 sm:gap-3">
-                {["SOC 2", "GDPR"].map((badge) => (
-                  <span key={badge} className="px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs border border-graphite text-slate">
+              <div className="flex items-center gap-3">
+                {["SOC 2", "GDPR", "HIPAA"].map((badge) => (
+                  <span key={badge} className="px-2 py-1 rounded text-xs border border-graphite/40 text-slate">
                     {badge}
                   </span>
                 ))}
               </div>
             </div>
 
-            {/* Footer Link Columns */}
+            {/* Link Columns */}
             {[
-              { title: "Product", links: ["Features", "Pricing", "Security", "Enterprise", "Integrations"] },
-              { title: "Company", links: ["About", "Blog", "Careers", "Press", "Partners"] },
-              { title: "Resources", links: ["Documentation", "Help Center", "API", "Status", "Webinars"] },
-              { title: "Legal", links: ["Privacy", "Terms", "Cookies", "Licenses", "GDPR"] },
+              { title: "Product", links: ["Features", "Pricing", "Integrations", "Security", "Roadmap"] },
+              { title: "Company", links: ["About", "Careers", "Blog", "Press", "Contact"] },
+              { title: "Resources", links: ["Documentation", "Help Center", "API", "Status", "Community"] },
+              { title: "Legal", links: ["Privacy", "Terms", "Cookies", "Licenses"] },
             ].map((section) => (
               <div key={section.title}>
-                <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base text-snow">{section.title}</h4>
-                <ul className="space-y-1.5 sm:space-y-2">
+                <h4 className="font-semibold text-snow mb-4">{section.title}</h4>
+                <ul className="space-y-2">
                   {section.links.map((link) => (
                     <li key={link}>
-                      <Link href="#" className="text-xs sm:text-sm text-slate hover:text-snow transition-colors">
+                      <Link href="#" className="text-sm text-slate hover:text-snow transition-colors">
                         {link}
                       </Link>
                     </li>
@@ -1302,14 +1645,13 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Footer Bottom - Responsive */}
-          <div className="pt-6 sm:pt-8 border-t border-graphite flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-            <p className="text-xs sm:text-sm text-slate order-2 sm:order-1">
+          <div className="pt-8 border-t border-graphite/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-slate">
               © {new Date().getFullYear()} MeetVerse AI. All rights reserved.
             </p>
-            <div className="flex items-center gap-4 sm:gap-6 order-1 sm:order-2">
+            <div className="flex items-center gap-6">
               {["Twitter", "LinkedIn", "GitHub", "YouTube"].map((social) => (
-                <Link key={social} href="#" className="text-xs sm:text-sm text-slate hover:text-snow transition-colors">
+                <Link key={social} href="#" className="text-sm text-slate hover:text-snow transition-colors">
                   {social}
                 </Link>
               ))}

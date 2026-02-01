@@ -1,12 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/shared/providers";
 
-const inter = Inter({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-bricolage",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jakarta",
   weight: ["300", "400", "500", "600", "700", "800"],
 });
 
@@ -66,7 +73,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${bricolage.variable} ${jakarta.variable} font-sans antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>

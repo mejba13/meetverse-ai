@@ -105,11 +105,15 @@ const config: Config = {
       // ============================================
       fontFamily: {
         sans: [
-          "Inter",
+          "var(--font-jakarta)",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
-          "Roboto",
+          "sans-serif",
+        ],
+        display: [
+          "var(--font-bricolage)",
+          "var(--font-jakarta)",
           "sans-serif",
         ],
         mono: [
