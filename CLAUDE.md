@@ -116,7 +116,9 @@ Key architectural choices are documented in `/docs/ADR/`:
 
 ### Styling
 - Tailwind CSS with design tokens in `tailwind.config.ts`
-- Brand colors: Primary Indigo (#6366F1), Secondary Purple (#8B5CF6), Accent Pink (#EC4899)
+- Brand colors: Primary Blue (#00A1FF), Secondary Navy (#1B293D), Surface (#453D3F)
+- Typography: Hanken Grotesk (primary), Dank Mono (monospace)
+- Design: Sharp corners (0px border radius), modern professional aesthetic
 - Dark mode as default, supports light mode via next-themes
 
 ### Environment Variables

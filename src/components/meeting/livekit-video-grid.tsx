@@ -146,7 +146,7 @@ function ParticipantTile({ participant, isLocal, size = "default" }: Participant
         />
       ) : (
         // Camera off state
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
           <Avatar className={cn(isSmall ? "h-12 w-12" : "h-24 w-24")}>
             <AvatarFallback
               className={cn(

@@ -11,8 +11,9 @@ export default function SignInPage() {
   return (
     <div className="flex min-h-screen">
       {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-primary via-purple-600 to-pink-600">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-cyan-500 via-cyan-600 to-cyan-700">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.15),transparent)]" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white">
           <Link href="/" className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 backdrop-blur">
@@ -50,7 +51,7 @@ export default function SignInPage() {
         <div className="mx-auto w-full max-w-md">
           {/* Mobile logo */}
           <Link href="/" className="flex items-center gap-2 lg:hidden mb-8">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-purple-600">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600">
               <Video className="h-4 w-4 text-white" />
             </div>
             <span className="text-xl font-bold">MeetVerse AI</span>

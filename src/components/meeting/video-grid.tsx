@@ -87,7 +87,7 @@ function ParticipantTile({ participant, size = "default" }: ParticipantTileProps
     >
       {participant.isVideoEnabled ? (
         // Video placeholder - in real app, this would be the actual video element
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-purple-500/20">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20">
           {/* Simulated video with avatar */}
           <div className="absolute inset-0 flex items-center justify-center">
             <Avatar className={cn(isSmall ? "h-12 w-12" : "h-24 w-24")}>

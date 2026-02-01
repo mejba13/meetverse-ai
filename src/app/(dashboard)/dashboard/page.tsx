@@ -113,8 +113,8 @@ export default function DashboardPage() {
             {meetingsLoading ? (
               <div className="space-y-3 sm:space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4">
-                    <Skeleton className="h-10 w-10 rounded-lg" />
+                  <div key={i} className="flex items-center gap-3 sm:gap-4 border p-3 sm:p-4">
+                    <Skeleton className="h-10 w-10" />
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-3/4" />
                       <Skeleton className="h-3 w-1/2" />
@@ -166,7 +166,7 @@ export default function DashboardPage() {
             <Button variant="outline" className="justify-start h-auto py-2.5 sm:py-3" asChild>
               <Link href="/meetings/new">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center border bg-primary/10">
                     <Video className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div className="text-left">
@@ -181,8 +181,8 @@ export default function DashboardPage() {
             <Button variant="outline" className="justify-start h-auto py-2.5 sm:py-3" asChild>
               <Link href="/meetings/schedule">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-purple-500/10">
-                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center bg-secondary/30">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div className="text-left">
                     <div className="font-medium text-sm sm:text-base">Schedule Meeting</div>
@@ -196,8 +196,8 @@ export default function DashboardPage() {
             <Button variant="outline" className="justify-start h-auto py-2.5 sm:py-3" asChild>
               <Link href="/meetings/join">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-pink-500/10">
-                    <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-pink-500" />
+                  <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center bg-primary/20">
+                    <LogIn className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   </div>
                   <div className="text-left">
                     <div className="font-medium text-sm sm:text-base">Join Meeting</div>
@@ -225,8 +225,8 @@ export default function DashboardPage() {
             {meetingsLoading ? (
               <div className="space-y-3 sm:space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4">
-                    <Skeleton className="h-10 w-10 rounded-lg" />
+                  <div key={i} className="flex items-center gap-3 sm:gap-4 border p-3 sm:p-4">
+                    <Skeleton className="h-10 w-10" />
                     <div className="flex-1 space-y-2">
                       <Skeleton className="h-4 w-3/4" />
                       <Skeleton className="h-3 w-1/2" />
@@ -247,10 +247,10 @@ export default function DashboardPage() {
                 {pastMeetings.map((meeting) => (
                   <div
                     key={meeting.id}
-                    className="flex items-center justify-between rounded-lg border p-3 sm:p-4 transition-colors hover:bg-muted/50"
+                    className="flex items-center justify-between border p-3 sm:p-4 transition-colors hover:bg-muted/50"
                   >
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-muted">
+                      <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center border bg-muted">
                         <Video className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                       </div>
                       <div>
@@ -277,13 +277,13 @@ export default function DashboardPage() {
         </Card>
 
         {/* AI Features Card */}
-        <Card className="bg-gradient-to-br from-primary/5 via-purple-500/5 to-pink-500/5">
+        <Card className="bg-gradient-to-br from-primary/5 via-primary/10 to-secondary/5">
           <CardHeader className="pb-2 sm:pb-4">
             <CardTitle className="text-base sm:text-lg">AI Features</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 sm:space-y-4">
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+              <div className="flex h-8 w-8 items-center justify-center border bg-primary/10">
                 <CheckSquare className="h-4 w-4 text-primary" />
               </div>
               <div>
@@ -294,8 +294,8 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10">
-                <Users className="h-4 w-4 text-purple-500" />
+              <div className="flex h-8 w-8 items-center justify-center bg-secondary/30">
+                <Users className="h-4 w-4 text-primary" />
               </div>
               <div>
                 <p className="font-medium text-sm">Action Items</p>
@@ -305,8 +305,8 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/10">
-                <Video className="h-4 w-4 text-pink-500" />
+              <div className="flex h-8 w-8 items-center justify-center bg-primary/20">
+                <Video className="h-4 w-4 text-primary" />
               </div>
               <div>
                 <p className="font-medium text-sm">Meeting Summaries</p>
@@ -377,9 +377,9 @@ function MeetingItem({
   isLive?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border p-3 sm:p-4 transition-colors hover:bg-muted/50">
+    <div className="flex items-center justify-between border p-3 sm:p-4 transition-colors hover:bg-muted/50">
       <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-        <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
+        <div className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center border bg-primary/10 flex-shrink-0">
           <Video className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
         </div>
         <div className="min-w-0 flex-1">
