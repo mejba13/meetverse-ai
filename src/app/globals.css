@@ -73,7 +73,7 @@
 }
 
 /* ============================================
-   BASE STYLES
+   BASE TYPOGRAPHY STYLES
    ============================================ */
 
 @layer base {
@@ -85,51 +85,203 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "pnum" 1, "tnum" 0, "onum" 0, "lnum" 1, "rlig" 1;
   }
 
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-optical-sizing: auto;
   }
 
-  /* Focus States - Accessible and beautiful */
-  *:focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  /* ============================================
+     TYPOGRAPHY HIERARCHY
+     ============================================ */
+
+  /* Display Headings - Hero sections */
+  .display-2xl {
+    @apply font-display text-display-2xl tracking-tight;
   }
 
-  /* Selection color */
-  ::selection {
-    @apply bg-primary/20 text-foreground;
+  .display-xl {
+    @apply font-display text-display-xl tracking-tight;
   }
 
-  /* Headings */
+  .display-lg {
+    @apply font-display text-display-lg tracking-tight;
+  }
+
+  .display-md {
+    @apply font-display text-display-md;
+  }
+
+  .display-sm {
+    @apply font-display text-display-sm;
+  }
+
+  /* Semantic Headings */
   h1 {
-    @apply text-display-lg tracking-tight;
+    @apply font-display text-display-lg tracking-tight;
   }
 
   h2 {
-    @apply text-display-md tracking-tight;
+    @apply font-display text-display-md;
   }
 
   h3 {
-    @apply text-heading-lg;
+    @apply font-display text-heading-lg;
   }
 
   h4 {
-    @apply text-heading-md;
+    @apply font-display text-heading-md;
   }
 
   h5 {
-    @apply text-heading-sm;
+    @apply font-display text-heading-sm;
   }
 
   h6 {
-    @apply text-body-lg font-semibold;
+    @apply font-sans text-body-lg font-semibold;
+  }
+
+  /* Body Text */
+  p {
+    @apply text-body-md;
+  }
+
+  .lead {
+    @apply text-body-xl text-muted-foreground;
+  }
+
+  .prose {
+    @apply text-body-md leading-relaxed;
+  }
+
+  /* Small Text */
+  small {
+    @apply text-body-sm;
+  }
+
+  /* Code */
+  code {
+    @apply font-mono text-body-sm bg-muted px-1.5 py-0.5 rounded;
+  }
+
+  pre {
+    @apply font-mono text-body-sm;
   }
 
   /* Links */
   a {
     @apply transition-colors duration-fast;
+  }
+
+  /* Focus States */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+
+  /* Strong emphasis */
+  strong, b {
+    @apply font-semibold;
+  }
+
+  /* Italic */
+  em, i {
+    @apply italic;
+  }
+}
+
+/* ============================================
+   TYPOGRAPHY UTILITIES
+   ============================================ */
+
+@layer utilities {
+  /* Text Balance for Headlines */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-vibrant {
+    @apply bg-gradient-to-r from-cyan-300 via-violet-400 to-purple-400 bg-clip-text text-transparent;
+    background-size: 200% auto;
+  }
+
+  .text-gradient-shimmer {
+    @apply bg-gradient-to-r from-cyan-300 via-violet-400 to-purple-400 bg-clip-text text-transparent;
+    background-size: 200% auto;
+    animation: text-shimmer 3s linear infinite;
+  }
+
+  /* Optical Adjustments */
+  .optical-size-auto {
+    font-optical-sizing: auto;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .proportional-nums {
+    font-variant-numeric: proportional-nums;
+  }
+
+  /* Caps Variations */
+  .small-caps {
+    font-variant-caps: small-caps;
+  }
+
+  .all-small-caps {
+    font-variant-caps: all-small-caps;
+  }
+
+  /* Line Clamp */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-4 {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Drop Caps */
+  .drop-cap::first-letter {
+    @apply float-left font-display text-5xl font-bold leading-none mr-2 mt-1;
+    color: theme('colors.primary.DEFAULT');
   }
 }
 
@@ -148,10 +300,6 @@
   }
 
   /* Gradient Utilities */
-  .gradient-text {
-    @apply bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent;
-  }
-
   .gradient-bg {
     @apply bg-gradient-to-br from-cyan-500/10 via-transparent to-cyan-500/5;
   }
@@ -177,7 +325,7 @@
   /* Button Base */
   .btn {
     @apply inline-flex items-center justify-center gap-2;
-    @apply font-medium text-sm tracking-wide;
+    @apply font-medium text-body-sm tracking-wide;
     @apply transition-all duration-normal;
     @apply disabled:opacity-50 disabled:pointer-events-none;
   }
@@ -209,7 +357,7 @@
   /* Input Base */
   .input-base {
     @apply w-full bg-card border border-border rounded-md;
-    @apply px-4 py-3 text-sm text-foreground;
+    @apply px-4 py-3 text-body-sm text-foreground;
     @apply transition-all duration-normal;
     @apply placeholder:text-muted-foreground;
     @apply hover:border-muted-foreground/30;
@@ -264,7 +412,7 @@
   /* Badge */
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5;
-    @apply text-xs font-medium tracking-wide;
+    @apply text-caption tracking-wide;
     @apply border rounded-md;
   }
 
@@ -291,7 +439,7 @@
   /* Sidebar */
   .sidebar-item {
     @apply flex items-center gap-3 px-3 py-2.5 rounded-md;
-    @apply text-sm text-muted-foreground;
+    @apply text-body-sm text-muted-foreground;
     @apply transition-colors duration-fast;
     @apply hover:bg-muted hover:text-foreground;
   }
@@ -331,7 +479,7 @@
   }
 
   .empty-state-title {
-    @apply text-heading-md text-foreground mb-2;
+    @apply font-display text-heading-md text-foreground mb-2;
   }
 
   .empty-state-description {
@@ -340,7 +488,7 @@
 }
 
 /* ============================================
-   UTILITY CLASSES
+   SCROLLBAR UTILITIES
    ============================================ */
 
 @layer utilities {
@@ -378,11 +526,6 @@
     background: hsl(var(--muted-foreground));
   }
 
-  /* Text Gradient */
-  .text-gradient {
-    @apply bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent;
-  }
-
   /* Glow Effects */
   .glow {
     @apply shadow-glow;
@@ -418,28 +561,6 @@
     animation-delay: 1000ms;
   }
 
-  /* Line Clamp */
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
   /* Container Query Support */
   .container-query {
     container-type: inline-size;
@@ -473,25 +594,13 @@
   animation: highlight-fade 2s ease-out;
 }
 
-/* ============================================
-   RESPONSIVE TYPOGRAPHY
-   ============================================ */
-
-@media (max-width: 640px) {
-  .text-display-xl {
-    font-size: 2.5rem;
+/* Text shimmer animation */
+@keyframes text-shimmer {
+  0% {
+    background-position: 0% 50%;
   }
-
-  .text-display-lg {
-    font-size: 2rem;
-  }
-
-  .text-display-md {
-    font-size: 1.75rem;
-  }
-
-  .text-display-sm {
-    font-size: 1.5rem;
+  100% {
+    background-position: 200% 50%;
   }
 }
 

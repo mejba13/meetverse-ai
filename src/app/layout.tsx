@@ -1,20 +1,38 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
+import { Space_Grotesk, DM_Sans, Fira_Code } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/shared/providers";
 
-const bricolage = Bricolage_Grotesque({
+// ============================================
+// TRENDING TYPOGRAPHY SYSTEM 2024-2025
+// ============================================
+
+// Display Font: Space Grotesk - Sharp, geometric, tech-forward
+// Trending for SaaS, AI products, and modern tech brands
+// Similar vibe to Clash Display / Cabinet Grotesk
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-bricolage",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-display",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
-const jakarta = Plus_Jakarta_Sans({
+// Body Font: DM Sans - Clean, modern, excellent readability
+// Trending alternative to Satoshi/General Sans
+// Perfect balance of geometric and humanist qualities
+const dmSans = DM_Sans({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-jakarta",
-  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+// Mono Font: Fira Code - Modern, ligature-enabled monospace
+const firaCode = Fira_Code({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-mono",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -62,7 +80,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#FAFAFA" },
-    { media: "(prefers-color-scheme: dark)", color: "#0A0A0B" },
+    { media: "(prefers-color-scheme: dark)", color: "#030014" },
   ],
 };
 
@@ -73,7 +91,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage.variable} ${jakarta.variable} font-sans antialiased`}>
+      <body
+        className={`
+          ${spaceGrotesk.variable}
+          ${dmSans.variable}
+          ${firaCode.variable}
+          font-sans antialiased
+        `}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -101,46 +101,190 @@ const config: Config = {
       },
 
       // ============================================
-      // TYPOGRAPHY
+      // TYPOGRAPHY - TRENDING 2024-2025
       // ============================================
       fontFamily: {
+        // Primary sans-serif for body text (DM Sans)
+        // Clean, modern, excellent x-height for screens
         sans: [
-          "var(--font-jakarta)",
+          "var(--font-sans)",
           "-apple-system",
           "BlinkMacSystemFont",
-          "Segoe UI",
+          "system-ui",
           "sans-serif",
         ],
+        // Display font for headlines (Space Grotesk)
+        // Sharp geometric forms, tech-forward aesthetic
         display: [
-          "var(--font-bricolage)",
-          "var(--font-jakarta)",
+          "var(--font-display)",
+          "var(--font-sans)",
+          "-apple-system",
           "sans-serif",
         ],
+        // Monospace for code (Fira Code)
+        // Ligature-enabled, modern developer font
         mono: [
-          "JetBrains Mono",
+          "var(--font-mono)",
           "SF Mono",
           "Consolas",
+          "Monaco",
           "monospace",
         ],
       },
 
+      // Fluid typography scale with optical sizing
       fontSize: {
-        // Display sizes
-        "display-xl": ["4.5rem", { lineHeight: "1", fontWeight: "700", letterSpacing: "-0.03em" }],
-        "display-lg": ["3.5rem", { lineHeight: "1.1", fontWeight: "700", letterSpacing: "-0.025em" }],
-        "display-md": ["2.75rem", { lineHeight: "1.15", fontWeight: "600", letterSpacing: "-0.02em" }],
-        "display-sm": ["2.25rem", { lineHeight: "1.2", fontWeight: "600", letterSpacing: "-0.015em" }],
-        // Heading sizes
-        "heading-lg": ["1.75rem", { lineHeight: "1.3", fontWeight: "600", letterSpacing: "-0.01em" }],
-        "heading-md": ["1.375rem", { lineHeight: "1.35", fontWeight: "600", letterSpacing: "-0.01em" }],
-        "heading-sm": ["1.125rem", { lineHeight: "1.4", fontWeight: "600", letterSpacing: "0" }],
-        // Body sizes
-        "body-lg": ["1.125rem", { lineHeight: "1.6", fontWeight: "400", letterSpacing: "0" }],
-        "body-md": ["1rem", { lineHeight: "1.6", fontWeight: "400", letterSpacing: "0" }],
-        "body-sm": ["0.875rem", { lineHeight: "1.5", fontWeight: "400", letterSpacing: "0.01em" }],
-        // Utility sizes
-        caption: ["0.75rem", { lineHeight: "1.5", fontWeight: "500", letterSpacing: "0.02em" }],
-        overline: ["0.6875rem", { lineHeight: "1.4", fontWeight: "600", letterSpacing: "0.1em" }],
+        // ============================================
+        // DISPLAY SIZES - For hero headlines
+        // ============================================
+        "display-2xl": [
+          "clamp(3.5rem, 8vw, 6rem)",
+          {
+            lineHeight: "0.95",
+            letterSpacing: "-0.035em",
+            fontWeight: "700",
+          },
+        ],
+        "display-xl": [
+          "clamp(3rem, 6vw, 4.5rem)",
+          {
+            lineHeight: "1",
+            letterSpacing: "-0.03em",
+            fontWeight: "700",
+          },
+        ],
+        "display-lg": [
+          "clamp(2.25rem, 5vw, 3.5rem)",
+          {
+            lineHeight: "1.05",
+            letterSpacing: "-0.025em",
+            fontWeight: "700",
+          },
+        ],
+        "display-md": [
+          "clamp(1.875rem, 4vw, 2.75rem)",
+          {
+            lineHeight: "1.1",
+            letterSpacing: "-0.02em",
+            fontWeight: "600",
+          },
+        ],
+        "display-sm": [
+          "clamp(1.5rem, 3vw, 2.25rem)",
+          {
+            lineHeight: "1.15",
+            letterSpacing: "-0.015em",
+            fontWeight: "600",
+          },
+        ],
+
+        // ============================================
+        // HEADING SIZES - For section titles
+        // ============================================
+        "heading-xl": [
+          "2rem",
+          {
+            lineHeight: "1.2",
+            letterSpacing: "-0.015em",
+            fontWeight: "600",
+          },
+        ],
+        "heading-lg": [
+          "1.5rem",
+          {
+            lineHeight: "1.25",
+            letterSpacing: "-0.01em",
+            fontWeight: "600",
+          },
+        ],
+        "heading-md": [
+          "1.25rem",
+          {
+            lineHeight: "1.3",
+            letterSpacing: "-0.01em",
+            fontWeight: "600",
+          },
+        ],
+        "heading-sm": [
+          "1.125rem",
+          {
+            lineHeight: "1.4",
+            letterSpacing: "-0.005em",
+            fontWeight: "600",
+          },
+        ],
+
+        // ============================================
+        // BODY SIZES - For content text
+        // ============================================
+        "body-xl": [
+          "1.25rem",
+          {
+            lineHeight: "1.6",
+            letterSpacing: "0",
+            fontWeight: "400",
+          },
+        ],
+        "body-lg": [
+          "1.125rem",
+          {
+            lineHeight: "1.65",
+            letterSpacing: "0",
+            fontWeight: "400",
+          },
+        ],
+        "body-md": [
+          "1rem",
+          {
+            lineHeight: "1.6",
+            letterSpacing: "0",
+            fontWeight: "400",
+          },
+        ],
+        "body-sm": [
+          "0.875rem",
+          {
+            lineHeight: "1.55",
+            letterSpacing: "0.01em",
+            fontWeight: "400",
+          },
+        ],
+        "body-xs": [
+          "0.8125rem",
+          {
+            lineHeight: "1.5",
+            letterSpacing: "0.01em",
+            fontWeight: "400",
+          },
+        ],
+
+        // ============================================
+        // UTILITY SIZES - For labels, badges, etc.
+        // ============================================
+        caption: [
+          "0.75rem",
+          {
+            lineHeight: "1.5",
+            letterSpacing: "0.02em",
+            fontWeight: "500",
+          },
+        ],
+        overline: [
+          "0.6875rem",
+          {
+            lineHeight: "1.4",
+            letterSpacing: "0.12em",
+            fontWeight: "600",
+          },
+        ],
+        micro: [
+          "0.625rem",
+          {
+            lineHeight: "1.4",
+            letterSpacing: "0.04em",
+            fontWeight: "500",
+          },
+        ],
       },
 
       // ============================================
@@ -165,20 +309,22 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
         xl: "16px",
         "2xl": "24px",
+        "3xl": "32px",
       },
 
       // ============================================
       // SHADOWS
       // ============================================
       boxShadow: {
-        "xs": "0 1px 2px rgba(0, 0, 0, 0.05)",
-        "sm": "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
-        "md": "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
-        "lg": "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
-        "xl": "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)",
+        xs: "0 1px 2px rgba(0, 0, 0, 0.05)",
+        sm: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        md: "0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)",
+        lg: "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
+        xl: "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)",
         "2xl": "0 25px 50px rgba(0, 0, 0, 0.25)",
-        "glow": "0 0 20px rgba(6, 182, 212, 0.3)",
+        glow: "0 0 20px rgba(6, 182, 212, 0.3)",
         "glow-lg": "0 0 40px rgba(6, 182, 212, 0.4)",
+        "glow-violet": "0 0 30px rgba(139, 92, 246, 0.3)",
         "inner-glow": "inset 0 0 20px rgba(6, 182, 212, 0.1)",
       },
 
@@ -188,15 +334,16 @@ const config: Config = {
       transitionTimingFunction: {
         "ease-smooth": "cubic-bezier(0.25, 0.1, 0.25, 1)",
         "ease-bounce": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
+        "ease-out-expo": "cubic-bezier(0.19, 1, 0.22, 1)",
       },
 
       transitionDuration: {
-        "instant": "50ms",
-        "fast": "100ms",
-        "normal": "200ms",
-        "slow": "300ms",
-        "slower": "500ms",
-        "slowest": "800ms",
+        instant: "50ms",
+        fast: "100ms",
+        normal: "200ms",
+        slow: "300ms",
+        slower: "500ms",
+        slowest: "800ms",
       },
 
       keyframes: {
@@ -228,17 +375,27 @@ const config: Config = {
           from: { opacity: "0", transform: "scale(0.95)" },
           to: { opacity: "1", transform: "scale(1)" },
         },
-        "shimmer": {
+        shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
         "pulse-glow": {
-          "0%, 100%": { opacity: "1", boxShadow: "0 0 20px rgba(6, 182, 212, 0.3)" },
-          "50%": { opacity: "0.8", boxShadow: "0 0 40px rgba(6, 182, 212, 0.5)" },
+          "0%, 100%": {
+            opacity: "1",
+            boxShadow: "0 0 20px rgba(6, 182, 212, 0.3)",
+          },
+          "50%": {
+            opacity: "0.8",
+            boxShadow: "0 0 40px rgba(6, 182, 212, 0.5)",
+          },
         },
-        "float": {
+        float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-10px)" },
+        },
+        "text-shimmer": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "100% 50%" },
         },
       },
 
@@ -250,9 +407,10 @@ const config: Config = {
         "slide-up": "slide-up 0.3s ease-out",
         "slide-down": "slide-down 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
-        "shimmer": "shimmer 1.5s ease-in-out infinite",
+        shimmer: "shimmer 1.5s ease-in-out infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "float": "float 3s ease-in-out infinite",
+        float: "float 3s ease-in-out infinite",
+        "text-shimmer": "text-shimmer 3s ease-in-out infinite",
       },
 
       // ============================================
