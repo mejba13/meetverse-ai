@@ -73,7 +73,8 @@
 }
 
 /* ============================================
-   BASE TYPOGRAPHY STYLES
+   MODERN TYPOGRAPHY - WEBFLOW STYLE
+   Clean, bold, professional sans-serif
    ============================================ */
 
 @layer base {
@@ -86,58 +87,70 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "pnum" 1, "tnum" 0, "onum" 0, "lnum" 1, "rlig" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-optical-sizing: auto;
+    letter-spacing: -0.011em;
   }
 
   /* ============================================
      TYPOGRAPHY HIERARCHY
+     Modern Sans-Serif System
      ============================================ */
 
-  /* Display Headings - Hero sections */
+  /* Display Headings - Bold, clean, impactful */
   .display-2xl {
-    @apply font-display text-display-2xl tracking-tight;
+    @apply font-sans text-display-2xl font-bold;
+    letter-spacing: -0.03em;
   }
 
   .display-xl {
-    @apply font-display text-display-xl tracking-tight;
+    @apply font-sans text-display-xl font-bold;
+    letter-spacing: -0.025em;
   }
 
   .display-lg {
-    @apply font-display text-display-lg tracking-tight;
+    @apply font-sans text-display-lg font-bold;
+    letter-spacing: -0.02em;
   }
 
   .display-md {
-    @apply font-display text-display-md;
+    @apply font-sans text-display-md font-semibold;
+    letter-spacing: -0.02em;
   }
 
   .display-sm {
-    @apply font-display text-display-sm;
+    @apply font-sans text-display-sm font-semibold;
+    letter-spacing: -0.015em;
   }
 
   /* Semantic Headings */
   h1 {
-    @apply font-display text-display-lg tracking-tight;
+    @apply font-sans text-display-lg font-bold;
+    letter-spacing: -0.02em;
   }
 
   h2 {
-    @apply font-display text-display-md;
+    @apply font-sans text-display-md font-bold;
+    letter-spacing: -0.02em;
   }
 
   h3 {
-    @apply font-display text-heading-lg;
+    @apply font-sans text-heading-lg font-semibold;
+    letter-spacing: -0.015em;
   }
 
   h4 {
-    @apply font-display text-heading-md;
+    @apply font-sans text-heading-md font-semibold;
+    letter-spacing: -0.01em;
   }
 
   h5 {
-    @apply font-display text-heading-sm;
+    @apply font-sans text-heading-sm font-semibold;
+    letter-spacing: -0.01em;
   }
 
   h6 {
@@ -147,10 +160,12 @@
   /* Body Text */
   p {
     @apply text-body-md;
+    line-height: 1.6;
   }
 
   .lead {
     @apply text-body-xl text-muted-foreground;
+    line-height: 1.5;
   }
 
   .prose {
@@ -183,7 +198,7 @@
 
   /* Selection */
   ::selection {
-    @apply bg-primary/20 text-foreground;
+    @apply bg-cyan-500/30 text-foreground;
   }
 
   /* Strong emphasis */
@@ -194,6 +209,17 @@
   /* Italic */
   em, i {
     @apply italic;
+  }
+
+  /* Overline/Label Style */
+  .overline-text {
+    @apply font-sans text-overline uppercase tracking-widest font-semibold;
+  }
+
+  /* Blockquote */
+  blockquote {
+    @apply font-sans text-xl font-medium;
+    letter-spacing: -0.01em;
   }
 }
 
@@ -211,20 +237,41 @@
     text-wrap: pretty;
   }
 
-  /* Gradient Text */
+  /* Gradient Text - Premium */
   .text-gradient {
-    @apply bg-gradient-to-r from-cyan-400 to-cyan-600 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-400 to-cyan-500 bg-clip-text text-transparent;
   }
 
   .text-gradient-vibrant {
-    @apply bg-gradient-to-r from-cyan-300 via-violet-400 to-purple-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-300 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent;
     background-size: 200% auto;
   }
 
   .text-gradient-shimmer {
-    @apply bg-gradient-to-r from-cyan-300 via-violet-400 to-purple-400 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-cyan-300 via-violet-400 to-fuchsia-400 bg-clip-text text-transparent;
     background-size: 200% auto;
     animation: text-shimmer 3s linear infinite;
+  }
+
+  /* Premium Editorial Gradient - Subtle elegance */
+  .text-gradient-editorial {
+    @apply bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent;
+  }
+
+  /* Accent underline for display text */
+  .accent-underline {
+    position: relative;
+    display: inline-block;
+  }
+  .accent-underline::after {
+    content: '';
+    position: absolute;
+    bottom: 0.1em;
+    left: 0;
+    right: 0;
+    height: 0.08em;
+    background: linear-gradient(90deg, theme('colors.cyan.400'), theme('colors.violet.400'));
+    border-radius: 1px;
   }
 
   /* Optical Adjustments */
@@ -280,8 +327,30 @@
 
   /* Drop Caps */
   .drop-cap::first-letter {
-    @apply float-left font-display text-5xl font-bold leading-none mr-2 mt-1;
+    @apply float-left font-sans text-5xl font-bold leading-none mr-3 mt-1;
     color: theme('colors.primary.DEFAULT');
+  }
+
+  /* Headline Classes */
+  .headline-bold {
+    @apply font-sans font-bold;
+    letter-spacing: -0.03em;
+  }
+
+  .headline-medium {
+    @apply font-sans font-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  /* Quote Style */
+  .quote-text {
+    @apply font-sans text-xl font-medium leading-relaxed;
+  }
+
+  /* Label/Badge Typography */
+  .label-text {
+    @apply font-sans text-xs font-semibold uppercase;
+    letter-spacing: 0.05em;
   }
 }
 

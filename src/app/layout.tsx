@@ -1,34 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, DM_Sans, Fira_Code } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/shared/providers";
 
 // ============================================
-// TRENDING TYPOGRAPHY SYSTEM 2024-2025
+// MODERN TYPOGRAPHY SYSTEM - WEBFLOW STYLE
+// Clean, bold, professional sans-serif
 // ============================================
 
-// Display Font: Space Grotesk - Sharp, geometric, tech-forward
-// Trending for SaaS, AI products, and modern tech brands
-// Similar vibe to Clash Display / Cabinet Grotesk
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-display",
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-// Body Font: DM Sans - Clean, modern, excellent readability
-// Trending alternative to Satoshi/General Sans
-// Perfect balance of geometric and humanist qualities
-const dmSans = DM_Sans({
+// Primary Font: Inter - The industry standard
+// Used by GitHub, Figma, Linear, Stripe, and most modern SaaS
+// Excellent readability, beautiful at all weights
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-sans",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
-// Mono Font: Fira Code - Modern, ligature-enabled monospace
-const firaCode = Fira_Code({
+// Mono Font: JetBrains Mono - Clean developer font
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-mono",
@@ -93,9 +84,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`
-          ${spaceGrotesk.variable}
-          ${dmSans.variable}
-          ${firaCode.variable}
+          ${inter.variable}
+          ${jetbrainsMono.variable}
           font-sans antialiased
         `}
       >

@@ -412,10 +412,10 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-xl font-bold tracking-tight">
+                    <span className="text-xl font-semibold tracking-tight">
                       MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
                     </span>
-                    <span className="text-[10px] text-white/40 tracking-widest uppercase">Intelligent Meetings</span>
+                    <span className="text-[10px] text-white/40 tracking-[0.15em] uppercase">Intelligent Meetings</span>
                   </div>
                 </Link>
 
@@ -560,14 +560,14 @@ export default function LandingPage() {
                   </motion.div>
                 </motion.div>
 
-                {/* Main Headline */}
+                {/* Main Headline - Bold Sans-Serif */}
                 <motion.h1
                   variants={slideUp}
-                  className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold tracking-tight leading-[0.95]"
+                  className="text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-bold leading-[0.95] tracking-tight"
                 >
                   <span className="block text-white mb-2">Meetings that</span>
                   <span className="relative inline-block">
-                    <GradientText className="font-display">actually work</GradientText>
+                    <GradientText>actually work</GradientText>
                     <motion.span
                       className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-violet-500/20 to-purple-500/20 blur-3xl rounded-full -z-10"
                       animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.05, 1] }}
@@ -932,7 +932,7 @@ export default function LandingPage() {
                 <BarChart3 className="w-4 h-4 text-cyan-400" />
                 <span className="text-sm text-white/60">The Meeting Productivity Gap</span>
               </motion.div>
-              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Stop losing </span>
                 <GradientText>31 hours</GradientText>
                 <span className="text-white"> monthly</span>
@@ -989,7 +989,7 @@ export default function LandingPage() {
                 <Wand2 className="w-4 h-4 text-violet-400" />
                 <span className="text-sm text-white/60">Powerful Capabilities</span>
               </motion.div>
-              <motion.h2 id="features-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 id="features-heading" variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Everything for </span>
                 <GradientText>smarter meetings</GradientText>
               </motion.h2>
@@ -1022,7 +1022,7 @@ export default function LandingPage() {
                           Most Popular
                         </div>
                       </div>
-                      <h3 className="font-display text-2xl lg:text-3xl font-bold text-white mb-4">
+                      <h3 className="font-sans text-xl lg:text-2xl font-bold text-white mb-4 tracking-tight">
                         AI Meeting Co-Pilot
                       </h3>
                       <p className="text-white/60 text-lg mb-8 max-w-md">
@@ -1112,7 +1112,7 @@ export default function LandingPage() {
                 <Layers className="w-4 h-4 text-emerald-400" />
                 <span className="text-sm text-white/60">Simple Workflow</span>
               </motion.div>
-              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Up and running in </span>
                 <GradientText>2 minutes</GradientText>
               </motion.h2>
@@ -1186,7 +1186,7 @@ export default function LandingPage() {
                 <Award className="w-4 h-4 text-amber-400" />
                 <span className="text-sm text-white/60">The Difference</span>
               </motion.div>
-              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Not just another </span>
                 <GradientText>meeting tool</GradientText>
               </motion.h2>
@@ -1262,7 +1262,7 @@ export default function LandingPage() {
                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                 <span className="text-sm text-white/60">Customer Success</span>
               </motion.div>
-              <motion.h2 id="testimonials-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 id="testimonials-heading" variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Loved by </span>
                 <GradientText>50,000+ teams</GradientText>
               </motion.h2>
@@ -1344,7 +1344,7 @@ export default function LandingPage() {
                 <Zap className="w-4 h-4 text-amber-400" />
                 <span className="text-sm text-white/60">Seamless Integrations</span>
               </motion.div>
-              <motion.h2 variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Works with </span>
                 <GradientText>your stack</GradientText>
               </motion.h2>
@@ -1412,7 +1412,7 @@ export default function LandingPage() {
                 <MessageSquare className="w-4 h-4 text-cyan-400" />
                 <span className="text-sm text-white/60">FAQ</span>
               </motion.div>
-              <motion.h2 id="faq-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 id="faq-heading" variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Got </span>
                 <GradientText>questions?</GradientText>
               </motion.h2>
@@ -1483,7 +1483,7 @@ export default function LandingPage() {
                 <Zap className="h-4 w-4 text-amber-400" />
                 <span className="text-sm text-amber-200">Limited: 3 months free on annual</span>
               </motion.div>
-              <motion.h2 id="pricing-heading" variants={slideUp} className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
+              <motion.h2 id="pricing-heading" variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
                 <span className="text-white">Start free, </span>
                 <GradientText>scale confidently</GradientText>
               </motion.h2>
@@ -1704,7 +1704,7 @@ export default function LandingPage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.3 }}
-                  className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-white"
+                  className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 text-white tracking-tight"
                 >
                   Ready to transform
                   <br />
@@ -1773,11 +1773,11 @@ export default function LandingPage() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-500">
                   <Video className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-xl font-bold text-white">
+                <span className="text-xl font-semibold text-white tracking-tight">
                   MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
                 </span>
               </Link>
-              <p className="text-sm text-white/50 max-w-xs mb-6">
+              <p className="text-sm text-white/50 max-w-xs mb-6 leading-relaxed">
                 AI-powered meetings that make every conversation count. Trusted by 50,000+ teams worldwide.
               </p>
               <div className="flex items-center gap-3">

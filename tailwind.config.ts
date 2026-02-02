@@ -101,28 +101,28 @@ const config: Config = {
       },
 
       // ============================================
-      // TYPOGRAPHY - TRENDING 2024-2025
+      // MODERN TYPOGRAPHY - WEBFLOW STYLE
       // ============================================
       fontFamily: {
-        // Primary sans-serif for body text (DM Sans)
-        // Clean, modern, excellent x-height for screens
+        // Primary Font: Inter - Industry standard
+        // Clean, modern, professional
         sans: [
           "var(--font-sans)",
+          "system-ui",
           "-apple-system",
           "BlinkMacSystemFont",
-          "system-ui",
+          "Segoe UI",
+          "Roboto",
           "sans-serif",
         ],
-        // Display font for headlines (Space Grotesk)
-        // Sharp geometric forms, tech-forward aesthetic
+        // Display uses same font with different weights
         display: [
-          "var(--font-display)",
           "var(--font-sans)",
+          "system-ui",
           "-apple-system",
           "sans-serif",
         ],
-        // Monospace for code (Fira Code)
-        // Ligature-enabled, modern developer font
+        // Monospace: JetBrains Mono
         mono: [
           "var(--font-mono)",
           "SF Mono",

@@ -178,16 +178,16 @@ export default function SignInPage() {
             variants={staggerContainer}
             className="space-y-10"
           >
-            {/* Hero Text */}
+            {/* Hero Text - Bold Sans-Serif */}
             <motion.div variants={slideUp} className="space-y-4">
-              <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
+              <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight tracking-tight">
                 Welcome back to
                 <br />
                 <span className="bg-gradient-to-r from-cyan-300 via-violet-400 to-purple-400 bg-clip-text text-transparent">
                   smarter meetings
                 </span>
               </h1>
-              <p className="text-lg text-white/60 max-w-md">
+              <p className="text-lg text-white/60 max-w-md leading-relaxed">
                 Your AI-powered meeting co-pilot is ready to capture every detail and drive action.
               </p>
             </motion.div>
@@ -298,7 +298,7 @@ export default function SignInPage() {
               <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
               <span className="text-xs text-cyan-400 font-medium">Welcome back</span>
             </motion.div>
-            <motion.h1 variants={slideUp} className="text-3xl sm:text-4xl font-bold text-white mb-3">
+            <motion.h1 variants={slideUp} className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
               Sign in to your account
             </motion.h1>
             <motion.p variants={slideUp} className="text-white/50">

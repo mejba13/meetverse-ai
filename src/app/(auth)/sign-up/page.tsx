@@ -204,20 +204,20 @@ export default function SignUpPage() {
             variants={staggerContainer}
             className="space-y-10"
           >
-            {/* Hero Text */}
+            {/* Hero Text - Bold Sans-Serif */}
             <motion.div variants={slideUp} className="space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 mb-4">
                 <Award className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="text-xs text-emerald-400 font-medium">Free forever plan available</span>
               </div>
-              <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight">
+              <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight tracking-tight">
                 Start your journey with
                 <br />
                 <span className="bg-gradient-to-r from-cyan-300 via-violet-400 to-pink-400 bg-clip-text text-transparent">
                   AI-powered meetings
                 </span>
               </h1>
-              <p className="text-lg text-white/60 max-w-md">
+              <p className="text-lg text-white/60 max-w-md leading-relaxed">
                 Join 50,000+ teams using MeetVerse AI to capture every detail, generate summaries, and drive action.
               </p>
             </motion.div>
@@ -320,7 +320,7 @@ export default function SignUpPage() {
               <Sparkles className="w-3.5 h-3.5 text-violet-400" />
               <span className="text-xs text-violet-400 font-medium">Start free today</span>
             </motion.div>
-            <motion.h1 variants={slideUp} className="text-3xl sm:text-4xl font-bold text-white mb-3">
+            <motion.h1 variants={slideUp} className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
               Create your account
             </motion.h1>
             <motion.p variants={slideUp} className="text-white/50">
