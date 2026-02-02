@@ -1,7 +1,7 @@
 /**
  * Prisma Seed Script
  *
- * Creates test data for development and testing.
+ * Creates comprehensive test data for development and testing.
  * Run with: pnpm db:seed
  */
 
@@ -16,8 +16,23 @@ async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, SALT_ROUNDS);
 }
 
+// Helper to generate unique room IDs
+function generateRoomId(): string {
+  return `room-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+}
+
 async function main() {
   console.log("🌱 Starting database seed...\n");
+
+  // Clear existing data (for clean re-seeding)
+  console.log("🧹 Cleaning existing data...");
+  await prisma.chatMessage.deleteMany();
+  await prisma.meetingHighlight.deleteMany();
+  await prisma.actionItem.deleteMany();
+  await prisma.transcriptSegment.deleteMany();
+  await prisma.meetingParticipant.deleteMany();
+  await prisma.meeting.deleteMany();
+  console.log("✓ Existing data cleared\n");
 
   // Create an organization
   const organization = await prisma.organization.upsert({
@@ -36,7 +51,7 @@ async function main() {
 
   console.log("✓ Organization created:", organization.name);
 
-  // Create 4 test users
+  // Create 6 test users
   const users = [
     {
       email: "admin@meetverse.ai",
@@ -50,7 +65,7 @@ async function main() {
       email: "host@meetverse.ai",
       name: "Marcus Johnson",
       password: "Host1234!@#567",
-      subscriptionTier: "PAID",
+      subscriptionTier: "PRO",
       role: "MEMBER",
       image: null,
     },
@@ -58,7 +73,7 @@ async function main() {
       email: "participant@meetverse.ai",
       name: "Alex Rivera",
       password: "Participant!@#890",
-      subscriptionTier: "FREE",
+      subscriptionTier: "PRO",
       role: "MEMBER",
       image: null,
     },
@@ -67,6 +82,22 @@ async function main() {
       name: "Emily Taylor",
       password: "Guest12345!@#$",
       subscriptionTier: "FREE",
+      role: "MEMBER",
+      image: null,
+    },
+    {
+      email: "developer@meetverse.ai",
+      name: "James Wilson",
+      password: "Dev123!@#$%^",
+      subscriptionTier: "PRO",
+      role: "MEMBER",
+      image: null,
+    },
+    {
+      email: "designer@meetverse.ai",
+      name: "Olivia Martinez",
+      password: "Design123!@#$",
+      subscriptionTier: "PRO",
       role: "MEMBER",
       image: null,
     },
@@ -109,19 +140,19 @@ async function main() {
     console.log(`✓ User created: ${user.name} (${user.email})`);
   }
 
-  // Create a sample meeting hosted by the first user
-  const sampleMeeting = await prisma.meeting.upsert({
-    where: { roomId: "demo-meeting-001" },
-    update: {},
-    create: {
-      roomId: "demo-meeting-001",
-      title: "Weekly Team Standup",
-      description: "Regular weekly sync to discuss progress and blockers",
+  // ==========================================
+  // CREATE LIVE MEETING (Currently Active)
+  // ==========================================
+  const liveMeeting = await prisma.meeting.create({
+    data: {
+      roomId: generateRoomId(),
+      title: "Sprint Planning - Q1 2026",
+      description: "Planning session for the upcoming sprint with the development team",
       hostId: createdUsers[0].id,
       organizationId: organization.id,
-      status: "SCHEDULED",
-      scheduledStart: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
-      scheduledEnd: new Date(Date.now() + 24 * 60 * 60 * 1000 + 60 * 60 * 1000), // +1 hour
+      status: "LIVE",
+      scheduledStart: new Date(Date.now() - 30 * 60 * 1000), // Started 30 min ago
+      actualStart: new Date(Date.now() - 30 * 60 * 1000),
       settings: JSON.stringify({
         waitingRoom: false,
         recording: true,
@@ -131,48 +162,109 @@ async function main() {
     },
   });
 
-  console.log(`✓ Sample meeting created: ${sampleMeeting.title}`);
-
-  // Add participants to the meeting
-  for (let i = 1; i < createdUsers.length; i++) {
-    await prisma.meetingParticipant.upsert({
-      where: {
-        meetingId_userId: {
-          meetingId: sampleMeeting.id,
-          userId: createdUsers[i].id,
-        },
-      },
-      update: {},
-      create: {
-        meetingId: sampleMeeting.id,
+  // Add participants to live meeting
+  for (let i = 1; i < 4; i++) {
+    await prisma.meetingParticipant.create({
+      data: {
+        meetingId: liveMeeting.id,
         userId: createdUsers[i].id,
         role: "PARTICIPANT",
       },
     });
   }
 
-  console.log("✓ Participants added to meeting");
+  console.log(`✓ LIVE meeting created: ${liveMeeting.title}`);
 
-  // Create a completed meeting with transcript and action items
-  const completedMeeting = await prisma.meeting.upsert({
-    where: { roomId: "demo-meeting-002" },
-    update: {},
-    create: {
-      roomId: "demo-meeting-002",
+  // ==========================================
+  // CREATE UPCOMING/SCHEDULED MEETINGS
+  // ==========================================
+  const upcomingMeetings = [
+    {
+      title: "Weekly Team Standup",
+      description: "Regular weekly sync to discuss progress and blockers",
+      hostId: createdUsers[0].id,
+      scheduledStart: new Date(Date.now() + 2 * 60 * 60 * 1000), // In 2 hours
+      duration: 30,
+    },
+    {
+      title: "Product Demo - New Features",
+      description: "Showcasing the latest AI-powered features to stakeholders",
+      hostId: createdUsers[1].id,
+      scheduledStart: new Date(Date.now() + 4 * 60 * 60 * 1000), // In 4 hours
+      duration: 60,
+    },
+    {
+      title: "Design Review Session",
+      description: "Review and finalize UI/UX designs for the dashboard",
+      hostId: createdUsers[5].id,
+      scheduledStart: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
+      duration: 45,
+    },
+    {
+      title: "Client Onboarding - TechCorp",
+      description: "Introduction and setup session with new enterprise client",
+      hostId: createdUsers[0].id,
+      scheduledStart: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // In 2 days
+      duration: 60,
+    },
+    {
+      title: "Engineering Sync",
+      description: "Technical discussion about API architecture improvements",
+      hostId: createdUsers[4].id,
+      scheduledStart: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // In 3 days
+      duration: 45,
+    },
+  ];
+
+  for (const meeting of upcomingMeetings) {
+    const created = await prisma.meeting.create({
+      data: {
+        roomId: generateRoomId(),
+        title: meeting.title,
+        description: meeting.description,
+        hostId: meeting.hostId,
+        organizationId: organization.id,
+        status: "SCHEDULED",
+        scheduledStart: meeting.scheduledStart,
+        scheduledEnd: new Date(meeting.scheduledStart.getTime() + meeting.duration * 60 * 1000),
+        settings: JSON.stringify({
+          waitingRoom: false,
+          recording: true,
+          transcription: true,
+          maxParticipants: 50,
+        }),
+      },
+    });
+
+    // Add random participants
+    const participantCount = Math.floor(Math.random() * 4) + 2;
+    const shuffledUsers = [...createdUsers].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < participantCount && i < shuffledUsers.length; i++) {
+      if (shuffledUsers[i].id !== meeting.hostId) {
+        await prisma.meetingParticipant.create({
+          data: {
+            meetingId: created.id,
+            userId: shuffledUsers[i].id,
+            role: "PARTICIPANT",
+          },
+        });
+      }
+    }
+
+    console.log(`✓ Scheduled meeting created: ${meeting.title}`);
+  }
+
+  // ==========================================
+  // CREATE COMPLETED/ENDED MEETINGS
+  // ==========================================
+  const completedMeetings = [
+    {
       title: "Product Planning Session",
       description: "Q1 roadmap planning and feature prioritization",
       hostId: createdUsers[1].id,
-      organizationId: organization.id,
-      status: "ENDED",
       scheduledStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-      actualStart: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      actualEnd: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 90 * 60 * 1000),
-      settings: JSON.stringify({
-        waitingRoom: false,
-        recording: true,
-        transcription: true,
-      }),
-      aiSummary: `## Meeting Summary
+      duration: 90,
+      summary: `## Meeting Summary
 
 ### Key Discussion Points
 - Reviewed Q1 roadmap priorities
@@ -188,145 +280,248 @@ async function main() {
 - Engineering to provide timeline estimates
 - Design team to complete mockups
 - Product to finalize requirements document`,
-      aiSummaryFormat: "markdown",
     },
-  });
+    {
+      title: "Customer Feedback Review",
+      description: "Analyzing recent customer feedback and feature requests",
+      hostId: createdUsers[0].id,
+      scheduledStart: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      duration: 45,
+      summary: `## Meeting Summary
 
-  console.log(`✓ Completed meeting created: ${completedMeeting.title}`);
+### Customer Insights
+- 85% satisfaction rate with video quality
+- Top request: Better mobile experience
+- Feature request: Calendar integrations
 
-  // Add transcript segments
-  const transcriptSegments = [
-    {
-      speakerId: createdUsers[1].id,
-      speakerName: "Marcus Johnson",
-      content: "Welcome everyone to our Q1 planning session. Let's start by reviewing our priorities.",
-      startTime: 0,
-      endTime: 5000,
-      confidence: 0.95,
+### Action Items
+1. Prioritize mobile app improvements
+2. Research calendar API integrations
+3. Schedule UX research sessions
+
+### Highlights
+- Positive feedback on AI transcription accuracy
+- Enterprise clients requesting SSO support`,
     },
     {
-      speakerId: createdUsers[0].id,
-      speakerName: "Sarah Chen",
-      content: "I think we should focus on improving video quality first. Users have been asking for better resolution options.",
-      startTime: 5000,
-      endTime: 12000,
-      confidence: 0.92,
+      title: "Engineering Architecture Review",
+      description: "Technical deep-dive into system architecture",
+      hostId: createdUsers[4].id,
+      scheduledStart: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+      duration: 60,
+      summary: `## Technical Review Summary
+
+### Architecture Decisions
+- Adopted microservices for AI pipeline
+- Selected Redis for real-time caching
+- Implemented WebSocket for live features
+
+### Performance Improvements
+- Reduced API latency by 40%
+- Optimized database queries
+- Implemented connection pooling
+
+### Next Steps
+- Load testing for 10k concurrent users
+- Implement horizontal scaling
+- Set up monitoring dashboards`,
     },
     {
-      speakerId: createdUsers[2].id,
-      speakerName: "Alex Rivera",
-      content: "Agreed. I can work on implementing adaptive bitrate streaming for better performance.",
-      startTime: 12000,
-      endTime: 18000,
-      confidence: 0.89,
+      title: "Marketing Strategy Alignment",
+      description: "Aligning product launches with marketing campaigns",
+      hostId: createdUsers[0].id,
+      scheduledStart: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
+      duration: 60,
+      summary: `## Marketing Alignment Summary
+
+### Campaign Timeline
+- Beta launch: Week 1
+- Public announcement: Week 3
+- Feature spotlight series: Ongoing
+
+### Key Messages
+- AI-powered meeting intelligence
+- Enterprise-grade security
+- Seamless integrations
+
+### Content Strategy
+- Blog posts highlighting AI features
+- Customer success stories
+- Technical documentation`,
     },
     {
-      speakerId: createdUsers[3].id,
-      speakerName: "Emily Taylor",
-      content: "For the AI features, the transcription module is ready for beta testing. We should launch it next week.",
-      startTime: 18000,
-      endTime: 25000,
-      confidence: 0.94,
+      title: "Team Retrospective - January",
+      description: "Monthly team retrospective and celebration",
+      hostId: createdUsers[1].id,
+      scheduledStart: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+      duration: 45,
+      summary: `## Retrospective Summary
+
+### What Went Well
+- Shipped 3 major features on time
+- Customer satisfaction improved 15%
+- Team collaboration excellent
+
+### Areas for Improvement
+- Better documentation practices
+- More async communication
+- Earlier testing cycles
+
+### Action Items
+- Implement documentation templates
+- Set up async standup bot
+- Create testing guidelines`,
+    },
+    {
+      title: "Security Audit Review",
+      description: "Review of quarterly security audit findings",
+      hostId: createdUsers[0].id,
+      scheduledStart: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
+      duration: 75,
+      summary: `## Security Audit Summary
+
+### Audit Results
+- Overall score: 94/100
+- No critical vulnerabilities
+- 3 minor recommendations
+
+### Implemented Fixes
+- Updated encryption protocols
+- Enhanced access controls
+- Improved logging
+
+### Compliance Status
+- SOC 2 Type II: Compliant
+- GDPR: Compliant
+- HIPAA: In progress`,
     },
   ];
 
-  for (const segment of transcriptSegments) {
-    await prisma.transcriptSegment.create({
+  for (const meeting of completedMeetings) {
+    const actualStart = new Date(meeting.scheduledStart);
+    const actualEnd = new Date(actualStart.getTime() + meeting.duration * 60 * 1000);
+
+    const created = await prisma.meeting.create({
       data: {
-        meetingId: completedMeeting.id,
-        speakerId: segment.speakerId,
-        speakerName: segment.speakerName,
-        content: segment.content,
-        startTime: segment.startTime,
-        endTime: segment.endTime,
-        confidence: segment.confidence,
-        language: "en",
-        isFinal: true,
+        roomId: generateRoomId(),
+        title: meeting.title,
+        description: meeting.description,
+        hostId: meeting.hostId,
+        organizationId: organization.id,
+        status: "ENDED",
+        scheduledStart: meeting.scheduledStart,
+        scheduledEnd: new Date(meeting.scheduledStart.getTime() + meeting.duration * 60 * 1000),
+        actualStart,
+        actualEnd,
+        settings: JSON.stringify({
+          waitingRoom: false,
+          recording: true,
+          transcription: true,
+        }),
+        aiSummary: meeting.summary,
+        aiSummaryFormat: "markdown",
       },
     });
-  }
 
-  console.log("✓ Transcript segments created");
-
-  // Create action items
-  const actionItems = [
-    {
-      title: "Provide timeline estimates for video improvements",
-      description: "Engineering team to estimate implementation time for adaptive bitrate streaming",
-      assigneeId: createdUsers[2].id,
-      status: "IN_PROGRESS",
-      priority: "HIGH",
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-    },
-    {
-      title: "Complete UI mockups for new features",
-      description: "Design team to finalize mockups for the Q1 feature set",
-      assigneeId: createdUsers[3].id,
-      status: "PENDING",
-      priority: "MEDIUM",
-      dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-    },
-    {
-      title: "Finalize Q1 requirements document",
-      description: "Product team to document all feature requirements and acceptance criteria",
-      assigneeId: createdUsers[0].id,
-      status: "PENDING",
-      priority: "HIGH",
-      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    },
-  ];
-
-  for (const item of actionItems) {
-    await prisma.actionItem.create({
-      data: {
-        meetingId: completedMeeting.id,
-        title: item.title,
-        description: item.description,
-        assigneeId: item.assigneeId,
-        status: item.status,
-        priority: item.priority,
-        dueDate: item.dueDate,
-        aiGenerated: true,
-        aiConfidence: 0.88,
+    // Add transcript segments for completed meetings
+    const transcripts = [
+      {
+        speakerId: createdUsers[0].id,
+        speakerName: "Sarah Chen",
+        content: `Welcome everyone to the ${meeting.title}. Let's get started with our agenda.`,
+        startTime: 0,
+        endTime: 5000,
       },
-    });
-  }
+      {
+        speakerId: createdUsers[1].id,
+        speakerName: "Marcus Johnson",
+        content: "Thanks Sarah. I'd like to start by sharing some updates from the team.",
+        startTime: 5000,
+        endTime: 10000,
+      },
+      {
+        speakerId: createdUsers[2].id,
+        speakerName: "Alex Rivera",
+        content: "Great progress on our end. We've completed the main deliverables ahead of schedule.",
+        startTime: 10000,
+        endTime: 16000,
+      },
+      {
+        speakerId: createdUsers[4].id,
+        speakerName: "James Wilson",
+        content: "The technical implementation is solid. We should discuss the next steps.",
+        startTime: 16000,
+        endTime: 22000,
+      },
+    ];
 
-  console.log("✓ Action items created");
+    for (const segment of transcripts) {
+      await prisma.transcriptSegment.create({
+        data: {
+          meetingId: created.id,
+          speakerId: segment.speakerId,
+          speakerName: segment.speakerName,
+          content: segment.content,
+          startTime: segment.startTime,
+          endTime: segment.endTime,
+          confidence: 0.92 + Math.random() * 0.06,
+          language: "en",
+          isFinal: true,
+        },
+      });
+    }
 
-  // Create meeting highlights
-  const highlights = [
-    {
-      type: "DECISION",
-      content: "Prioritize video quality improvements for Q1",
-      timestamp: 8000,
-      speakerName: "Sarah Chen",
-    },
-    {
-      type: "KEY_MOMENT",
-      content: "AI transcription ready for beta launch next week",
-      timestamp: 20000,
-      speakerName: "Emily Taylor",
-    },
-  ];
+    // Add action items for completed meetings
+    const actionItemTemplates = [
+      { title: "Follow up on discussion points", priority: "HIGH" },
+      { title: "Share meeting notes with team", priority: "MEDIUM" },
+      { title: "Schedule follow-up meeting", priority: "LOW" },
+    ];
 
-  for (const highlight of highlights) {
+    for (const template of actionItemTemplates) {
+      const randomAssignee = createdUsers[Math.floor(Math.random() * createdUsers.length)];
+      await prisma.actionItem.create({
+        data: {
+          meetingId: created.id,
+          title: template.title,
+          description: `Action item from ${meeting.title}`,
+          assigneeId: randomAssignee.id,
+          status: Math.random() > 0.5 ? "COMPLETED" : "PENDING",
+          priority: template.priority,
+          dueDate: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000),
+          aiGenerated: true,
+          aiConfidence: 0.85 + Math.random() * 0.1,
+        },
+      });
+    }
+
+    // Add highlights for completed meetings
     await prisma.meetingHighlight.create({
       data: {
-        meetingId: completedMeeting.id,
-        type: highlight.type,
-        content: highlight.content,
-        timestamp: highlight.timestamp,
-        speakerName: highlight.speakerName,
+        meetingId: created.id,
+        type: "DECISION",
+        content: `Key decision made during ${meeting.title}`,
+        timestamp: 15000,
+        speakerName: "Sarah Chen",
         aiConfidence: 0.9,
       },
     });
+
+    console.log(`✓ Completed meeting created: ${meeting.title}`);
   }
 
-  console.log("✓ Meeting highlights created");
-
+  // ==========================================
+  // SUMMARY
+  // ==========================================
   console.log("\n✅ Database seed completed successfully!\n");
-  console.log("Test Accounts:");
+  console.log("═══════════════════════════════════════════════════════════");
+  console.log("📊 Data Summary:");
+  console.log("   • 1 LIVE meeting (active now)");
+  console.log("   • 5 SCHEDULED meetings (upcoming)");
+  console.log("   • 6 ENDED meetings (with summaries)");
+  console.log("   • 6 Test users");
+  console.log("═══════════════════════════════════════════════════════════\n");
+  console.log("🔐 Test Accounts:");
   console.log("═══════════════════════════════════════════════════════════");
   users.forEach((u) => {
     console.log(`  📧 ${u.email}`);
