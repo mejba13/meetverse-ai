@@ -9,18 +9,24 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Primary: #146EF5 bg, white text, 4px radius, no shadow
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
+          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] rounded-[4px]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.98]",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 active:scale-[0.98] rounded-[4px]",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground active:scale-[0.98]",
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground active:scale-[0.98] rounded-[4px]",
+        // Secondary: white bg, #080808 text, 0px radius, no shadow
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-[0.98]",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+          "bg-white text-[#080808] border border-border hover:bg-gray-50 active:scale-[0.98] rounded-none",
+        ghost: "hover:bg-accent hover:text-accent-foreground rounded-[4px]",
         link: "text-primary underline-offset-4 hover:underline",
+        // Gradient variant for CTAs
         gradient:
-          "bg-gradient-to-r from-primary to-primary/70 text-white hover:opacity-90 active:scale-[0.98]",
+          "bg-gradient-to-r from-brand-500 to-brand-600 text-white hover:from-brand-600 hover:to-brand-700 active:scale-[0.98] rounded-[4px]",
+        // Brand primary button
+        brand:
+          "bg-brand-500 text-white hover:bg-brand-600 active:scale-[0.98] rounded-[4px]",
       },
       size: {
         default: "h-10 px-4 py-2",

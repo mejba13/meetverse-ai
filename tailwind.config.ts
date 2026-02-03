@@ -48,55 +48,80 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // Brand color palette
-        ink: "#0A0A0B",
-        charcoal: "#18181B",
-        graphite: "#27272A",
-        steel: "#3F3F46",
-        slate: "#71717A",
-        silver: "#A1A1AA",
-        pearl: "#E4E4E7",
-        snow: "#FAFAFA",
+        // Dark Theme Palette
+        // #000000, #14213d, #fca311, #e5e5e5, #ffffff
+        ink: "#000000",
+        navy: "#14213d",
+        gold: "#fca311",
+        silver: "#e5e5e5",
+        white: "#ffffff",
 
-        // Cyan accent scale (primary brand color)
-        cyan: {
-          50: "#ECFEFF",
-          100: "#CFFAFE",
-          200: "#A5F3FC",
-          300: "#67E8F9",
-          400: "#22D3EE",
-          500: "#06B6D4",
-          600: "#0891B2",
-          700: "#0E7490",
-          800: "#155E75",
-          900: "#164E63",
-          950: "#083344",
+        // Extended neutral palette
+        charcoal: "#0a0a0a",
+        graphite: "#1a1a2e",
+        steel: "#2a2a40",
+        slate: "#52525b",
+        pearl: "#e4e4e7",
+        snow: "#fafafa",
+
+        // Primary brand color scale - Vibrant Blue (#146EF5)
+        brand: {
+          50: "#E8F1FE",
+          100: "#D4E4FD",
+          200: "#A9C9FB",
+          300: "#7EAEF9",
+          400: "#5393F7",
+          500: "#146EF5",
+          600: "#1058C4",
+          700: "#0C4293",
+          800: "#082C62",
+          900: "#041631",
+          950: "#020B19",
+        },
+
+        // Secondary accent - Electric violet for premium feel
+        violet: {
+          50: "#f5f3ff",
+          100: "#ede9fe",
+          200: "#ddd6fe",
+          300: "#c4b5fd",
+          400: "#a78bfa",
+          500: "#8b5cf6",
+          600: "#7c3aed",
+          700: "#6d28d9",
+          800: "#5b21b6",
+          900: "#4c1d95",
+          950: "#2e1065",
         },
 
         // Semantic colors
         success: {
           DEFAULT: "#10B981",
           50: "#ECFDF5",
+          100: "#D1FAE5",
           500: "#10B981",
           600: "#059669",
         },
         warning: {
           DEFAULT: "#F59E0B",
           50: "#FFFBEB",
+          100: "#FEF3C7",
           500: "#F59E0B",
           600: "#D97706",
         },
         error: {
           DEFAULT: "#EF4444",
           50: "#FEF2F2",
+          100: "#FEE2E2",
           500: "#EF4444",
           600: "#DC2626",
         },
         info: {
-          DEFAULT: "#3B82F6",
-          50: "#EFF6FF",
-          500: "#3B82F6",
-          600: "#2563EB",
+          DEFAULT: "#146EF5",
+          50: "#E8F1FE",
+          100: "#D4E4FD",
+          500: "#146EF5",
+          600: "#1058C4",
         },
       },
 
@@ -104,22 +129,17 @@ const config: Config = {
       // MODERN TYPOGRAPHY - WEBFLOW STYLE
       // ============================================
       fontFamily: {
-        // Primary Font: Inter - Industry standard
-        // Clean, modern, professional
+        // Primary Font: Inter (similar to WF Visual Sans Variable)
+        // Fallback: Arial, sans-serif as per brand guidelines
         sans: [
           "var(--font-sans)",
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
+          "Arial",
           "sans-serif",
         ],
-        // Display uses same font with different weights
+        // Display/Heading uses same font stack
         display: [
           "var(--font-sans)",
-          "system-ui",
-          "-apple-system",
+          "Arial",
           "sans-serif",
         ],
         // Monospace: JetBrains Mono
@@ -322,10 +342,22 @@ const config: Config = {
         lg: "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
         xl: "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)",
         "2xl": "0 25px 50px rgba(0, 0, 0, 0.25)",
-        glow: "0 0 20px rgba(6, 182, 212, 0.3)",
-        "glow-lg": "0 0 40px rgba(6, 182, 212, 0.4)",
+        // Brand blue glow effects
+        glow: "0 0 20px rgba(20, 110, 245, 0.25)",
+        "glow-lg": "0 0 40px rgba(20, 110, 245, 0.35)",
+        "glow-brand": "0 0 30px rgba(20, 110, 245, 0.4)",
         "glow-violet": "0 0 30px rgba(139, 92, 246, 0.3)",
-        "inner-glow": "inset 0 0 20px rgba(6, 182, 212, 0.1)",
+        "inner-glow": "inset 0 0 20px rgba(20, 110, 245, 0.1)",
+        // Gold glow effects for dark mode
+        "glow-gold": "0 0 20px rgba(252, 163, 17, 0.3)",
+        "glow-gold-lg": "0 0 40px rgba(252, 163, 17, 0.4)",
+        // Premium elevation shadows
+        "elevation-1": "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
+        "elevation-2": "0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08)",
+        "elevation-3": "0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10)",
+        "elevation-4": "0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.05)",
+        // Navy card shadows for dark mode
+        "navy": "0 4px 20px rgba(20, 33, 61, 0.5)",
       },
 
       // ============================================
@@ -382,11 +414,11 @@ const config: Config = {
         "pulse-glow": {
           "0%, 100%": {
             opacity: "1",
-            boxShadow: "0 0 20px rgba(6, 182, 212, 0.3)",
+            boxShadow: "0 0 20px rgba(20, 110, 245, 0.3)",
           },
           "50%": {
             opacity: "0.8",
-            boxShadow: "0 0 40px rgba(6, 182, 212, 0.5)",
+            boxShadow: "0 0 40px rgba(20, 110, 245, 0.5)",
           },
         },
         float: {
@@ -396,6 +428,14 @@ const config: Config = {
         "text-shimmer": {
           "0%": { backgroundPosition: "0% 50%" },
           "100%": { backgroundPosition: "100% 50%" },
+        },
+        gradient: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "pulse-ring": {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "100%": { transform: "scale(1.5)", opacity: "0" },
         },
       },
 
@@ -411,6 +451,8 @@ const config: Config = {
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
         float: "float 3s ease-in-out infinite",
         "text-shimmer": "text-shimmer 3s ease-in-out infinite",
+        gradient: "gradient 3s ease infinite",
+        "pulse-ring": "pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
 
       // ============================================

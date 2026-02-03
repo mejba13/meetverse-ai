@@ -47,7 +47,7 @@ function FloatingParticles() {
       {[...Array(15)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-cyan-400/40"
+          className="absolute w-1 h-1 rounded-full bg-brand-400/40"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
@@ -97,13 +97,13 @@ const testimonials = [
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-screen bg-[#030014]">
+    <div className="flex min-h-screen bg-ink">
       {/* ============================================ */}
       {/* LEFT SIDE - IMMERSIVE BRANDING */}
       {/* ============================================ */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
         {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/20 via-violet-500/20 to-purple-600/20" />
+        <div className="absolute inset-0 bg-gradient-to-br from-brand-500/20 via-violet-500/20 to-purple-600/20" />
 
         {/* Animated Orbs */}
         <motion.div
@@ -154,17 +154,17 @@ export default function SignInPage() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-violet-500 rounded-xl blur-xl opacity-50 group-hover:opacity-80"
+                  className="absolute inset-0 bg-gradient-to-br from-brand-400 to-violet-500 rounded-xl blur-xl opacity-50 group-hover:opacity-80"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 via-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
                   <Video className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-white">
-                  MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                  MeetVerse<span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI</span>
                 </span>
                 <span className="text-[10px] text-white/40 tracking-widest uppercase">Intelligent Meetings</span>
               </div>
@@ -183,7 +183,7 @@ export default function SignInPage() {
               <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight tracking-tight">
                 Welcome back to
                 <br />
-                <span className="bg-gradient-to-r from-cyan-300 via-violet-400 to-purple-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-brand-300 via-violet-400 to-purple-400 bg-clip-text text-transparent">
                   smarter meetings
                 </span>
               </h1>
@@ -220,7 +220,7 @@ export default function SignInPage() {
                   "{testimonials[0].quote}"
                 </blockquote>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center font-semibold text-white">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center font-semibold text-white">
                     {testimonials[0].avatar}
                   </div>
                   <div>
@@ -230,7 +230,7 @@ export default function SignInPage() {
                 </div>
 
                 {/* Decorative gradient */}
-                <div className="absolute -top-px left-8 right-8 h-px bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
+                <div className="absolute -top-px left-8 right-8 h-px bg-gradient-to-r from-transparent via-brand-500/50 to-transparent" />
               </div>
             </motion.div>
 
@@ -242,7 +242,7 @@ export default function SignInPage() {
                 { icon: Users, label: "50K+ Teams" },
               ].map((badge, i) => (
                 <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10">
-                  <badge.icon className="w-3.5 h-3.5 text-cyan-400" />
+                  <badge.icon className="w-3.5 h-3.5 text-brand-400" />
                   <span className="text-xs text-white/60">{badge.label}</span>
                 </div>
               ))}
@@ -278,11 +278,11 @@ export default function SignInPage() {
             className="lg:hidden mb-10"
           >
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-500">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 via-violet-500 to-purple-500">
                 <Video className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-bold text-white">
-                MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                MeetVerse<span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI</span>
               </span>
             </Link>
           </motion.div>
@@ -294,9 +294,9 @@ export default function SignInPage() {
             variants={staggerContainer}
             className="mb-8"
           >
-            <motion.div variants={slideUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="text-xs text-cyan-400 font-medium">Welcome back</span>
+            <motion.div variants={slideUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-500/10 border border-brand-500/20 mb-6">
+              <Sparkles className="w-3.5 h-3.5 text-brand-400" />
+              <span className="text-xs text-brand-400 font-medium">Welcome back</span>
             </motion.div>
             <motion.h1 variants={slideUp} className="text-3xl sm:text-4xl font-bold text-white mb-3 tracking-tight">
               Sign in to your account
@@ -325,7 +325,7 @@ export default function SignInPage() {
             Don't have an account?{" "}
             <Link
               href="/sign-up"
-              className="font-medium text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1"
+              className="font-medium text-brand-400 hover:text-brand-300 transition-colors inline-flex items-center gap-1"
             >
               Create one free
               <ArrowRight className="w-3.5 h-3.5" />
@@ -347,7 +347,7 @@ export default function SignInPage() {
                 { icon: Shield, label: "Enterprise Security" },
               ].map((feature, i) => (
                 <div key={i} className="flex items-center gap-2 text-white/50">
-                  <feature.icon className="w-4 h-4 text-cyan-400" />
+                  <feature.icon className="w-4 h-4 text-brand-400" />
                   <span className="text-sm">{feature.label}</span>
                 </div>
               ))}

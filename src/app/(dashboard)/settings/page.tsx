@@ -76,11 +76,12 @@ const itemVariants = {
 // ============================================
 function FloatingParticles() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none dark:hidden">
+      {/* Only show particles in light mode */}
       {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-violet-400/30"
+          className="absolute w-1 h-1 rounded-full bg-brand-400/30"
           style={{
             left: `${15 + Math.random() * 70}%`,
             top: `${10 + Math.random() * 80}%`,
@@ -116,7 +117,7 @@ interface SettingsSectionProps {
 function SettingsSection({ icon: Icon, title, description, gradient, children }: SettingsSectionProps) {
   return (
     <motion.div variants={itemVariants}>
-      <Card className="relative overflow-hidden bg-white/[0.02] border-white/[0.08] backdrop-blur-xl hover:border-white/[0.12] transition-all duration-300 group">
+      <Card className="relative overflow-hidden bg-white dark:bg-navy border-gray-200 dark:border-navy/50 hover:border-gray-300 dark:hover:border-gold/20 transition-all duration-300 group">
         {/* Gradient Border Effect */}
         <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
 
@@ -127,8 +128,8 @@ function SettingsSection({ icon: Icon, title, description, gradient, children }:
               <Icon className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
-              <p className="text-sm text-white/50">{description}</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>
+              <p className="text-sm text-gray-500 dark:text-silver">{description}</p>
             </div>
           </div>
 
@@ -154,14 +155,14 @@ interface SettingRowProps {
 
 function SettingRow({ icon: Icon, label, description, children }: SettingRowProps) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-200">
+    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gray-50 dark:bg-ink border border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-ink/80 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-white/[0.05]">
-          <Icon className="w-4 h-4 text-white/60" />
+        <div className="p-2 rounded-lg bg-gray-200 dark:bg-navy">
+          <Icon className="w-4 h-4 text-gray-500 dark:text-silver" />
         </div>
         <div>
-          <p className="text-sm font-medium text-white">{label}</p>
-          <p className="text-xs text-white/40">{description}</p>
+          <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+          <p className="text-xs text-gray-500 dark:text-silver/60">{description}</p>
         </div>
       </div>
       {children}
@@ -190,28 +191,28 @@ function ThemeButton({ value, currentTheme, icon: Icon, label, onClick }: ThemeB
       onClick={onClick}
       className={`relative flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-300 ${
         isActive
-          ? "bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border-cyan-500/50"
-          : "bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.05] hover:border-white/[0.12]"
+          ? "bg-gradient-to-br from-brand-500/20 to-violet-500/20 dark:from-gold/20 dark:to-amber-500/20 border-brand-500/50 dark:border-gold/50"
+          : "bg-gray-50 dark:bg-ink border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-ink/80 hover:border-gray-300 dark:hover:border-white/10"
       }`}
     >
       {isActive && (
         <motion.div
           layoutId="activeTheme"
-          className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 rounded-xl"
+          className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-violet-500/10 dark:from-gold/10 dark:to-amber-500/10 rounded-xl"
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
         />
       )}
-      <div className={`relative p-3 rounded-xl ${isActive ? "bg-gradient-to-br from-cyan-500 to-violet-500" : "bg-white/[0.08]"}`}>
-        <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-white/60"}`} />
+      <div className={`relative p-3 rounded-xl ${isActive ? "bg-gradient-to-br from-brand-500 to-violet-500" : "bg-gray-200 dark:bg-navy"}`}>
+        <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-500 dark:text-silver"}`} />
       </div>
-      <span className={`text-sm font-medium ${isActive ? "text-white" : "text-white/60"}`}>{label}</span>
+      <span className={`text-sm font-medium ${isActive ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-silver"}`}>{label}</span>
       {isActive && (
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="absolute top-2 right-2"
         >
-          <Check className="w-4 h-4 text-cyan-400" />
+          <Check className="w-4 h-4 text-brand-500 dark:text-gold" />
         </motion.div>
       )}
     </motion.button>
@@ -325,33 +326,33 @@ export default function SettingsPage() {
         {/* Header */}
         <motion.div variants={itemVariants} className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500">
               <Settings className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-white">Settings</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
           </div>
-          <p className="text-white/50">
+          <p className="text-gray-500 dark:text-silver">
             Customize your MeetVerse AI experience
           </p>
         </motion.div>
 
         {/* Quick Actions Bar */}
         <motion.div variants={itemVariants}>
-          <Card className="bg-gradient-to-r from-cyan-500/10 via-violet-500/10 to-purple-500/10 border-white/[0.08] backdrop-blur-xl">
+          <Card className="bg-gradient-to-r from-brand-500/10 via-violet-500/10 to-brand-500/10 dark:from-gold/10 dark:via-navy dark:to-gold/10 border-gray-200 dark:border-navy/50">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-cyan-400" />
+                  <Sparkles className="w-5 h-5 text-brand-500 dark:text-gold" />
                   <div>
-                    <p className="text-sm font-medium text-white">Pro Tip</p>
-                    <p className="text-xs text-white/50">Enable AI features for smarter meetings</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">Pro Tip</p>
+                    <p className="text-xs text-gray-500 dark:text-silver">Enable AI features for smarter meetings</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-white/60 hover:text-white hover:bg-white/10"
+                    className="text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Export
@@ -359,7 +360,7 @@ export default function SettingsPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-white/60 hover:text-white hover:bg-white/10"
+                    className="text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink"
                   >
                     <Info className="w-4 h-4 mr-2" />
                     Help
@@ -687,22 +688,22 @@ export default function SettingsPage() {
               exit={{ opacity: 0, y: 20 }}
               className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
             >
-              <Card className="bg-zinc-900/95 border-white/[0.1] backdrop-blur-xl shadow-2xl">
+              <Card className="bg-white dark:bg-navy border-gray-200 dark:border-white/10 shadow-2xl">
                 <CardContent className="p-4 flex items-center gap-4">
-                  <p className="text-sm text-white/60">You have unsaved changes</p>
+                  <p className="text-sm text-gray-500 dark:text-silver">You have unsaved changes</p>
                   <div className="flex items-center gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setHasChanges(false)}
-                      className="text-white/60 hover:text-white hover:bg-white/10"
+                      className="text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink"
                     >
                       Discard
                     </Button>
                     <Button
                       onClick={handleSave}
                       disabled={updatePreferences.isPending}
-                      className="bg-gradient-to-r from-cyan-500 to-violet-500 text-white hover:opacity-90"
+                      className="bg-gradient-to-r from-brand-500 to-brand-600 text-white hover:opacity-90"
                     >
                       {updatePreferences.isPending ? (
                         <>

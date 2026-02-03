@@ -39,13 +39,13 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
   };
 
   return (
-    <aside className={cn("flex flex-col border-r bg-card h-full", className)}>
+    <aside className={cn("flex flex-col border-r border-white/10 dark:border-navy/50 bg-white dark:bg-navy h-full", className)}>
       {/* Logo */}
-      <div className="flex h-16 items-center gap-2 border-b px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600">
+      <div className="flex h-16 items-center gap-2 border-b border-white/10 dark:border-white/5 px-6">
+        <div className="flex h-8 w-8 items-center justify-center rounded-[4px] bg-gradient-to-br from-brand-500 to-brand-600 shadow-sm">
           <Video className="h-4 w-4 text-white" />
         </div>
-        <span className="text-lg font-bold">MeetVerse AI</span>
+        <span className="text-lg font-bold text-gray-900 dark:text-white">MeetVerse AI</span>
       </div>
 
       {/* Quick Action */}
@@ -82,7 +82,7 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
           })}
         </div>
 
-        <div className="my-4 border-t" />
+        <div className="my-4 border-t border-white/10 dark:border-white/5" />
 
         <div className="space-y-1">
           {secondaryNavigation.map((item) => {
@@ -106,15 +106,15 @@ export function Sidebar({ className, onNavigate }: SidebarProps) {
 
         {/* Upgrade Card */}
         <div className="mt-auto pb-4">
-          <div className="bg-gradient-to-br from-cyan-500/10 via-cyan-500/5 to-cyan-600/10 border border-border rounded-lg p-4">
-            <h4 className="font-semibold">Upgrade to Pro</h4>
-            <p className="mt-1 text-sm text-muted-foreground">
+          <div className="bg-gradient-to-br from-brand-500/10 via-brand-500/5 to-violet-500/10 dark:from-gold/10 dark:via-gold/5 dark:to-amber-500/10 border border-brand-500/20 dark:border-gold/20 rounded-[4px] p-4">
+            <h4 className="font-semibold text-gray-900 dark:text-white">Upgrade to Pro</h4>
+            <p className="mt-1 text-sm text-gray-600 dark:text-silver">
               Get unlimited meetings and full AI features
             </p>
             <Link
               href="/#pricing"
               onClick={handleClick}
-              className="mt-3 inline-flex items-center text-sm font-medium text-cyan-500 hover:text-cyan-400 hover:underline"
+              className="mt-3 inline-flex items-center text-sm font-medium text-brand-500 dark:text-gold hover:text-brand-400 dark:hover:text-gold/80 hover:underline"
             >
               Learn more →
             </Link>

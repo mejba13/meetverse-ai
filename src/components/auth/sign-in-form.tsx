@@ -81,7 +81,7 @@ export function SignInForm() {
             Email address
           </Label>
           <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-cyan-400 transition-colors" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-brand-400 transition-colors" />
             <Input
               id="email"
               type="email"
@@ -90,7 +90,7 @@ export function SignInForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              className="h-12 pl-11 bg-white/[0.03] border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/20 text-white placeholder:text-white/30 rounded-xl transition-all duration-300"
+              className="h-12 pl-11 bg-white/[0.03] border-white/10 focus:border-brand-500/50 focus:ring-brand-500/20 text-white placeholder:text-white/30 rounded-xl transition-all duration-300"
             />
           </div>
         </div>
@@ -101,13 +101,13 @@ export function SignInForm() {
             </Label>
             <a
               href="/forgot-password"
-              className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="text-sm text-brand-400 hover:text-brand-300 transition-colors"
             >
               Forgot password?
             </a>
           </div>
           <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-cyan-400 transition-colors" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-brand-400 transition-colors" />
             <Input
               id="password"
               type="password"
@@ -116,7 +116,7 @@ export function SignInForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
-              className="h-12 pl-11 bg-white/[0.03] border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/20 text-white placeholder:text-white/30 rounded-xl transition-all duration-300"
+              className="h-12 pl-11 bg-white/[0.03] border-white/10 focus:border-brand-500/50 focus:ring-brand-500/20 text-white placeholder:text-white/30 rounded-xl transition-all duration-300"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ export function SignInForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500 hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-violet-500/25 transition-all duration-300"
+            className="w-full h-12 bg-gradient-to-r from-brand-500 via-violet-500 to-purple-500 hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-violet-500/25 transition-all duration-300"
           >
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

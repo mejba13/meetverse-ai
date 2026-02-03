@@ -28,7 +28,7 @@ export function SignUpForm() {
 
   const passwordStrength = getPasswordStrength(password);
   const strengthLabels = ["Weak", "Fair", "Good", "Strong", "Excellent"];
-  const strengthColors = ["bg-rose-500", "bg-amber-500", "bg-yellow-500", "bg-emerald-500", "bg-cyan-500"];
+  const strengthColors = ["bg-rose-500", "bg-amber-500", "bg-yellow-500", "bg-emerald-500", "bg-brand-500"];
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -181,7 +181,7 @@ export function SignUpForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500 hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-violet-500/25 transition-all duration-300"
+            className="w-full h-12 bg-gradient-to-r from-brand-500 via-violet-500 to-purple-500 hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-violet-500/25 transition-all duration-300"
           >
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -198,11 +198,11 @@ export function SignUpForm() {
       {/* Terms */}
       <p className="text-xs text-center text-white/40 leading-relaxed">
         By creating an account, you agree to our{" "}
-        <a href="/terms" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+        <a href="/terms" className="text-brand-400 hover:text-brand-300 transition-colors">
           Terms of Service
         </a>{" "}
         and{" "}
-        <a href="/privacy" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+        <a href="/privacy" className="text-brand-400 hover:text-brand-300 transition-colors">
           Privacy Policy
         </a>
       </p>

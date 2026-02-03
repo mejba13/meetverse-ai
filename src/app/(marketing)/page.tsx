@@ -76,11 +76,11 @@ const scaleReveal = {
 function FloatingOrbs() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Primary aurora gradient */}
+      {/* Primary aurora gradient - Navy/Gold palette */}
       <motion.div
         className="absolute -top-[40%] -left-[20%] w-[80vw] h-[80vw] rounded-full"
         style={{
-          background: "conic-gradient(from 180deg, rgba(6,182,212,0.15), rgba(168,85,247,0.1), rgba(6,182,212,0.05), rgba(236,72,153,0.08), rgba(6,182,212,0.15))",
+          background: "conic-gradient(from 180deg, rgba(20,33,61,0.4), rgba(252,163,17,0.15), rgba(20,33,61,0.2), rgba(252,163,17,0.1), rgba(20,33,61,0.4))",
           filter: "blur(100px)",
         }}
         animate={{
@@ -89,11 +89,11 @@ function FloatingOrbs() {
         transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* Secondary orb */}
+      {/* Secondary orb - Gold accent */}
       <motion.div
         className="absolute top-[20%] right-[-15%] w-[60vw] h-[60vw] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(168,85,247,0.12) 0%, rgba(6,182,212,0.06) 50%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(252,163,17,0.15) 0%, rgba(20,33,61,0.3) 50%, transparent 70%)",
           filter: "blur(80px)",
         }}
         animate={{
@@ -104,11 +104,11 @@ function FloatingOrbs() {
         transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Accent orb */}
+      {/* Accent orb - Navy glow */}
       <motion.div
         className="absolute bottom-[-20%] left-[30%] w-[50vw] h-[50vw] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(236,72,153,0.08) 0%, rgba(6,182,212,0.04) 50%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(252,163,17,0.1) 0%, rgba(20,33,61,0.2) 50%, transparent 70%)",
           filter: "blur(100px)",
         }}
         animate={{
@@ -118,11 +118,11 @@ function FloatingOrbs() {
         transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Floating particles */}
+      {/* Floating particles - Gold sparkles */}
       {[...Array(20)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-cyan-400/30"
+          className="absolute w-1 h-1 rounded-full bg-gold/40"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
@@ -188,7 +188,7 @@ function MagneticButton({ children, className = "", href }: { children: React.Re
 function GradientText({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <span className={`relative inline-block ${className}`}>
-      <span className="relative z-10 bg-gradient-to-r from-cyan-300 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
+      <span className="relative z-10 bg-gradient-to-r from-brand-300 via-purple-400 to-pink-400 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
         {children}
       </span>
     </span>
@@ -205,12 +205,12 @@ function GlassCard({ children, className = "", hover = true }: { children: React
       bg-gradient-to-br from-white/[0.08] to-white/[0.02]
       backdrop-blur-2xl
       border border-white/[0.08]
-      ${hover ? "hover:border-white/[0.15] hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-cyan-500/5" : ""}
+      ${hover ? "hover:border-white/[0.15] hover:bg-white/[0.06] hover:shadow-2xl hover:shadow-brand-500/5" : ""}
       transition-all duration-500
       ${className}
     `}>
       {/* Inner glow */}
-      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-brand-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <div className="relative z-10">
         {children}
       </div>
@@ -237,7 +237,7 @@ const features = [
     icon: Brain,
     title: "AI Meeting Co-Pilot",
     description: "Real-time Q&A, smart suggestions, and proactive insights during every meeting.",
-    gradient: "from-cyan-500 to-blue-600",
+    gradient: "from-brand-500 to-blue-600",
     badge: "Most Popular",
     size: "large",
   },
@@ -315,7 +315,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-[#030014] text-white overflow-hidden selection:bg-cyan-500/30">
+    <div ref={containerRef} className="relative min-h-screen bg-ink text-white overflow-hidden selection:bg-brand-500/30">
       {/* ============================================ */}
       {/* IMMERSIVE BACKGROUND */}
       {/* ============================================ */}
@@ -350,7 +350,7 @@ export default function LandingPage() {
         <div
           className="pointer-events-none fixed inset-0 transition-opacity duration-500"
           style={{
-            background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(6,182,212,0.06), transparent 50%)`,
+            background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(20,110,245,0.06), transparent 50%)`,
           }}
         />
       </div>
@@ -403,17 +403,17 @@ export default function LandingPage() {
                 <Link href="/" className="flex items-center gap-3 group">
                   <div className="relative">
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl blur-xl opacity-50 group-hover:opacity-80"
+                      className="absolute inset-0 bg-gradient-to-br from-brand-400 to-purple-500 rounded-xl blur-xl opacity-50 group-hover:opacity-80"
                       animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
                       transition={{ duration: 3, repeat: Infinity }}
                     />
-                    <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-violet-500 to-purple-500 shadow-lg shadow-purple-500/25">
+                    <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 via-violet-500 to-purple-500 shadow-lg shadow-purple-500/25">
                       <Video className="h-5 w-5 text-white" />
                     </div>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xl font-semibold tracking-tight">
-                      MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                      MeetVerse<span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI</span>
                     </span>
                     <span className="text-[10px] text-white/40 tracking-[0.15em] uppercase">Intelligent Meetings</span>
                   </div>
@@ -449,7 +449,7 @@ export default function LandingPage() {
                     Sign in
                   </Link>
                   <MagneticButton href="/sign-up">
-                    <Button className="relative overflow-hidden bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500 hover:opacity-90 text-white border-0 shadow-lg shadow-purple-500/25 rounded-xl px-6 group">
+                    <Button className="relative overflow-hidden bg-gradient-to-r from-brand-500 via-violet-500 to-purple-500 hover:opacity-90 text-white border-0 shadow-lg shadow-purple-500/25 rounded-xl px-6 group">
                       <span className="relative z-10 flex items-center font-medium">
                         Start Free
                         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -500,7 +500,7 @@ export default function LandingPage() {
                           Sign in
                         </Link>
                         <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
-                          <Button className="w-full bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500 text-white rounded-xl py-3">
+                          <Button className="w-full bg-gradient-to-r from-brand-500 via-violet-500 to-purple-500 text-white rounded-xl py-3">
                             Start Free Trial
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
@@ -547,16 +547,16 @@ export default function LandingPage() {
                     <span className="text-sm text-amber-200 font-medium">#1 on Product Hunt</span>
                   </motion.div>
                   <motion.div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-cyan-500/20 to-violet-500/10 border border-cyan-500/30 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-brand-500/20 to-violet-500/10 border border-brand-500/30 backdrop-blur-sm"
                     whileHover={{ scale: 1.05 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >
                     <div className="flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-3.5 w-3.5 text-cyan-400 fill-cyan-400" />
+                        <Star key={i} className="h-3.5 w-3.5 text-brand-400 fill-brand-400" />
                       ))}
                     </div>
-                    <span className="text-sm text-cyan-200 font-medium">4.9/5 from 2,800+ reviews</span>
+                    <span className="text-sm text-brand-200 font-medium">4.9/5 from 2,800+ reviews</span>
                   </motion.div>
                 </motion.div>
 
@@ -569,7 +569,7 @@ export default function LandingPage() {
                   <span className="relative inline-block">
                     <GradientText>actually work</GradientText>
                     <motion.span
-                      className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 via-violet-500/20 to-purple-500/20 blur-3xl rounded-full -z-10"
+                      className="absolute -inset-4 bg-gradient-to-r from-brand-500/20 via-violet-500/20 to-purple-500/20 blur-3xl rounded-full -z-10"
                       animate={{ opacity: [0.4, 0.7, 0.4], scale: [1, 1.05, 1] }}
                       transition={{ duration: 4, repeat: Infinity }}
                     />
@@ -631,7 +631,7 @@ export default function LandingPage() {
                     onClick={() => setIsVideoPlaying(true)}
                     className="w-full sm:w-auto group border-white/20 bg-white/5 hover:bg-white/10 backdrop-blur-sm px-8 py-7 text-base rounded-2xl text-white"
                   >
-                    <CirclePlay className="mr-2 h-5 w-5 text-cyan-400 group-hover:scale-110 transition-transform" />
+                    <CirclePlay className="mr-2 h-5 w-5 text-brand-400 group-hover:scale-110 transition-transform" />
                     Watch 2-min Demo
                   </Button>
                 </motion.div>
@@ -659,7 +659,7 @@ export default function LandingPage() {
                 className="lg:col-span-6 relative perspective-1000"
               >
                 {/* Floating Glow */}
-                <div className="absolute -inset-10 bg-gradient-to-br from-cyan-500/30 via-violet-500/20 to-purple-500/30 rounded-[4rem] blur-[80px] opacity-50" />
+                <div className="absolute -inset-10 bg-gradient-to-br from-brand-500/30 via-violet-500/20 to-purple-500/30 rounded-[4rem] blur-[80px] opacity-50" />
 
                 {/* Main Visual Container */}
                 <div className="relative">
@@ -703,25 +703,25 @@ export default function LandingPage() {
                               animate={{ opacity: 1, scale: 1 }}
                               transition={{ delay: 0.7 + i * 0.08 }}
                               className={`relative rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 border ${
-                                participant.speaking ? "border-cyan-500/50 shadow-lg shadow-cyan-500/20" : "border-white/10"
+                                participant.speaking ? "border-brand-500/50 shadow-lg shadow-brand-500/20" : "border-white/10"
                               } flex items-center justify-center`}
                             >
                               <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold ${
                                 participant.name === "+3"
                                   ? "bg-white/10 text-white/60"
-                                  : "bg-gradient-to-br from-cyan-500 to-violet-500 text-white"
+                                  : "bg-gradient-to-br from-brand-500 to-violet-500 text-white"
                               }`}>
                                 {participant.name.charAt(0)}
                                 {participant.name === "+3" && "3"}
                               </div>
                               {participant.speaking && (
                                 <motion.div
-                                  className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full bg-cyan-500/20 border border-cyan-500/30"
+                                  className="absolute bottom-1.5 left-1.5 sm:bottom-2 sm:left-2 flex items-center gap-1 px-2 py-0.5 sm:py-1 rounded-full bg-brand-500/20 border border-brand-500/30"
                                   animate={{ opacity: [1, 0.6, 1] }}
                                   transition={{ duration: 1, repeat: Infinity }}
                                 >
-                                  <Mic className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-cyan-400" />
-                                  <span className="text-[8px] sm:text-[10px] text-cyan-300 hidden sm:inline">Speaking</span>
+                                  <Mic className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-brand-400" />
+                                  <span className="text-[8px] sm:text-[10px] text-brand-300 hidden sm:inline">Speaking</span>
                                 </motion.div>
                               )}
                             </motion.div>
@@ -737,7 +737,7 @@ export default function LandingPage() {
                         >
                           <GlassCard className="h-full p-3 sm:p-4" hover={false}>
                             <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center">
+                              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center">
                                 <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                               </div>
                               <span className="font-semibold text-xs sm:text-sm text-white">AI Co-Pilot</span>
@@ -749,14 +749,14 @@ export default function LandingPage() {
                             </div>
 
                             {/* Live Transcript */}
-                            <div className="mb-3 sm:mb-4 p-2 sm:p-3 rounded-xl bg-gradient-to-br from-cyan-500/10 to-violet-500/10 border border-cyan-500/20">
+                            <div className="mb-3 sm:mb-4 p-2 sm:p-3 rounded-xl bg-gradient-to-br from-brand-500/10 to-violet-500/10 border border-brand-500/20">
                               <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
                                 <motion.div
                                   animate={{ scale: [1, 1.3, 1] }}
                                   transition={{ duration: 1, repeat: Infinity }}
-                                  className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-cyan-400"
+                                  className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-brand-400"
                                 />
-                                <span className="text-[10px] sm:text-xs text-cyan-300">Live Transcript</span>
+                                <span className="text-[10px] sm:text-xs text-brand-300">Live Transcript</span>
                               </div>
                               <p className="text-[10px] sm:text-xs text-white/50 leading-relaxed line-clamp-2">
                                 "...the Q2 targets look achievable if we focus on enterprise..."
@@ -929,7 +929,7 @@ export default function LandingPage() {
               className="text-center mb-20"
             >
               <motion.div variants={slideUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
-                <BarChart3 className="w-4 h-4 text-cyan-400" />
+                <BarChart3 className="w-4 h-4 text-brand-400" />
                 <span className="text-sm text-white/60">The Meeting Productivity Gap</span>
               </motion.div>
               <motion.h2 variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
@@ -951,7 +951,7 @@ export default function LandingPage() {
               className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"
             >
               {[
-                { value: "73%", label: "Less time on notes", description: "AI captures everything automatically", gradient: "from-cyan-500 to-blue-600", icon: FileText },
+                { value: "73%", label: "Less time on notes", description: "AI captures everything automatically", gradient: "from-brand-500 to-blue-600", icon: FileText },
                 { value: "5h+", label: "Saved per week", description: "Average time saved per team member", gradient: "from-violet-500 to-purple-600", icon: Clock },
                 { value: "98%", label: "Action accuracy", description: "Never miss a commitment again", gradient: "from-amber-500 to-orange-600", icon: Target },
                 { value: "2x", label: "Follow-through", description: "Double your team's execution rate", gradient: "from-emerald-500 to-green-600", icon: TrendingUp },
@@ -1011,11 +1011,11 @@ export default function LandingPage() {
                 <GlassCard className="h-full overflow-hidden group">
                   <div className="relative h-full p-8 lg:p-10 flex flex-col min-h-[450px]">
                     {/* Background gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-violet-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-violet-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
 
                     <div className="relative z-10">
                       <div className="flex items-center gap-4 mb-6">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center shadow-lg shadow-violet-500/30">
                           <Brain className="w-7 h-7 text-white" />
                         </div>
                         <div className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-medium">
@@ -1038,7 +1038,7 @@ export default function LandingPage() {
                         ].map((item, i) => (
                           <div key={i} className="flex items-center gap-3 text-white/70 group-hover:text-white/90 transition-colors">
                             <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
-                              <item.icon className="w-4 h-4 text-cyan-400" />
+                              <item.icon className="w-4 h-4 text-brand-400" />
                             </div>
                             <span className="text-sm">{item.label}</span>
                           </div>
@@ -1049,7 +1049,7 @@ export default function LandingPage() {
                     {/* Decorative Element */}
                     <div className="absolute right-0 bottom-0 w-72 h-72 hidden lg:block opacity-20 group-hover:opacity-40 transition-opacity duration-700">
                       <motion.div
-                        className="absolute inset-0 border border-cyan-500/30 rounded-full"
+                        className="absolute inset-0 border border-brand-500/30 rounded-full"
                         animate={{ rotate: 360 }}
                         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
                       />
@@ -1064,7 +1064,7 @@ export default function LandingPage() {
                         transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                       />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Brain className="w-20 h-20 text-cyan-500/30" />
+                        <Brain className="w-20 h-20 text-brand-500/30" />
                       </div>
                     </div>
                   </div>
@@ -1098,7 +1098,7 @@ export default function LandingPage() {
         {/* HOW IT WORKS */}
         {/* ============================================ */}
         <section id="how-it-works" className="py-32 relative overflow-hidden" aria-label="How MeetVerse AI works">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-500/5 to-transparent" />
 
           <div className="container max-w-7xl mx-auto px-6 relative">
             <motion.div
@@ -1148,9 +1148,9 @@ export default function LandingPage() {
                 <motion.div key={i} variants={slideUp} className="relative group">
                   {i < 2 && (
                     <div className="hidden md:block absolute top-16 left-full w-full h-px z-0">
-                      <div className="h-full bg-gradient-to-r from-white/20 via-cyan-500/20 to-transparent" />
+                      <div className="h-full bg-gradient-to-r from-white/20 via-brand-500/20 to-transparent" />
                       <motion.div
-                        className="absolute top-0 left-0 w-8 h-px bg-cyan-400"
+                        className="absolute top-0 left-0 w-8 h-px bg-brand-400"
                         animate={{ x: [0, 100, 0] }}
                         transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
                       />
@@ -1158,9 +1158,9 @@ export default function LandingPage() {
                   )}
                   <GlassCard className="p-8 text-center h-full">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/10 mb-6 group-hover:scale-110 transition-transform duration-500">
-                      <item.icon className="w-8 h-8 text-cyan-400" />
+                      <item.icon className="w-8 h-8 text-brand-400" />
                     </div>
-                    <div className="text-xs font-bold text-cyan-400 mb-3 tracking-widest">{item.step}</div>
+                    <div className="text-xs font-bold text-brand-400 mb-3 tracking-widest">{item.step}</div>
                     <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
                     <p className="text-white/50 text-sm leading-relaxed">{item.description}</p>
                   </GlassCard>
@@ -1203,9 +1203,9 @@ export default function LandingPage() {
                 <div className="grid grid-cols-3 border-b border-white/10">
                   <div className="p-6 font-semibold text-white/60">Feature</div>
                   <div className="p-6 font-semibold text-white/40 text-center border-x border-white/10">Traditional Tools</div>
-                  <div className="p-6 font-semibold text-white text-center bg-gradient-to-r from-cyan-500/10 to-violet-500/10">
+                  <div className="p-6 font-semibold text-white text-center bg-gradient-to-r from-brand-500/10 to-violet-500/10">
                     <span className="inline-flex items-center gap-2">
-                      <Video className="w-4 h-4 text-cyan-400" />
+                      <Video className="w-4 h-4 text-brand-400" />
                       MeetVerse AI
                     </span>
                   </div>
@@ -1233,10 +1233,10 @@ export default function LandingPage() {
                         {row.old}
                       </span>
                     </div>
-                    <div className="p-5 text-white text-center bg-gradient-to-r from-cyan-500/5 to-violet-500/5 flex items-center justify-center">
+                    <div className="p-5 text-white text-center bg-gradient-to-r from-brand-500/5 to-violet-500/5 flex items-center justify-center">
                       <span className="flex items-center gap-2">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                        <span className={row.highlight ? "font-semibold text-cyan-300" : ""}>{row.new}</span>
+                        <span className={row.highlight ? "font-semibold text-brand-300" : ""}>{row.new}</span>
                       </span>
                     </div>
                   </div>
@@ -1308,13 +1308,13 @@ export default function LandingPage() {
                       "{testimonial.quote}"
                     </blockquote>
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center font-semibold text-white">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center font-semibold text-white">
                         {testimonial.author.split(" ").map(n => n[0]).join("")}
                       </div>
                       <div>
                         <div className="font-semibold text-white flex items-center gap-2">
                           {testimonial.author}
-                          <BadgeCheck className="w-4 h-4 text-cyan-400" />
+                          <BadgeCheck className="w-4 h-4 text-brand-400" />
                         </div>
                         <div className="text-sm text-white/50">{testimonial.role}, {testimonial.company}</div>
                       </div>
@@ -1388,7 +1388,7 @@ export default function LandingPage() {
               viewport={{ once: true }}
               className="mt-12 text-center"
             >
-              <Link href="#" className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 transition-colors font-medium">
+              <Link href="#" className="inline-flex items-center gap-2 text-brand-400 hover:text-brand-300 transition-colors font-medium">
                 See all 50+ integrations
                 <ArrowRight className="w-4 h-4" />
               </Link>
@@ -1409,7 +1409,7 @@ export default function LandingPage() {
               className="text-center mb-16"
             >
               <motion.div variants={slideUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6">
-                <MessageSquare className="w-4 h-4 text-cyan-400" />
+                <MessageSquare className="w-4 h-4 text-brand-400" />
                 <span className="text-sm text-white/60">FAQ</span>
               </motion.div>
               <motion.h2 id="faq-heading" variants={slideUp} className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
@@ -1520,7 +1520,7 @@ export default function LandingPage() {
                   period: "/user/mo",
                   description: "For growing teams that need more power",
                   icon: Zap,
-                  gradient: "from-cyan-500 to-violet-500",
+                  gradient: "from-brand-500 to-violet-500",
                   features: [
                     "Unlimited meetings",
                     "Up to 100 participants",
@@ -1563,8 +1563,8 @@ export default function LandingPage() {
                   {plan.badge && (
                     <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-500 blur-md opacity-60" />
-                        <div className="relative px-5 py-1.5 rounded-full bg-gradient-to-r from-cyan-500 to-violet-500 text-sm font-semibold text-white shadow-xl">
+                        <div className="absolute inset-0 bg-gradient-to-r from-brand-500 to-violet-500 blur-md opacity-60" />
+                        <div className="relative px-5 py-1.5 rounded-full bg-gradient-to-r from-brand-500 to-violet-500 text-sm font-semibold text-white shadow-xl">
                           {plan.badge}
                         </div>
                       </div>
@@ -1574,12 +1574,12 @@ export default function LandingPage() {
                   {/* Card */}
                   <div className={`relative h-full rounded-3xl overflow-hidden transition-all duration-500 ${
                     plan.highlighted
-                      ? "bg-gradient-to-b from-white/[0.12] to-white/[0.04] border-2 border-cyan-500/40 shadow-[0_0_60px_rgba(6,182,212,0.15)]"
+                      ? "bg-gradient-to-b from-white/[0.12] to-white/[0.04] border-2 border-brand-500/40 shadow-[0_0_60px_rgba(20,110,245,0.15)]"
                       : "bg-white/[0.03] border border-white/[0.08] hover:border-white/20 hover:bg-white/[0.05]"
                   }`}>
                     {/* Glow effect for highlighted */}
                     {plan.highlighted && (
-                      <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/10 via-transparent to-violet-500/10 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-b from-brand-500/10 via-transparent to-violet-500/10 pointer-events-none" />
                     )}
 
                     <div className="relative p-8">
@@ -1597,7 +1597,7 @@ export default function LandingPage() {
                       {/* Price */}
                       <div className="mb-8">
                         <div className="flex items-baseline gap-2">
-                          <span className={`text-5xl font-bold ${plan.highlighted ? "bg-gradient-to-r from-white to-cyan-200 bg-clip-text text-transparent" : "text-white"}`}>
+                          <span className={`text-5xl font-bold ${plan.highlighted ? "bg-gradient-to-r from-white to-brand-200 bg-clip-text text-transparent" : "text-white"}`}>
                             {plan.price}
                           </span>
                           {plan.period && (
@@ -1617,7 +1617,7 @@ export default function LandingPage() {
                           <li key={featureIndex} className="flex items-start gap-3">
                             <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
                               plan.highlighted
-                                ? "bg-gradient-to-br from-cyan-500 to-violet-500"
+                                ? "bg-gradient-to-br from-brand-500 to-violet-500"
                                 : "bg-white/10"
                             }`}>
                               <CheckCircle2 className="w-3 h-3 text-white" />
@@ -1631,7 +1631,7 @@ export default function LandingPage() {
                       <Link href={plan.name === "Business" ? "/contact" : "/sign-up"} className="block">
                         <button className={`w-full py-4 px-6 rounded-2xl font-semibold text-sm transition-all duration-300 ${
                           plan.highlighted
-                            ? "bg-white text-[#030014] hover:bg-white/90 shadow-xl hover:shadow-2xl hover:shadow-cyan-500/20 hover:-translate-y-0.5"
+                            ? "bg-white text-[#030014] hover:bg-white/90 shadow-xl hover:shadow-2xl hover:shadow-brand-500/20 hover:-translate-y-0.5"
                             : "bg-white/10 hover:bg-white/20 text-white border border-white/10 hover:border-white/20"
                         }`}>
                           {plan.cta}
@@ -1671,7 +1671,7 @@ export default function LandingPage() {
               className="relative rounded-[3rem] overflow-hidden"
             >
               {/* Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-600" />
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-500 via-violet-500 to-purple-600" />
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.2),transparent)]" />
 
               {/* Animated orbs */}
@@ -1681,7 +1681,7 @@ export default function LandingPage() {
                 transition={{ duration: 6, repeat: Infinity }}
               />
               <motion.div
-                className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-cyan-300/20 blur-3xl"
+                className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-brand-300/20 blur-3xl"
                 animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
                 transition={{ duration: 8, repeat: Infinity }}
               />
@@ -1770,11 +1770,11 @@ export default function LandingPage() {
             {/* Brand Column */}
             <div className="col-span-2">
               <Link href="/" className="flex items-center gap-3 mb-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-500">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 via-violet-500 to-purple-500">
                   <Video className="h-5 w-5 text-white" />
                 </div>
                 <span className="text-xl font-semibold text-white tracking-tight">
-                  MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                  MeetVerse<span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI</span>
                 </span>
               </Link>
               <p className="text-sm text-white/50 max-w-xs mb-6 leading-relaxed">
@@ -1840,7 +1840,7 @@ export default function LandingPage() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative w-full max-w-4xl aspect-video bg-[#030014] rounded-2xl overflow-hidden"
+              className="relative w-full max-w-4xl aspect-video bg-ink rounded-2xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <button

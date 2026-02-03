@@ -105,15 +105,15 @@ function StatCard({ icon: Icon, label, value, color }: {
 }) {
   return (
     <motion.div variants={itemVariants} whileHover={{ y: -2 }}>
-      <Card className="border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
+      <Card className="border-gray-200 dark:border-navy/50 bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-navy/80 hover:border-gray-300 dark:hover:border-gold/20 transition-all duration-300">
         <CardContent className="p-4">
           <div className="flex items-center gap-3">
             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", color)}>
               <Icon className="w-5 h-5 text-white" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{value}</p>
-              <p className="text-xs text-white/50">{label}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+              <p className="text-xs text-gray-500 dark:text-silver">{label}</p>
             </div>
           </div>
         </CardContent>
@@ -176,7 +176,7 @@ export default function ProfilePage() {
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
         >
-          <Loader2 className="h-8 w-8 text-cyan-400" />
+          <Loader2 className="h-8 w-8 text-brand-500 dark:text-gold" />
         </motion.div>
       </div>
     );
@@ -191,9 +191,9 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen relative">
-      {/* Background Effects */}
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[150px]" />
+      {/* Background Effects - Only in light mode */}
+      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden dark:hidden">
+        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-brand-500/5 rounded-full blur-[150px]" />
         <div className="absolute bottom-1/4 left-1/4 w-[500px] h-[500px] bg-violet-500/5 rounded-full blur-[120px]" />
       </div>
 
@@ -205,23 +205,23 @@ export default function ProfilePage() {
       >
         {/* Profile Header Card */}
         <motion.div variants={itemVariants}>
-          <Card className="relative overflow-hidden border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl">
+          <Card className="relative overflow-hidden border-gray-200 dark:border-navy/50 bg-white dark:bg-navy">
             {/* Gradient top border */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500" />
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand-500 via-violet-500 to-brand-600" />
 
-            {/* Background decoration */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-cyan-500/10 to-violet-500/10 rounded-full blur-3xl" />
+            {/* Background decoration - only in light mode */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-500/10 to-violet-500/10 rounded-full blur-3xl dark:hidden" />
 
             <CardContent className="p-8 relative">
               <div className="flex flex-col md:flex-row md:items-start gap-8">
                 {/* Avatar Section */}
                 <div className="relative group">
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-violet-500 rounded-3xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
+                    className="absolute inset-0 bg-gradient-to-br from-brand-400 to-violet-500 rounded-3xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ duration: 3, repeat: Infinity }}
                   />
-                  <div className="relative w-32 h-32 rounded-3xl bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-500 flex items-center justify-center text-4xl font-bold text-white shadow-lg shadow-violet-500/25">
+                  <div className="relative w-32 h-32 rounded-3xl bg-gradient-to-br from-brand-500 via-violet-500 to-brand-600 flex items-center justify-center text-4xl font-bold text-white shadow-lg shadow-brand-500/25">
                     {profile?.image ? (
                       <img src={profile.image} alt="Profile" className="w-full h-full rounded-3xl object-cover" />
                     ) : (
@@ -230,9 +230,9 @@ export default function ProfilePage() {
                   </div>
                   <Button
                     size="icon"
-                    className="absolute -bottom-2 -right-2 h-10 w-10 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 backdrop-blur-sm"
+                    className="absolute -bottom-2 -right-2 h-10 w-10 rounded-xl bg-gray-100 dark:bg-ink hover:bg-gray-200 dark:hover:bg-ink/80 border border-gray-200 dark:border-white/10"
                   >
-                    <Camera className="h-5 w-5 text-white" />
+                    <Camera className="h-5 w-5 text-gray-600 dark:text-white" />
                   </Button>
                 </div>
 
@@ -244,34 +244,34 @@ export default function ProfilePage() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Enter your name"
-                        className="text-2xl font-bold h-12 bg-white/[0.03] border-white/[0.08] text-white max-w-xs"
+                        className="text-2xl font-bold h-12 bg-gray-50 dark:bg-ink border-gray-200 dark:border-white/10 text-gray-900 dark:text-white max-w-xs"
                       />
                     ) : (
-                      <h1 className="text-3xl font-bold text-white tracking-tight">
+                      <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
                         {profile?.name || "Set your name"}
                       </h1>
                     )}
                     <Badge className={cn(
                       "w-fit gap-1.5 px-3 py-1",
-                      subscriptionTier === "PRO" && "bg-gradient-to-r from-cyan-500/20 to-violet-500/20 text-cyan-400 border-cyan-500/30",
-                      subscriptionTier === "ENTERPRISE" && "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-amber-500/30",
-                      subscriptionTier === "FREE" && "bg-white/10 text-white/60 border-white/20"
+                      subscriptionTier === "PRO" && "bg-gradient-to-r from-brand-500/20 to-violet-500/20 text-brand-500 dark:text-gold border-brand-500/30 dark:border-gold/30",
+                      subscriptionTier === "ENTERPRISE" && "bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-500 dark:text-amber-400 border-amber-500/30",
+                      subscriptionTier === "FREE" && "bg-gray-100 dark:bg-ink text-gray-500 dark:text-silver border-gray-200 dark:border-white/10"
                     )}>
                       <Crown className="w-3.5 h-3.5" />
                       {subscriptionTier}
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-2 text-white/50">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-silver">
                     <Mail className="w-4 h-4" />
                     <span>{profile?.email}</span>
-                    <Badge variant="outline" className="ml-2 bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-xs">
+                    <Badge variant="outline" className="ml-2 bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20 text-xs">
                       <Check className="w-3 h-3 mr-1" />
                       Verified
                     </Badge>
                   </div>
 
-                  <div className="flex items-center gap-2 text-white/40 text-sm">
+                  <div className="flex items-center gap-2 text-gray-400 dark:text-silver/60 text-sm">
                     <Calendar className="w-4 h-4" />
                     <span>Member since {profile?.createdAt
                       ? new Date(profile.createdAt).toLocaleDateString("en-US", {
@@ -287,12 +287,12 @@ export default function ProfilePage() {
                       <motion.div
                         key={i}
                         whileHover={{ scale: 1.05 }}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-ink border border-gray-200 dark:border-white/10"
                       >
                         <div className={cn("w-5 h-5 rounded-md bg-gradient-to-br flex items-center justify-center", achievement.color)}>
                           <achievement.icon className="w-3 h-3 text-white" />
                         </div>
-                        <span className="text-xs text-white/60">{achievement.label}</span>
+                        <span className="text-xs text-gray-500 dark:text-silver">{achievement.label}</span>
                       </motion.div>
                     ))}
                   </div>
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                         <Button
                           variant="outline"
                           onClick={handleCancel}
-                          className="border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                          className="border-gray-200 dark:border-navy bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-ink text-gray-700 dark:text-white"
                         >
                           <X className="mr-2 h-4 w-4" />
                           Cancel
@@ -312,7 +312,7 @@ export default function ProfilePage() {
                         <Button
                           onClick={handleSave}
                           disabled={updateProfile.isPending}
-                          className="bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white"
+                          className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white"
                         >
                           {updateProfile.isPending ? (
                             <>
@@ -330,7 +330,7 @@ export default function ProfilePage() {
                     ) : (
                       <Button
                         onClick={handleEdit}
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/10"
+                        className="bg-gray-100 dark:bg-ink hover:bg-gray-200 dark:hover:bg-ink/80 text-gray-700 dark:text-white border border-gray-200 dark:border-white/10"
                       >
                         <Edit3 className="mr-2 h-4 w-4" />
                         Edit Profile
@@ -374,7 +374,7 @@ export default function ProfilePage() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Subscription Card */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
-            <Card className="border-white/[0.08] bg-gradient-to-br from-white/[0.04] to-transparent backdrop-blur-sm overflow-hidden">
+            <Card className="border-gray-200 dark:border-navy/50 bg-white dark:bg-navy overflow-hidden">
               <div className={cn(
                 "absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r",
                 tierColors[subscriptionTier as keyof typeof tierColors]
@@ -390,13 +390,13 @@ export default function ProfilePage() {
                         <Crown className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white">{subscriptionTier} Plan</h2>
-                        <p className="text-sm text-white/50">Your current subscription</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{subscriptionTier} Plan</h2>
+                        <p className="text-sm text-gray-500 dark:text-silver">Your current subscription</p>
                       </div>
                     </div>
                   </div>
                   {subscriptionTier !== "ENTERPRISE" && (
-                    <Button className="bg-gradient-to-r from-cyan-500 to-violet-500 hover:from-cyan-400 hover:to-violet-400 text-white shadow-lg shadow-violet-500/25">
+                    <Button className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white shadow-lg shadow-brand-500/25">
                       <TrendingUp className="mr-2 h-4 w-4" />
                       Upgrade Plan
                     </Button>
@@ -407,9 +407,9 @@ export default function ProfilePage() {
                   {planFeatures[subscriptionTier as keyof typeof planFeatures]?.map((feature, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm">
                       <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                        <Check className="w-3 h-3 text-emerald-400" />
+                        <Check className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
                       </div>
-                      <span className="text-white/70">{feature}</span>
+                      <span className="text-gray-600 dark:text-silver">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -419,38 +419,38 @@ export default function ProfilePage() {
 
           {/* Quick Actions */}
           <motion.div variants={itemVariants} className="space-y-4">
-            <Card className="border-white/[0.06] bg-white/[0.02]">
+            <Card className="border-gray-200 dark:border-navy/50 bg-white dark:bg-navy">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3 mb-4">
-                  <Shield className="w-5 h-5 text-emerald-400" />
-                  <h3 className="font-semibold text-white">Security</h3>
+                  <Shield className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Security</h3>
                 </div>
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start border-white/10 bg-white/5 hover:bg-white/10 text-white">
-                    <Shield className="mr-2 h-4 w-4 text-cyan-400" />
+                  <Button variant="outline" className="w-full justify-start border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-ink hover:bg-gray-100 dark:hover:bg-ink/80 text-gray-700 dark:text-white">
+                    <Shield className="mr-2 h-4 w-4 text-brand-500 dark:text-gold" />
                     Enable 2FA
                   </Button>
-                  <Button variant="outline" className="w-full justify-start border-white/10 bg-white/5 hover:bg-white/10 text-white">
-                    <Globe className="mr-2 h-4 w-4 text-violet-400" />
+                  <Button variant="outline" className="w-full justify-start border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-ink hover:bg-gray-100 dark:hover:bg-ink/80 text-gray-700 dark:text-white">
+                    <Globe className="mr-2 h-4 w-4 text-violet-500 dark:text-violet-400" />
                     Connected Apps
                   </Button>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-white/[0.06] bg-white/[0.02]">
+            <Card className="border-gray-200 dark:border-navy/50 bg-white dark:bg-navy">
               <CardContent className="p-5">
                 <div className="flex items-center gap-3 mb-4">
-                  <BarChart3 className="w-5 h-5 text-cyan-400" />
-                  <h3 className="font-semibold text-white">Usage</h3>
+                  <BarChart3 className="w-5 h-5 text-brand-500 dark:text-gold" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Usage</h3>
                 </div>
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/50">Meetings this month</span>
-                    <span className="text-white font-medium">12 / unlimited</span>
+                    <span className="text-gray-500 dark:text-silver">Meetings this month</span>
+                    <span className="text-gray-900 dark:text-white font-medium">12 / unlimited</span>
                   </div>
-                  <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                    <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-cyan-500 to-violet-500" />
+                  <div className="h-2 rounded-full bg-gray-200 dark:bg-ink overflow-hidden">
+                    <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-brand-500 to-brand-600" />
                   </div>
                 </div>
               </CardContent>
@@ -464,11 +464,11 @@ export default function ProfilePage() {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-6 h-6 text-red-400" />
+                  <AlertTriangle className="w-6 h-6 text-red-500 dark:text-red-400" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white mb-1">Danger Zone</h3>
-                  <p className="text-sm text-white/50 mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">Danger Zone</h3>
+                  <p className="text-sm text-gray-500 dark:text-silver mb-4">
                     Permanently delete your account and all associated data. This action cannot be undone.
                   </p>
                   <AnimatePresence>
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                         <Button
                           variant="outline"
                           onClick={() => setShowDeleteConfirm(false)}
-                          className="border-white/10 bg-white/5 hover:bg-white/10 text-white"
+                          className="border-gray-200 dark:border-white/10 bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-ink text-gray-700 dark:text-white"
                         >
                           Cancel
                         </Button>
@@ -498,7 +498,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         onClick={() => setShowDeleteConfirm(true)}
-                        className="border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-400"
+                        className="border-red-500/30 bg-red-500/10 hover:bg-red-500/20 text-red-500 dark:text-red-400"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Account

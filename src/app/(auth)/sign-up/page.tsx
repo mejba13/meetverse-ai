@@ -46,7 +46,7 @@ function FloatingOrbs() {
       <motion.div
         className="absolute -top-32 -right-32 w-96 h-96 rounded-full"
         style={{
-          background: "conic-gradient(from 0deg, rgba(6,182,212,0.25), rgba(168,85,247,0.15), rgba(236,72,153,0.1), rgba(6,182,212,0.25))",
+          background: "conic-gradient(from 0deg, rgba(20,110,245,0.25), rgba(168,85,247,0.15), rgba(236,72,153,0.1), rgba(20,110,245,0.25))",
           filter: "blur(80px)",
         }}
         animate={{ rotate: -360 }}
@@ -55,7 +55,7 @@ function FloatingOrbs() {
       <motion.div
         className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(6,182,212,0.1) 50%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(168,85,247,0.25) 0%, rgba(20,110,245,0.1) 50%, transparent 70%)",
           filter: "blur(60px)",
         }}
         animate={{
@@ -110,7 +110,7 @@ const features = [
     icon: Brain,
     title: "AI Meeting Co-Pilot",
     description: "Real-time assistance, smart suggestions, and proactive insights during every meeting.",
-    gradient: "from-cyan-500 to-blue-600",
+    gradient: "from-brand-500 to-blue-600",
   },
   {
     icon: MessageSquare,
@@ -146,7 +146,7 @@ const features = [
 
 export default function SignUpPage() {
   return (
-    <div className="flex min-h-screen bg-[#030014]">
+    <div className="flex min-h-screen bg-ink">
       {/* ============================================ */}
       {/* LEFT SIDE - IMMERSIVE FEATURES SHOWCASE */}
       {/* ============================================ */}
@@ -180,17 +180,17 @@ export default function SignUpPage() {
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative">
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-violet-500 rounded-xl blur-xl opacity-50 group-hover:opacity-80"
+                  className="absolute inset-0 bg-gradient-to-br from-brand-400 to-violet-500 rounded-xl blur-xl opacity-50 group-hover:opacity-80"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-400 via-violet-500 to-purple-500 shadow-lg shadow-violet-500/30">
                   <Video className="h-6 w-6 text-white" />
                 </div>
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-white">
-                  MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                  MeetVerse<span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI</span>
                 </span>
                 <span className="text-[10px] text-white/40 tracking-widest uppercase">Intelligent Meetings</span>
               </div>
@@ -213,7 +213,7 @@ export default function SignUpPage() {
               <h1 className="text-4xl xl:text-5xl font-bold text-white leading-tight tracking-tight">
                 Start your journey with
                 <br />
-                <span className="bg-gradient-to-r from-cyan-300 via-violet-400 to-pink-400 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-brand-300 via-violet-400 to-pink-400 bg-clip-text text-transparent">
                   AI-powered meetings
                 </span>
               </h1>
@@ -300,11 +300,11 @@ export default function SignUpPage() {
             className="lg:hidden mb-10"
           >
             <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-500">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 via-violet-500 to-purple-500">
                 <Video className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-bold text-white">
-                MeetVerse<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">AI</span>
+                MeetVerse<span className="bg-gradient-to-r from-brand-400 to-purple-400 bg-clip-text text-transparent">AI</span>
               </span>
             </Link>
           </motion.div>
@@ -347,7 +347,7 @@ export default function SignUpPage() {
             Already have an account?{" "}
             <Link
               href="/sign-in"
-              className="font-medium text-cyan-400 hover:text-cyan-300 transition-colors inline-flex items-center gap-1"
+              className="font-medium text-brand-400 hover:text-brand-300 transition-colors inline-flex items-center gap-1"
             >
               Sign in
               <ArrowRight className="w-3.5 h-3.5" />
