@@ -31,6 +31,7 @@ import {
   Globe,
   Star,
   MessageSquare,
+  Command,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -256,50 +257,85 @@ const scaleIn = {
 };
 
 // ============================================
-// AURORA BACKGROUND
+// AURORA BACKGROUND - Lime/Purple Theme
 // ============================================
 function AuroraBackground() {
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-      {/* Primary aurora orb - gold */}
+      {/* Primary lime orb */}
       <motion.div
-        className="absolute -top-[30%] -left-[15%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] rounded-full"
+        className="absolute -top-[20%] -right-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full"
         style={{
-          background: "conic-gradient(from 180deg, rgba(20,33,61,0.6), rgba(252,161,17,0.12), rgba(20,33,61,0.4), rgba(252,161,17,0.06), rgba(20,33,61,0.6))",
-          filter: "blur(140px)",
-        }}
-        animate={{ rotate: [0, 360] }}
-        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
-      />
-
-      {/* Secondary orb - navy/gold blend */}
-      <motion.div
-        className="absolute top-[15%] right-[-20%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(252,161,17,0.08) 0%, rgba(20,33,61,0.25) 50%, transparent 70%)",
-          filter: "blur(100px)",
-        }}
-        animate={{ x: [0, -30, 0], y: [0, 30, 0] }}
-        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Bottom accent */}
-      <motion.div
-        className="absolute bottom-[-10%] left-[20%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(252,161,17,0.06) 0%, rgba(20,33,61,0.15) 60%, transparent 80%)",
+          background: "radial-gradient(circle, rgba(202,255,75,0.08) 0%, rgba(202,255,75,0.02) 40%, transparent 70%)",
           filter: "blur(80px)",
         }}
-        animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.5, 0.7, 0.5],
+        }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Subtle grid overlay */}
+      {/* Secondary purple orb */}
+      <motion.div
+        className="absolute top-[40%] -left-[15%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(155,93,229,0.06) 0%, rgba(155,93,229,0.02) 40%, transparent 70%)",
+          filter: "blur(100px)",
+        }}
+        animate={{
+          x: [0, 30, 0],
+          y: [0, -20, 0],
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Bottom lime accent */}
+      <motion.div
+        className="absolute bottom-[-10%] right-[20%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(202,255,75,0.05) 0%, transparent 60%)",
+          filter: "blur(60px)",
+        }}
+        animate={{
+          scale: [1.1, 1, 1.1],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Floating particles */}
+      {[...Array(15)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 rounded-full"
+          style={{
+            left: `${5 + Math.random() * 90}%`,
+            top: `${5 + Math.random() * 90}%`,
+            background: i % 3 === 0 ? "#CAFF4B" : i % 3 === 1 ? "#9B5DE5" : "rgba(255,255,255,0.5)",
+          }}
+          animate={{
+            y: [0, -30, 0],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.5, 1],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 4,
+            repeat: Infinity,
+            delay: Math.random() * 3,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Subtle grid */}
       <div
         className="absolute inset-0 opacity-[0.015]"
         style={{
-          backgroundImage: `linear-gradient(rgba(252,161,17,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(252,161,17,0.3) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px',
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+          `,
+          backgroundSize: "80px 80px",
         }}
       />
     </div>
@@ -314,27 +350,32 @@ function GlassCard({
   className = "",
   hover = true,
   glow = false,
+  glowColor = "lime",
 }: {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
   glow?: boolean;
+  glowColor?: "lime" | "purple" | "emerald";
 }) {
+  const glowStyles = {
+    lime: "ring-1 ring-lime/20 shadow-[0_8px_40px_rgba(202,255,75,0.1)]",
+    purple: "ring-1 ring-purple/20 shadow-[0_8px_40px_rgba(155,93,229,0.1)]",
+    emerald: "ring-1 ring-emerald-500/20 shadow-[0_8px_40px_rgba(16,185,129,0.1)]",
+  };
+
   return (
     <div
       className={cn(
         "relative overflow-hidden rounded-2xl",
-        "bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.02]",
-        "backdrop-blur-2xl",
-        "border border-white/[0.08]",
-        "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
-        hover && "hover:border-gold/30 hover:shadow-[0_8px_40px_rgba(252,161,17,0.08)] transition-all duration-500",
-        glow && "ring-1 ring-gold/20",
+        "bg-gradient-to-br from-white/[0.05] via-white/[0.02] to-white/[0.01]",
+        "backdrop-blur-xl",
+        "border border-white/[0.06]",
+        hover && "hover:border-lime/20 hover:shadow-[0_8px_40px_rgba(202,255,75,0.06)] transition-all duration-500",
+        glow && glowStyles[glowColor],
         className
       )}
     >
-      {/* Inner glow effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent pointer-events-none" />
       {children}
     </div>
   );
@@ -347,7 +388,7 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; className: string; icon?: React.ReactNode }> = {
     SCHEDULED: {
       label: "Scheduled",
-      className: "bg-gold/10 text-gold border-gold/30",
+      className: "bg-lime/10 text-lime border-lime/30",
       icon: <Calendar className="w-3 h-3" />,
     },
     LIVE: {
@@ -357,7 +398,7 @@ function StatusBadge({ status }: { status: string }) {
     },
     ENDED: {
       label: "Completed",
-      className: "bg-white/5 text-silver/70 border-white/10",
+      className: "bg-white/5 text-white/60 border-white/10",
       icon: <CheckCircle2 className="w-3 h-3" />,
     },
     CANCELLED: {
@@ -391,19 +432,20 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
   return (
     <motion.div
       variants={itemVariants}
-      whileHover={{ y: -6, transition: { duration: 0.3, ease: "easeOut" } }}
+      whileHover={{ y: -4, transition: { duration: 0.3, ease: "easeOut" } }}
       className="group"
     >
       <GlassCard
         className={cn(
-          isLive && "border-emerald-500/40 shadow-[0_8px_40px_rgba(16,185,129,0.15)]",
+          isLive && "border-emerald-500/30",
           isCancelled && "opacity-50"
         )}
         glow={isLive}
+        glowColor="emerald"
       >
         {/* Live indicator glow */}
         {isLive && (
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
         )}
 
         {/* Top gradient accent line */}
@@ -413,7 +455,7 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
             ? "bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-300"
             : isCancelled
             ? "bg-gradient-to-r from-red-500/50 to-transparent"
-            : "bg-gradient-to-r from-gold via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            : "bg-gradient-to-r from-lime via-lime/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         )} />
 
         <div className="p-6">
@@ -423,38 +465,38 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
               <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <StatusBadge status={meeting.status} />
                 {meeting.hasAI && (
-                  <Badge variant="outline" className="bg-violet-500/10 text-violet-400 border-violet-500/30 gap-1.5 text-xs px-2.5 py-1">
-                    <Sparkles className="w-3 h-3" />
+                  <Badge variant="outline" className="bg-purple/10 text-purple border-purple/30 gap-1.5 text-xs px-2.5 py-1">
+                    <Brain className="w-3 h-3" />
                     AI
                   </Badge>
                 )}
                 {(meeting as typeof seedMeetings.upcoming[0]).recurring && (
-                  <Badge variant="outline" className="bg-gold/10 text-gold border-gold/30 gap-1.5 text-xs px-2.5 py-1">
+                  <Badge variant="outline" className="bg-lime/10 text-lime border-lime/30 gap-1.5 text-xs px-2.5 py-1">
                     <TrendingUp className="w-3 h-3" />
                     Weekly
                   </Badge>
                 )}
               </div>
-              <h3 className="font-semibold text-lg text-white truncate group-hover:text-gold transition-colors duration-300">
+              <h3 className="font-semibold text-lg text-white truncate group-hover:text-lime transition-colors duration-300">
                 {meeting.title}
               </h3>
-              <p className="text-sm text-silver/70 line-clamp-1 mt-1.5">
+              <p className="text-sm text-white/50 line-clamp-1 mt-1.5">
                 {meeting.description}
               </p>
             </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-2.5 rounded-xl text-silver/50 hover:text-white hover:bg-white/[0.06] transition-all duration-200">
+                <button className="p-2.5 rounded-xl text-white/40 hover:text-white hover:bg-white/[0.06] transition-all duration-200">
                   <MoreVertical className="h-4 w-4" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-ink/95 backdrop-blur-xl border-white/[0.08] rounded-xl shadow-2xl">
-                <DropdownMenuItem onClick={copyMeetingLink} className="text-silver hover:text-white hover:bg-white/[0.06] rounded-lg mx-1 cursor-pointer">
+              <DropdownMenuContent align="end" className="bg-[#0d0d0d] backdrop-blur-xl border-white/[0.08] rounded-xl shadow-2xl">
+                <DropdownMenuItem onClick={copyMeetingLink} className="text-white/70 hover:text-white hover:bg-white/[0.06] rounded-lg mx-1 cursor-pointer">
                   <Copy className="mr-2 h-4 w-4" />
                   Copy Link
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-silver hover:text-white hover:bg-white/[0.06] rounded-lg mx-1 cursor-pointer">
+                <DropdownMenuItem asChild className="text-white/70 hover:text-white hover:bg-white/[0.06] rounded-lg mx-1 cursor-pointer">
                   <Link href={`/meeting/${meeting.roomId}`} target="_blank">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Open in New Tab
@@ -492,26 +534,26 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
           <div className="space-y-3 mb-5">
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-gold/10 flex items-center justify-center">
-                  <Calendar className="w-3.5 h-3.5 text-gold" />
+                <div className="w-7 h-7 rounded-lg bg-lime/10 flex items-center justify-center">
+                  <Calendar className="w-3.5 h-3.5 text-lime" />
                 </div>
-                <span className="text-white/90 font-medium">{meeting.scheduledStart && format(new Date(meeting.scheduledStart), "MMM d, yyyy")}</span>
+                <span className="text-white/80 font-medium">{meeting.scheduledStart && format(new Date(meeting.scheduledStart), "MMM d, yyyy")}</span>
               </div>
               <span className="text-white/20">•</span>
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-violet-500/10 flex items-center justify-center">
-                  <Clock className="w-3.5 h-3.5 text-violet-400" />
+                <div className="w-7 h-7 rounded-lg bg-purple/10 flex items-center justify-center">
+                  <Clock className="w-3.5 h-3.5 text-purple" />
                 </div>
-                <span className="text-white/90 font-medium">{meeting.scheduledStart && format(new Date(meeting.scheduledStart), "h:mm a")}</span>
+                <span className="text-white/80 font-medium">{meeting.scheduledStart && format(new Date(meeting.scheduledStart), "h:mm a")}</span>
               </div>
             </div>
 
             {/* Duration */}
             <div className="flex items-center gap-2.5 text-sm">
-              <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <div className="w-7 h-7 rounded-lg bg-white/[0.05] flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-white/60" />
               </div>
-              <span className="text-white/80">{meeting.duration} minutes</span>
+              <span className="text-white/60">{meeting.duration} minutes</span>
             </div>
           </div>
 
@@ -525,7 +567,7 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: i * 0.1, duration: 0.3 }}
-                    className="w-9 h-9 rounded-full bg-gradient-to-br from-gold via-amber-500 to-orange-500 flex items-center justify-center text-xs font-bold text-ink border-2 border-ink ring-0 shadow-lg"
+                    className="w-9 h-9 rounded-full bg-gradient-to-br from-lime via-lime-500 to-purple flex items-center justify-center text-xs font-bold text-ink border-2 border-ink ring-0 shadow-lg"
                     title={p.name}
                   >
                     {p.avatar}
@@ -537,7 +579,7 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
                   </div>
                 )}
               </div>
-              <span className="ml-4 text-sm text-silver/70">
+              <span className="ml-4 text-sm text-white/50">
                 {meeting.participants.length} participant{meeting.participants.length > 1 ? 's' : ''}
               </span>
             </div>
@@ -545,19 +587,19 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
 
           {/* Past Meeting Summary */}
           {isPast && pastMeeting.summary && (
-            <div className="mb-5 p-4 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+            <div className="mb-5 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-xl font-bold text-gold">{pastMeeting.summary.actionItems}</p>
-                  <p className="text-xs text-silver/60 mt-1">Action Items</p>
+                  <p className="text-xl font-bold text-lime">{pastMeeting.summary.actionItems}</p>
+                  <p className="text-xs text-white/40 mt-1">Action Items</p>
                 </div>
                 <div>
-                  <p className="text-xl font-bold text-violet-400">{pastMeeting.summary.keyDecisions}</p>
-                  <p className="text-xs text-silver/60 mt-1">Decisions</p>
+                  <p className="text-xl font-bold text-purple">{pastMeeting.summary.keyDecisions}</p>
+                  <p className="text-xs text-white/40 mt-1">Decisions</p>
                 </div>
                 <div>
                   <p className="text-xl font-bold text-emerald-400">{pastMeeting.summary.duration}</p>
-                  <p className="text-xs text-silver/60 mt-1">Duration</p>
+                  <p className="text-xs text-white/40 mt-1">Duration</p>
                 </div>
               </div>
             </div>
@@ -574,8 +616,8 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
                   isLive
                     ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white shadow-lg shadow-emerald-500/30"
                     : isPast
-                    ? "bg-white/[0.04] hover:bg-white/[0.08] text-white/80 hover:text-white border border-white/[0.08] hover:border-white/[0.15]"
-                    : "bg-gradient-to-r from-gold via-amber-500 to-gold bg-[length:200%_auto] hover:bg-right text-ink shadow-lg shadow-gold/25"
+                    ? "bg-white/[0.04] hover:bg-white/[0.08] text-white/80 hover:text-white border border-white/[0.08] hover:border-purple/30"
+                    : "bg-lime hover:bg-lime-400 text-ink shadow-lg shadow-lime/25"
                 )}
               >
                 {isLive ? (
@@ -603,7 +645,7 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
           )}
 
           {isCancelled && (
-            <div className="text-center py-3 text-sm text-silver/40">
+            <div className="text-center py-3 text-sm text-white/30">
               {(meeting as typeof seedMeetings.past[0]).cancelReason || "This meeting was cancelled"}
             </div>
           )}
@@ -631,14 +673,14 @@ function StatsCard({ icon: Icon, label, value, trend, gradient }: {
             "w-12 h-12 rounded-xl flex items-center justify-center shadow-lg",
             gradient
           )}>
-            <Icon className="w-5 h-5 text-white" />
+            <Icon className="w-5 h-5 text-ink" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-2xl font-bold text-white tracking-tight">{value}</p>
-            <p className="text-xs text-silver/60 truncate">{label}</p>
+            <p className="text-xs text-white/50 truncate">{label}</p>
           </div>
           {trend && (
-            <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-xs font-semibold">
+            <Badge className="bg-lime/10 text-lime border-lime/20 text-xs font-semibold">
               {trend}
             </Badge>
           )}
@@ -696,8 +738,8 @@ export default function MeetingsPage() {
                 whileHover={{ scale: 1.05, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 blur-xl opacity-60" />
-                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-gold via-amber-500 to-orange-500 flex items-center justify-center shadow-2xl shadow-gold/30">
+                <div className="absolute inset-0 bg-lime blur-xl opacity-40" />
+                <div className="relative w-14 h-14 rounded-2xl bg-lime flex items-center justify-center shadow-2xl shadow-lime/30">
                   <Video className="w-7 h-7 text-ink" />
                 </div>
               </motion.div>
@@ -710,7 +752,7 @@ export default function MeetingsPage() {
                     </Badge>
                   )}
                 </div>
-                <p className="text-silver/70 text-sm mt-0.5">
+                <p className="text-white/50 text-sm mt-0.5">
                   Manage your AI-powered video meetings with real-time transcription and smart insights
                 </p>
               </div>
@@ -724,20 +766,24 @@ export default function MeetingsPage() {
                 whileTap={{ scale: 0.98 }}
                 className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-300"
               >
-                <Calendar className="h-4 w-4 text-gold" />
+                <Calendar className="h-4 w-4 text-lime" />
                 <span className="font-medium">Schedule</span>
               </motion.button>
             </Link>
             <Link href="/meetings/new">
               <motion.button
-                whileHover={{ scale: 1.02, boxShadow: "0 0 40px rgba(252,161,17,0.3)" }}
+                whileHover={{ scale: 1.02, boxShadow: "0 0 40px rgba(202,255,75,0.3)" }}
                 whileTap={{ scale: 0.98 }}
-                className="relative flex items-center gap-2.5 px-6 py-3 rounded-xl overflow-hidden group"
+                className="relative flex items-center gap-2.5 px-6 py-3 rounded-xl bg-lime text-ink font-semibold overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-gold via-amber-500 to-gold bg-[length:200%_auto] animate-gradient" />
-                <div className="absolute inset-0 bg-gradient-to-r from-gold/50 to-amber-500/50 blur-xl opacity-50 group-hover:opacity-70 transition-opacity" />
-                <Plus className="h-4 w-4 text-ink relative z-10" />
-                <span className="font-semibold text-ink relative z-10">New Meeting</span>
+                {/* Shine effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
+                  animate={{ translateX: ["100%", "-100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                />
+                <Plus className="h-4 w-4" />
+                <span>New Meeting</span>
               </motion.button>
             </Link>
           </div>
@@ -749,40 +795,40 @@ export default function MeetingsPage() {
             icon={Video}
             label="Upcoming Meetings"
             value={upcomingMeetings.length}
-            gradient="bg-gradient-to-br from-gold to-amber-600 shadow-gold/30"
+            gradient="bg-lime shadow-lime/30"
           />
           <StatsCard
             icon={Users}
             label="Total Participants"
             value={totalParticipants}
-            gradient="bg-gradient-to-br from-violet-500 to-violet-700 shadow-violet-500/30"
+            gradient="bg-purple shadow-purple/30"
           />
           <StatsCard
             icon={Brain}
             label="AI-Powered Meetings"
             value={aiEnabledMeetings}
             trend="+23%"
-            gradient="bg-gradient-to-br from-cyan-500 to-cyan-700 shadow-cyan-500/30"
+            gradient="bg-gradient-to-br from-lime to-purple shadow-lime/20"
           />
           <StatsCard
             icon={BarChart3}
             label="Hours This Week"
             value="12.5"
-            gradient="bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-emerald-500/30"
+            gradient="bg-emerald-500 shadow-emerald-500/30"
           />
         </motion.div>
 
         {/* Filters & Search */}
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
           {/* Tabs */}
-          <div className="flex p-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
+          <div className="flex p-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
             <button
               onClick={() => setActiveTab("upcoming")}
               className={cn(
                 "px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300",
                 activeTab === "upcoming"
-                  ? "bg-gradient-to-r from-gold to-amber-500 text-ink shadow-lg shadow-gold/25"
-                  : "text-silver/70 hover:text-white hover:bg-white/[0.04]"
+                  ? "bg-lime text-ink shadow-lg shadow-lime/25"
+                  : "text-white/50 hover:text-white hover:bg-white/[0.04]"
               )}
             >
               Upcoming ({upcomingMeetings.length})
@@ -792,8 +838,8 @@ export default function MeetingsPage() {
               className={cn(
                 "px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300",
                 activeTab === "past"
-                  ? "bg-gradient-to-r from-gold to-amber-500 text-ink shadow-lg shadow-gold/25"
-                  : "text-silver/70 hover:text-white hover:bg-white/[0.04]"
+                  ? "bg-lime text-ink shadow-lg shadow-lime/25"
+                  : "text-white/50 hover:text-white hover:bg-white/[0.04]"
               )}
             >
               Past ({pastMeetings.length})
@@ -802,23 +848,28 @@ export default function MeetingsPage() {
 
           {/* Search */}
           <div className="relative flex-1 max-w-md group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-silver/40 group-focus-within:text-gold transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-lime transition-colors" />
             <input
               type="text"
               placeholder="Search meetings, participants, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-silver/40 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/30 transition-all text-sm backdrop-blur-sm"
+              className="w-full pl-11 pr-20 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white placeholder:text-white/30 focus:outline-none focus:border-lime/30 focus:bg-white/[0.05] transition-all text-sm backdrop-blur-sm"
             />
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-white/[0.05] border border-white/[0.08] text-[10px] text-white/40 font-mono">
+                <Command className="h-3 w-3" />K
+              </kbd>
+            </div>
           </div>
 
           {/* View Toggle */}
-          <div className="flex p-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
+          <div className="flex p-1.5 rounded-xl bg-white/[0.03] border border-white/[0.06] backdrop-blur-sm">
             <button
               onClick={() => setViewMode("grid")}
               className={cn(
                 "p-2.5 rounded-lg transition-all",
-                viewMode === "grid" ? "bg-white/[0.08] text-white shadow-sm" : "text-silver/50 hover:text-white"
+                viewMode === "grid" ? "bg-lime/20 text-lime" : "text-white/40 hover:text-white"
               )}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -827,7 +878,7 @@ export default function MeetingsPage() {
               onClick={() => setViewMode("list")}
               className={cn(
                 "p-2.5 rounded-lg transition-all",
-                viewMode === "list" ? "bg-white/[0.08] text-white shadow-sm" : "text-silver/50 hover:text-white"
+                viewMode === "list" ? "bg-lime/20 text-lime" : "text-white/40 hover:text-white"
               )}
             >
               <List className="w-4 h-4" />
@@ -853,12 +904,12 @@ export default function MeetingsPage() {
                 <GlassCard hover={false}>
                   <div className="flex flex-col items-center justify-center py-20 px-4">
                     <div className="relative mb-8">
-                      <div className="absolute inset-0 bg-gradient-to-br from-gold/30 to-violet-500/30 blur-3xl rounded-full" />
-                      <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-gold/20 to-violet-500/20 flex items-center justify-center border border-white/10 backdrop-blur-sm">
+                      <div className="absolute inset-0 bg-gradient-to-br from-lime/20 to-purple/20 blur-3xl rounded-full" />
+                      <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-lime/10 to-purple/10 flex items-center justify-center border border-white/[0.08] backdrop-blur-sm">
                         {activeTab === "upcoming" ? (
-                          <Video className="w-12 h-12 text-gold" />
+                          <Video className="w-12 h-12 text-lime" />
                         ) : (
-                          <Clock className="w-12 h-12 text-violet-400" />
+                          <Clock className="w-12 h-12 text-purple" />
                         )}
                       </div>
                     </div>
@@ -869,7 +920,7 @@ export default function MeetingsPage() {
                         ? "No upcoming meetings"
                         : "No past meetings"}
                     </h3>
-                    <p className="text-silver/60 text-center max-w-md mb-8">
+                    <p className="text-white/50 text-center max-w-md mb-8">
                       {searchQuery
                         ? "Try adjusting your search terms"
                         : activeTab === "upcoming"
@@ -891,7 +942,7 @@ export default function MeetingsPage() {
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="px-6 py-3 rounded-xl bg-gradient-to-r from-gold to-amber-500 text-ink font-semibold text-sm shadow-lg shadow-gold/25"
+                            className="px-6 py-3 rounded-xl bg-lime text-ink font-semibold text-sm shadow-lg shadow-lime/25"
                           >
                             Start Now
                           </motion.button>
@@ -916,7 +967,7 @@ export default function MeetingsPage() {
         {/* AI Features Banner */}
         <motion.div variants={itemVariants}>
           <GlassCard hover={false} className="overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-violet-500/5" />
+            <div className="absolute inset-0 bg-gradient-to-r from-lime/5 via-transparent to-purple/5" />
             <div className="relative p-8">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-center gap-5">
@@ -925,33 +976,33 @@ export default function MeetingsPage() {
                     animate={{ rotate: [0, 10, -10, 0] }}
                     transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 blur-2xl opacity-50" />
-                    <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-gold via-amber-500 to-orange-500 flex items-center justify-center shadow-2xl shadow-gold/40">
+                    <div className="absolute inset-0 bg-lime blur-2xl opacity-40" />
+                    <div className="relative w-16 h-16 rounded-2xl bg-lime flex items-center justify-center shadow-2xl shadow-lime/40">
                       <Sparkles className="w-8 h-8 text-ink" />
                     </div>
                   </motion.div>
                   <div>
                     <h3 className="text-xl font-bold text-white mb-1">AI Meeting Assistant</h3>
-                    <p className="text-sm text-silver/70">
+                    <p className="text-sm text-white/50">
                       Get real-time transcription, smart summaries, and action item detection
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {[
-                    { icon: Globe, label: "100+ Languages", color: "text-gold" },
-                    { icon: MessageSquare, label: "Live Captions", color: "text-violet-400" },
-                    { icon: Star, label: "99% Accuracy", color: "text-amber-400" },
+                    { icon: Globe, label: "100+ Languages", color: "text-lime" },
+                    { icon: MessageSquare, label: "Live Captions", color: "text-purple" },
+                    { icon: Star, label: "99% Accuracy", color: "text-lime" },
                   ].map((feature, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.5 + i * 0.1 }}
-                      className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.12] transition-all"
+                      className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-lime/20 transition-all"
                     >
                       <feature.icon className={cn("h-4 w-4", feature.color)} />
-                      <span className="text-sm text-silver/80 font-medium">{feature.label}</span>
+                      <span className="text-sm text-white/70 font-medium">{feature.label}</span>
                     </motion.div>
                   ))}
                 </div>

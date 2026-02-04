@@ -31,30 +31,47 @@ const staggerContainer = {
 
 
 // ============================================
-// ANIMATED BACKGROUND COMPONENT
+// VIDEO BACKGROUND COMPONENT
 // ============================================
-function AnimatedBackground() {
+function VideoBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Base gradient */}
-      <div className="absolute inset-0 bg-[#0a0a0a]" />
+      {/* Background Video */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source
+          src="https://videos.pexels.com/video-files/7579653/7579653-uhd_2560_1440_25fps.mp4"
+          type="video/mp4"
+        />
+      </video>
 
-      {/* Animated orb - Lime */}
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-black/70" />
+
+      {/* Gradient overlay for brand colors */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/90 via-[#0a0a0a]/70 to-[#9B5DE5]/20" />
+
+      {/* Animated orb - Lime (subtle) */}
       <motion.div
         className="absolute -top-32 -left-32 w-96 h-96 rounded-full"
         style={{
-          background: "conic-gradient(from 180deg, rgba(202,255,75,0.2), rgba(155,93,229,0.1), transparent, rgba(202,255,75,0.15))",
+          background: "conic-gradient(from 180deg, rgba(202,255,75,0.15), rgba(155,93,229,0.08), transparent, rgba(202,255,75,0.1))",
           filter: "blur(80px)",
         }}
         animate={{ rotate: 360 }}
         transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* Animated orb - Purple */}
+      {/* Animated orb - Purple (subtle) */}
       <motion.div
         className="absolute bottom-0 right-0 w-80 h-80 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(155,93,229,0.15) 0%, transparent 60%)",
+          background: "radial-gradient(circle, rgba(155,93,229,0.12) 0%, transparent 60%)",
           filter: "blur(60px)",
         }}
         animate={{
@@ -66,7 +83,7 @@ function AnimatedBackground() {
 
       {/* Grid Pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -77,17 +94,17 @@ function AnimatedBackground() {
       />
 
       {/* Floating particles */}
-      {[...Array(12)].map((_, i) => (
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-[#CAFF4B]/30"
+          className="absolute w-1 h-1 rounded-full bg-[#CAFF4B]/40"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${15 + Math.random() * 70}%`,
+            top: `${15 + Math.random() * 70}%`,
           }}
           animate={{
-            y: [0, -25, 0],
-            opacity: [0.2, 0.5, 0.2],
+            y: [0, -20, 0],
+            opacity: [0.2, 0.6, 0.2],
           }}
           transition={{
             duration: 3 + Math.random() * 2,
@@ -97,6 +114,9 @@ function AnimatedBackground() {
           }}
         />
       ))}
+
+      {/* Vignette effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
     </div>
   );
 }
@@ -135,7 +155,7 @@ export default function SignInPage() {
       {/* LEFT SIDE - IMMERSIVE BRANDING */}
       {/* ============================================ */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
-        <AnimatedBackground />
+        <VideoBackground />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">

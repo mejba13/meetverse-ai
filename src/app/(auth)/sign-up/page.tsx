@@ -38,30 +38,47 @@ const fadeIn = {
 };
 
 // ============================================
-// ANIMATED BACKGROUND COMPONENT
+// VIDEO BACKGROUND COMPONENT
 // ============================================
-function AnimatedBackground() {
+function VideoBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Base gradient */}
-      <div className="absolute inset-0 bg-[#0a0a0a]" />
+      {/* Background Video - Team collaboration/meeting theme */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source
+          src="https://videos.pexels.com/video-files/8348111/8348111-uhd_2560_1440_30fps.mp4"
+          type="video/mp4"
+        />
+      </video>
 
-      {/* Animated orb - Purple */}
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-black/70" />
+
+      {/* Gradient overlay with purple accent for sign-up page */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/90 via-[#0a0a0a]/70 to-[#CAFF4B]/10" />
+
+      {/* Animated orb - Purple (subtle) */}
       <motion.div
         className="absolute -top-32 -right-32 w-96 h-96 rounded-full"
         style={{
-          background: "conic-gradient(from 0deg, rgba(155,93,229,0.2), rgba(202,255,75,0.1), transparent, rgba(155,93,229,0.15))",
+          background: "conic-gradient(from 0deg, rgba(155,93,229,0.12), rgba(202,255,75,0.06), transparent, rgba(155,93,229,0.1))",
           filter: "blur(80px)",
         }}
         animate={{ rotate: -360 }}
         transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
       />
 
-      {/* Animated orb - Lime */}
+      {/* Animated orb - Lime (subtle) */}
       <motion.div
         className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(202,255,75,0.15) 0%, transparent 60%)",
+          background: "radial-gradient(circle, rgba(202,255,75,0.1) 0%, transparent 60%)",
           filter: "blur(60px)",
         }}
         animate={{
@@ -75,19 +92,19 @@ function AnimatedBackground() {
       <motion.div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(155,93,229,0.1) 0%, transparent 60%)",
+          background: "radial-gradient(circle, rgba(155,93,229,0.08) 0%, transparent 60%)",
           filter: "blur(50px)",
         }}
         animate={{
           scale: [1, 1.2, 1],
-          opacity: [0.5, 0.8, 0.5],
+          opacity: [0.4, 0.7, 0.4],
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* Grid Pattern */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -98,16 +115,16 @@ function AnimatedBackground() {
       />
 
       {/* Floating particles */}
-      {[...Array(12)].map((_, i) => (
+      {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-[#9B5DE5]/40"
+          className="absolute w-1 h-1 rounded-full bg-[#9B5DE5]/50"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${15 + Math.random() * 70}%`,
+            top: `${15 + Math.random() * 70}%`,
           }}
           animate={{
-            y: [0, -25, 0],
+            y: [0, -20, 0],
             opacity: [0.3, 0.7, 0.3],
           }}
           transition={{
@@ -118,6 +135,9 @@ function AnimatedBackground() {
           }}
         />
       ))}
+
+      {/* Vignette effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)]" />
     </div>
   );
 }
@@ -159,7 +179,7 @@ export default function SignUpPage() {
       {/* LEFT SIDE - IMMERSIVE FEATURES SHOWCASE */}
       {/* ============================================ */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden">
-        <AnimatedBackground />
+        <VideoBackground />
 
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
