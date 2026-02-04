@@ -2,16 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   Moon,
   Sun,
@@ -40,12 +31,14 @@ import {
   Lock,
   Eye,
   Download,
+  ChevronDown,
+  HelpCircle,
   ChevronRight,
-  Info,
 } from "lucide-react";
 import { trpc } from "@/lib/api/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useTheme } from "next-themes";
+import { cn } from "@/lib/utils";
 
 // ============================================
 // ANIMATION VARIANTS
@@ -55,50 +48,145 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.1,
+      staggerChildren: 0.06,
+      delayChildren: 0.08,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 // ============================================
-// FLOATING PARTICLES
+// GLASS CARD COMPONENT
 // ============================================
-function FloatingParticles() {
+function GlassCard({
+  children,
+  className = "",
+  hover = true,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  hover?: boolean;
+}) {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none dark:hidden">
-      {/* Only show particles in light mode */}
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-1 h-1 rounded-full bg-brand-400/30"
-          style={{
-            left: `${15 + Math.random() * 70}%`,
-            top: `${10 + Math.random() * 80}%`,
-          }}
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.2, 0.5, 0.2],
-            scale: [1, 1.2, 1],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 2,
-            repeat: Infinity,
-            delay: Math.random() * 3,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl",
+        "bg-[#111111]/80 backdrop-blur-xl",
+        "border border-white/[0.06]",
+        hover && "hover:border-lime/20 transition-all duration-400",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+// ============================================
+// CUSTOM TOGGLE SWITCH
+// ============================================
+function ToggleSwitch({
+  checked,
+  onCheckedChange,
+}: {
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}) {
+  return (
+    <motion.button
+      onClick={() => onCheckedChange(!checked)}
+      className={cn(
+        "relative w-12 h-7 rounded-full transition-colors duration-300",
+        checked ? "bg-lime" : "bg-white/[0.1]"
+      )}
+      whileTap={{ scale: 0.95 }}
+    >
+      <motion.div
+        className={cn(
+          "absolute top-1 w-5 h-5 rounded-full shadow-md",
+          checked ? "bg-ink" : "bg-white/60"
+        )}
+        animate={{ left: checked ? "calc(100% - 24px)" : "4px" }}
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+      />
+    </motion.button>
+  );
+}
+
+// ============================================
+// CUSTOM SELECT DROPDOWN
+// ============================================
+function CustomSelect({
+  value,
+  options,
+  onChange,
+  className = "",
+}: {
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+  className?: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div className={cn("relative", className)}>
+      <motion.button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] border border-white/[0.08] text-white text-sm min-w-[140px] hover:bg-white/[0.08] hover:border-white/[0.12] transition-all"
+        whileTap={{ scale: 0.98 }}
+      >
+        <span>{selectedOption?.label || value}</span>
+        <ChevronDown className={cn("w-4 h-4 text-white/50 transition-transform", isOpen && "rotate-180")} />
+      </motion.button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40"
+              onClick={() => setIsOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 top-full mt-2 z-50 min-w-full rounded-xl bg-[#111] border border-white/[0.08] shadow-2xl shadow-black/50 overflow-hidden"
+            >
+              {options.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    onChange(option.value);
+                    setIsOpen(false);
+                  }}
+                  className={cn(
+                    "w-full px-4 py-2.5 text-left text-sm transition-colors",
+                    option.value === value
+                      ? "bg-lime/10 text-lime"
+                      : "text-white/70 hover:bg-white/[0.05] hover:text-white"
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -106,39 +194,35 @@ function FloatingParticles() {
 // ============================================
 // SETTINGS SECTION COMPONENT
 // ============================================
-interface SettingsSectionProps {
+function SettingsSection({
+  icon: Icon,
+  title,
+  iconBg = "bg-lime/10",
+  iconColor = "text-lime",
+  children,
+}: {
   icon: React.ElementType;
   title: string;
-  description: string;
-  gradient: string;
+  iconBg?: string;
+  iconColor?: string;
   children: React.ReactNode;
-}
-
-function SettingsSection({ icon: Icon, title, description, gradient, children }: SettingsSectionProps) {
+}) {
   return (
     <motion.div variants={itemVariants}>
-      <Card className="relative overflow-hidden bg-white dark:bg-navy border-gray-200 dark:border-navy/50 hover:border-gray-300 dark:hover:border-gold/20 transition-all duration-300 group">
-        {/* Gradient Border Effect */}
-        <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
-
-        <CardContent className="p-6">
+      <GlassCard hover={false}>
+        <div className="p-6">
           {/* Section Header */}
-          <div className="flex items-start gap-4 mb-6">
-            <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}>
-              <Icon className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-3 mb-5">
+            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", iconBg)}>
+              <Icon className={cn("w-5 h-5", iconColor)} />
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>
-              <p className="text-sm text-gray-500 dark:text-silver">{description}</p>
-            </div>
+            <h3 className="text-base font-medium text-white/70">{title}</h3>
           </div>
 
           {/* Section Content */}
-          <div className="space-y-4">
-            {children}
-          </div>
-        </CardContent>
-      </Card>
+          <div className="space-y-3">{children}</div>
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }
@@ -146,23 +230,26 @@ function SettingsSection({ icon: Icon, title, description, gradient, children }:
 // ============================================
 // SETTING ROW COMPONENT
 // ============================================
-interface SettingRowProps {
+function SettingRow({
+  icon: Icon,
+  label,
+  description,
+  children,
+}: {
   icon: React.ElementType;
   label: string;
   description: string;
   children: React.ReactNode;
-}
-
-function SettingRow({ icon: Icon, label, description, children }: SettingRowProps) {
+}) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gray-50 dark:bg-ink border border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-ink/80 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200">
+    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] hover:border-white/[0.08] transition-all duration-200">
       <div className="flex items-center gap-3">
-        <div className="p-2 rounded-lg bg-gray-200 dark:bg-navy">
-          <Icon className="w-4 h-4 text-gray-500 dark:text-silver" />
+        <div className="w-9 h-9 rounded-lg bg-white/[0.05] flex items-center justify-center">
+          <Icon className="w-4 h-4 text-white/50" />
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
-          <p className="text-xs text-gray-500 dark:text-silver/60">{description}</p>
+          <p className="text-sm font-medium text-white">{label}</p>
+          <p className="text-xs text-white/40">{description}</p>
         </div>
       </div>
       {children}
@@ -173,15 +260,19 @@ function SettingRow({ icon: Icon, label, description, children }: SettingRowProp
 // ============================================
 // THEME BUTTON COMPONENT
 // ============================================
-interface ThemeButtonProps {
+function ThemeButton({
+  value,
+  currentTheme,
+  icon: Icon,
+  label,
+  onClick,
+}: {
   value: string;
   currentTheme: string | undefined;
   icon: React.ElementType;
   label: string;
   onClick: () => void;
-}
-
-function ThemeButton({ value, currentTheme, icon: Icon, label, onClick }: ThemeButtonProps) {
+}) {
   const isActive = currentTheme === value;
 
   return (
@@ -189,30 +280,34 @@ function ThemeButton({ value, currentTheme, icon: Icon, label, onClick }: ThemeB
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`relative flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-300 ${
+      className={cn(
+        "relative flex-1 flex flex-col items-center gap-3 p-5 rounded-xl border transition-all duration-300",
         isActive
-          ? "bg-gradient-to-br from-brand-500/20 to-violet-500/20 dark:from-gold/20 dark:to-amber-500/20 border-brand-500/50 dark:border-gold/50"
-          : "bg-gray-50 dark:bg-ink border-gray-200 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-ink/80 hover:border-gray-300 dark:hover:border-white/10"
-      }`}
+          ? "bg-lime/5 border-lime/30"
+          : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.1]"
+      )}
     >
       {isActive && (
         <motion.div
           layoutId="activeTheme"
-          className="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-violet-500/10 dark:from-gold/10 dark:to-amber-500/10 rounded-xl"
+          className="absolute inset-0 bg-lime/5 rounded-xl"
           transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
         />
       )}
-      <div className={`relative p-3 rounded-xl ${isActive ? "bg-gradient-to-br from-brand-500 to-violet-500" : "bg-gray-200 dark:bg-navy"}`}>
-        <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-gray-500 dark:text-silver"}`} />
+      <div
+        className={cn(
+          "relative w-12 h-12 rounded-xl flex items-center justify-center transition-colors",
+          isActive ? "bg-lime/20" : "bg-white/[0.05]"
+        )}
+      >
+        <Icon className={cn("w-6 h-6", isActive ? "text-lime" : "text-white/50")} />
       </div>
-      <span className={`text-sm font-medium ${isActive ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-silver"}`}>{label}</span>
+      <span className={cn("text-sm font-medium relative", isActive ? "text-white" : "text-white/50")}>
+        {label}
+      </span>
       {isActive && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="absolute top-2 right-2"
-        >
-          <Check className="w-4 h-4 text-brand-500 dark:text-gold" />
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-3 right-3">
+          <Check className="w-4 h-4 text-lime" />
         </motion.div>
       )}
     </motion.button>
@@ -240,7 +335,12 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState("en");
   const [timezone, setTimezone] = useState("America/New_York");
 
-  const { data: profile, isLoading } = trpc.user.me.useQuery();
+  // Fetch profile with error handling - don't block UI on failure
+  const { data: profile, isLoading, isError } = trpc.user.me.useQuery(undefined, {
+    retry: 1,
+    retryDelay: 1000,
+    staleTime: 30000,
+  });
 
   const updatePreferences = trpc.user.updatePreferences.useMutation({
     onSuccess: () => {
@@ -259,10 +359,12 @@ export default function SettingsPage() {
     },
   });
 
+  // Handle client-side mounting for theme
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Load preferences from profile when available
   useEffect(() => {
     if (profile?.preferences) {
       try {
@@ -277,6 +379,17 @@ export default function SettingsPage() {
       }
     }
   }, [profile]);
+
+  // Show error toast if profile fails to load (but don't block UI)
+  useEffect(() => {
+    if (isError) {
+      toast({
+        title: "Could not load preferences",
+        description: "Using default settings. Your changes will still be saved.",
+        variant: "destructive",
+      });
+    }
+  }, [isError, toast]);
 
   const handleSettingChange = <T,>(setter: React.Dispatch<React.SetStateAction<T>>, value: T) => {
     setter(value);
@@ -293,437 +406,291 @@ export default function SettingsPage() {
     });
   };
 
-  if (isLoading || !mounted) {
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Spanish" },
+    { value: "fr", label: "French" },
+    { value: "de", label: "German" },
+    { value: "ja", label: "Japanese" },
+    { value: "zh", label: "Chinese" },
+    { value: "ko", label: "Korean" },
+    { value: "pt", label: "Portuguese" },
+  ];
+
+  const timezoneOptions = [
+    { value: "America/New_York", label: "Eastern (ET)" },
+    { value: "America/Chicago", label: "Central (CT)" },
+    { value: "America/Denver", label: "Mountain (MT)" },
+    { value: "America/Los_Angeles", label: "Pacific (PT)" },
+    { value: "Europe/London", label: "London (GMT)" },
+    { value: "Europe/Paris", label: "Paris (CET)" },
+    { value: "Asia/Tokyo", label: "Tokyo (JST)" },
+    { value: "Asia/Singapore", label: "Singapore (SGT)" },
+  ];
+
+  // Only wait for client-side mounting (for theme hydration), not for data loading
+  if (!mounted) {
     return (
-      <div className="flex items-center justify-center min-h-[600px]">
+      <div className="flex items-center justify-center min-h-[400px]">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="flex flex-col items-center gap-4"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-violet-500 rounded-full blur-xl opacity-50 animate-pulse" />
-            <div className="relative p-4 rounded-full bg-gradient-to-br from-cyan-500 to-violet-500">
-              <Loader2 className="h-8 w-8 animate-spin text-white" />
+            <div className="absolute inset-0 bg-lime/30 rounded-full blur-xl animate-pulse" />
+            <div className="relative w-16 h-16 rounded-2xl bg-lime flex items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-ink" />
             </div>
           </div>
-          <p className="text-white/50 text-sm">Loading settings...</p>
+          <p className="text-white/40 text-sm">Loading settings...</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen pb-24">
-      <FloatingParticles />
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="max-w-4xl mx-auto space-y-6"
-      >
-        {/* Header */}
-        <motion.div variants={itemVariants} className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500">
-              <Settings className="w-5 h-5 text-white" />
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="min-h-screen text-white pb-24"
+    >
+      {/* Header */}
+      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-4">
+          <motion.div
+            className="relative"
+            whileHover={{ scale: 1.05, rotate: 15 }}
+            transition={{ type: "spring", stiffness: 400 }}
+          >
+            <div className="absolute inset-0 bg-lime/30 blur-2xl rounded-full" />
+            <div className="relative w-14 h-14 rounded-2xl bg-lime flex items-center justify-center shadow-xl shadow-lime/25">
+              <Settings className="w-7 h-7 text-ink" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
+          </motion.div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Settings</h1>
+            <p className="text-white/40 text-sm mt-0.5">Customize your MeetVerse AI experience</p>
           </div>
-          <p className="text-gray-500 dark:text-silver">
-            Customize your MeetVerse AI experience
-          </p>
-        </motion.div>
+        </div>
 
-        {/* Quick Actions Bar */}
-        <motion.div variants={itemVariants}>
-          <Card className="bg-gradient-to-r from-brand-500/10 via-violet-500/10 to-brand-500/10 dark:from-gold/10 dark:via-navy dark:to-gold/10 border-gray-200 dark:border-navy/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Sparkles className="w-5 h-5 text-brand-500 dark:text-gold" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">Pro Tip</p>
-                    <p className="text-xs text-gray-500 dark:text-silver">Enable AI features for smarter meetings</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink"
-                  >
-                    <Info className="w-4 h-4 mr-2" />
-                    Help
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Appearance Section */}
-        <SettingsSection
-          icon={Palette}
-          title="Appearance"
-          description="Customize the look and feel"
-          gradient="from-pink-500 to-rose-600"
-        >
-          {/* Theme Selection */}
-          <div className="space-y-3">
-            <p className="text-sm text-white/60 mb-3">Theme</p>
-            <div className="flex gap-3">
-              <ThemeButton
-                value="light"
-                currentTheme={theme}
-                icon={Sun}
-                label="Light"
-                onClick={() => setTheme("light")}
-              />
-              <ThemeButton
-                value="dark"
-                currentTheme={theme}
-                icon={Moon}
-                label="Dark"
-                onClick={() => setTheme("dark")}
-              />
-              <ThemeButton
-                value="system"
-                currentTheme={theme}
-                icon={Monitor}
-                label="System"
-                onClick={() => setTheme("system")}
-              />
-            </div>
-          </div>
-        </SettingsSection>
-
-        {/* Localization Section */}
-        <SettingsSection
-          icon={Globe}
-          title="Language & Region"
-          description="Set your preferred language and timezone"
-          gradient="from-emerald-500 to-green-600"
-        >
-          <SettingRow
-            icon={Globe}
-            label="Language"
-            description="Select your preferred language"
-          >
-            <Select value={language} onValueChange={(v) => handleSettingChange(setLanguage, v)}>
-              <SelectTrigger className="w-[180px] bg-white/[0.05] border-white/[0.1] text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/[0.1]">
-                <SelectItem value="en">English</SelectItem>
-                <SelectItem value="es">Spanish</SelectItem>
-                <SelectItem value="fr">French</SelectItem>
-                <SelectItem value="de">German</SelectItem>
-                <SelectItem value="ja">Japanese</SelectItem>
-                <SelectItem value="zh">Chinese</SelectItem>
-                <SelectItem value="ko">Korean</SelectItem>
-                <SelectItem value="pt">Portuguese</SelectItem>
-              </SelectContent>
-            </Select>
-          </SettingRow>
-
-          <SettingRow
-            icon={Clock}
-            label="Timezone"
-            description="Your local timezone for scheduling"
-          >
-            <Select value={timezone} onValueChange={(v) => handleSettingChange(setTimezone, v)}>
-              <SelectTrigger className="w-[200px] bg-white/[0.05] border-white/[0.1] text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/[0.1]">
-                <SelectItem value="America/New_York">Eastern (ET)</SelectItem>
-                <SelectItem value="America/Chicago">Central (CT)</SelectItem>
-                <SelectItem value="America/Denver">Mountain (MT)</SelectItem>
-                <SelectItem value="America/Los_Angeles">Pacific (PT)</SelectItem>
-                <SelectItem value="Europe/London">London (GMT)</SelectItem>
-                <SelectItem value="Europe/Paris">Paris (CET)</SelectItem>
-                <SelectItem value="Asia/Tokyo">Tokyo (JST)</SelectItem>
-                <SelectItem value="Asia/Singapore">Singapore (SGT)</SelectItem>
-              </SelectContent>
-            </Select>
-          </SettingRow>
-        </SettingsSection>
-
-        {/* Notifications Section */}
-        <SettingsSection
-          icon={Bell}
-          title="Notifications"
-          description="Control how you receive updates"
-          gradient="from-amber-500 to-orange-600"
-        >
-          <SettingRow
-            icon={Mail}
-            label="Email Notifications"
-            description="Receive meeting reminders and summaries"
-          >
-            <Switch
-              checked={emailNotifications}
-              onCheckedChange={(v) => handleSettingChange(setEmailNotifications, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={Smartphone}
-            label="Push Notifications"
-            description="Get notified on your devices"
-          >
-            <Switch
-              checked={pushNotifications}
-              onCheckedChange={(v) => handleSettingChange(setPushNotifications, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={BellRing}
-            label="Meeting Reminders"
-            description="Get reminded before meetings start"
-          >
-            <Switch
-              checked={meetingReminders}
-              onCheckedChange={(v) => handleSettingChange(setMeetingReminders, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={FileText}
-            label="Summary Emails"
-            description="Receive AI-generated meeting summaries"
-          >
-            <Switch
-              checked={summaryEmails}
-              onCheckedChange={(v) => handleSettingChange(setSummaryEmails, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-        </SettingsSection>
-
-        {/* Meeting Defaults Section */}
-        <SettingsSection
-          icon={Video}
-          title="Meeting Defaults"
-          description="Default settings when joining meetings"
-          gradient="from-cyan-500 to-blue-600"
-        >
-          <SettingRow
-            icon={Video}
-            label="Camera On by Default"
-            description="Start with camera enabled"
-          >
-            <Switch
-              checked={defaultVideoEnabled}
-              onCheckedChange={(v) => handleSettingChange(setDefaultVideoEnabled, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={Mic}
-            label="Microphone On by Default"
-            description="Start with microphone enabled"
-          >
-            <Switch
-              checked={defaultAudioEnabled}
-              onCheckedChange={(v) => handleSettingChange(setDefaultAudioEnabled, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={Volume2}
-            label="Speaker Test"
-            description="Test your audio output"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/[0.05] border-white/[0.1] text-white hover:bg-white/[0.1]"
-            >
-              Test
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </SettingRow>
-        </SettingsSection>
-
-        {/* AI Features Section */}
-        <SettingsSection
-          icon={Brain}
-          title="AI Features"
-          description="Configure AI-powered capabilities"
-          gradient="from-violet-500 to-purple-600"
-        >
-          <SettingRow
-            icon={Sparkles}
-            label="AI Assistant"
-            description="Enable real-time meeting assistance"
-          >
-            <Switch
-              checked={aiAssistant}
-              onCheckedChange={(v) => handleSettingChange(setAiAssistant, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={MessageSquare}
-            label="Auto Transcription"
-            description="Automatically transcribe meetings"
-          >
-            <Switch
-              checked={autoTranscribe}
-              onCheckedChange={(v) => handleSettingChange(setAutoTranscribe, v)}
-              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-violet-500"
-            />
-          </SettingRow>
-
-          <SettingRow
-            icon={Zap}
-            label="Smart Suggestions"
-            description="Get AI-powered meeting insights"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-gradient-to-r from-violet-500/20 to-purple-500/20 border-violet-500/30 text-violet-400 hover:bg-violet-500/30"
-            >
-              <Sparkles className="w-4 h-4 mr-1" />
-              Pro
-            </Button>
-          </SettingRow>
-        </SettingsSection>
-
-        {/* Privacy & Security Section */}
-        <SettingsSection
-          icon={Shield}
-          title="Privacy & Security"
-          description="Manage your data and security settings"
-          gradient="from-slate-500 to-zinc-600"
-        >
-          <SettingRow
-            icon={Eye}
-            label="Profile Visibility"
-            description="Control who can see your profile"
-          >
-            <Select defaultValue="team">
-              <SelectTrigger className="w-[140px] bg-white/[0.05] border-white/[0.1] text-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/[0.1]">
-                <SelectItem value="public">Public</SelectItem>
-                <SelectItem value="team">Team Only</SelectItem>
-                <SelectItem value="private">Private</SelectItem>
-              </SelectContent>
-            </Select>
-          </SettingRow>
-
-          <SettingRow
-            icon={Lock}
-            label="Two-Factor Authentication"
-            description="Add an extra layer of security"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/[0.05] border-white/[0.1] text-white hover:bg-white/[0.1]"
-            >
-              Enable
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </SettingRow>
-
-          <SettingRow
-            icon={Calendar}
-            label="Calendar Access"
-            description="Manage connected calendars"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/[0.05] border-white/[0.1] text-white hover:bg-white/[0.1]"
-            >
-              Manage
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </SettingRow>
-
-          <SettingRow
-            icon={Users}
-            label="Team Permissions"
-            description="Configure team access levels"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-white/[0.05] border-white/[0.1] text-white hover:bg-white/[0.1]"
-            >
-              Configure
-              <ChevronRight className="w-4 h-4 ml-1" />
-            </Button>
-          </SettingRow>
-        </SettingsSection>
-
-        {/* Floating Save Button */}
+        {/* Subtle loading indicator when fetching profile */}
         <AnimatePresence>
-          {hasChanges && (
+          {isLoading && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]"
             >
-              <Card className="bg-white dark:bg-navy border-gray-200 dark:border-white/10 shadow-2xl">
-                <CardContent className="p-4 flex items-center gap-4">
-                  <p className="text-sm text-gray-500 dark:text-silver">You have unsaved changes</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setHasChanges(false)}
-                      className="text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink"
-                    >
-                      Discard
-                    </Button>
-                    <Button
-                      onClick={handleSave}
-                      disabled={updatePreferences.isPending}
-                      className="bg-gradient-to-r from-brand-500 to-brand-600 text-white hover:opacity-90"
-                    >
-                      {updatePreferences.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Check className="mr-2 h-4 w-4" />
-                          Save Changes
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-lime" />
+              <span className="text-xs text-white/40">Syncing...</span>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
-    </div>
+
+      {/* Pro Tip Banner */}
+      <motion.div variants={itemVariants} className="mb-6">
+        <GlassCard hover={false} className="overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-lime/[0.03] via-transparent to-purple/[0.03]" />
+          <div className="relative p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-lime/10 flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-lime" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white">Pro Tip</p>
+                <p className="text-xs text-white/40">Enable AI features for smarter meetings</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors"
+              >
+                <HelpCircle className="w-4 h-4" />
+                Help
+              </motion.button>
+            </div>
+          </div>
+        </GlassCard>
+      </motion.div>
+
+      <div className="space-y-5">
+        {/* Appearance Section */}
+        <SettingsSection icon={Palette} title="Customize the look and feel" iconBg="bg-rose-500/10" iconColor="text-rose-400">
+          <div className="flex gap-3">
+            <ThemeButton value="light" currentTheme={theme} icon={Sun} label="Light" onClick={() => setTheme("light")} />
+            <ThemeButton value="dark" currentTheme={theme} icon={Moon} label="Dark" onClick={() => setTheme("dark")} />
+            <ThemeButton value="system" currentTheme={theme} icon={Monitor} label="System" onClick={() => setTheme("system")} />
+          </div>
+        </SettingsSection>
+
+        {/* Language & Region Section */}
+        <SettingsSection icon={Globe} title="Set your preferred language and timezone" iconBg="bg-emerald-500/10" iconColor="text-emerald-400">
+          <SettingRow icon={Globe} label="Language" description="Select your preferred language">
+            <CustomSelect value={language} options={languageOptions} onChange={(v) => handleSettingChange(setLanguage, v)} />
+          </SettingRow>
+          <SettingRow icon={Clock} label="Timezone" description="Your local timezone for scheduling">
+            <CustomSelect value={timezone} options={timezoneOptions} onChange={(v) => handleSettingChange(setTimezone, v)} className="min-w-[160px]" />
+          </SettingRow>
+        </SettingsSection>
+
+        {/* Notifications Section */}
+        <SettingsSection icon={Bell} title="Control how you receive updates" iconBg="bg-amber-500/10" iconColor="text-amber-400">
+          <SettingRow icon={Mail} label="Email Notifications" description="Receive meeting reminders and summaries">
+            <ToggleSwitch checked={emailNotifications} onCheckedChange={(v) => handleSettingChange(setEmailNotifications, v)} />
+          </SettingRow>
+          <SettingRow icon={Smartphone} label="Push Notifications" description="Get notified on your devices">
+            <ToggleSwitch checked={pushNotifications} onCheckedChange={(v) => handleSettingChange(setPushNotifications, v)} />
+          </SettingRow>
+          <SettingRow icon={BellRing} label="Meeting Reminders" description="Get reminded before meetings start">
+            <ToggleSwitch checked={meetingReminders} onCheckedChange={(v) => handleSettingChange(setMeetingReminders, v)} />
+          </SettingRow>
+          <SettingRow icon={FileText} label="Summary Emails" description="Receive AI-generated meeting summaries">
+            <ToggleSwitch checked={summaryEmails} onCheckedChange={(v) => handleSettingChange(setSummaryEmails, v)} />
+          </SettingRow>
+        </SettingsSection>
+
+        {/* Meeting Defaults Section */}
+        <SettingsSection icon={Video} title="Default settings when joining meetings" iconBg="bg-sky-500/10" iconColor="text-sky-400">
+          <SettingRow icon={Video} label="Camera On by Default" description="Start with camera enabled">
+            <ToggleSwitch checked={defaultVideoEnabled} onCheckedChange={(v) => handleSettingChange(setDefaultVideoEnabled, v)} />
+          </SettingRow>
+          <SettingRow icon={Mic} label="Microphone On by Default" description="Start with microphone enabled">
+            <ToggleSwitch checked={defaultAudioEnabled} onCheckedChange={(v) => handleSettingChange(setDefaultAudioEnabled, v)} />
+          </SettingRow>
+          <SettingRow icon={Volume2} label="Speaker Test" description="Test your audio output">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-white/70 bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:text-white transition-colors"
+            >
+              Test
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          </SettingRow>
+        </SettingsSection>
+
+        {/* AI Features Section */}
+        <SettingsSection icon={Brain} title="Configure AI-powered capabilities" iconBg="bg-purple/10" iconColor="text-purple">
+          <SettingRow icon={Sparkles} label="AI Assistant" description="Enable real-time meeting assistance">
+            <ToggleSwitch checked={aiAssistant} onCheckedChange={(v) => handleSettingChange(setAiAssistant, v)} />
+          </SettingRow>
+          <SettingRow icon={MessageSquare} label="Auto Transcription" description="Automatically transcribe meetings">
+            <ToggleSwitch checked={autoTranscribe} onCheckedChange={(v) => handleSettingChange(setAutoTranscribe, v)} />
+          </SettingRow>
+          <SettingRow icon={Zap} label="Smart Suggestions" description="Get AI-powered meeting insights">
+            <Badge className="bg-purple/15 text-purple border-purple/20 text-xs flex items-center gap-1">
+              <Sparkles className="w-3 h-3" />
+              Pro
+            </Badge>
+          </SettingRow>
+        </SettingsSection>
+
+        {/* Privacy & Security Section */}
+        <SettingsSection icon={Shield} title="Manage your data and security settings" iconBg="bg-slate-500/10" iconColor="text-slate-400">
+          <SettingRow icon={Eye} label="Profile Visibility" description="Control who can see your profile">
+            <CustomSelect
+              value="team"
+              options={[
+                { value: "public", label: "Public" },
+                { value: "team", label: "Team Only" },
+                { value: "private", label: "Private" },
+              ]}
+              onChange={() => setHasChanges(true)}
+            />
+          </SettingRow>
+          <SettingRow icon={Lock} label="Two-Factor Authentication" description="Add an extra layer of security">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-white/70 bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:text-white transition-colors"
+            >
+              Enable
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          </SettingRow>
+          <SettingRow icon={Calendar} label="Calendar Access" description="Manage connected calendars">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-white/70 bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:text-white transition-colors"
+            >
+              Manage
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          </SettingRow>
+          <SettingRow icon={Users} label="Team Permissions" description="Configure team access levels">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm text-white/70 bg-white/[0.05] border border-white/[0.08] hover:bg-white/[0.08] hover:text-white transition-colors"
+            >
+              Configure
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
+          </SettingRow>
+        </SettingsSection>
+      </div>
+
+      {/* Floating Save Button */}
+      <AnimatePresence>
+        {hasChanges && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
+          >
+            <GlassCard hover={false} className="shadow-2xl shadow-black/50">
+              <div className="p-4 flex items-center gap-4">
+                <p className="text-sm text-white/50">You have unsaved changes</p>
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setHasChanges(false)}
+                    className="px-4 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.05] transition-colors"
+                  >
+                    Discard
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(202,255,75,0.25)" }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleSave}
+                    disabled={updatePreferences.isPending}
+                    className="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold bg-lime text-ink disabled:opacity-50"
+                  >
+                    {updatePreferences.isPending ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Save Changes
+                      </>
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </GlassCard>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
