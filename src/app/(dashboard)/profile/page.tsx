@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,8 @@ import {
   CreditCard,
   Bell,
   ChevronRight,
+  Upload,
+  ImagePlus,
 } from "lucide-react";
 import { trpc } from "@/lib/api/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -85,8 +87,13 @@ const mockProfile = {
 // ============================================
 export default function ProfilePage() {
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [name, setName] = useState("");
 
   // tRPC query - renders immediately with mock data, updates when real data arrives
@@ -98,6 +105,51 @@ export default function ProfilePage() {
   // Use real profile or mock data
   const displayProfile = profile || mockProfile;
   const subscriptionTier = displayProfile?.subscriptionTier || "FREE";
+
+  // Handle file selection for avatar
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        toast({ title: "Invalid file type", description: "Please select an image file", variant: "destructive" });
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({ title: "File too large", description: "Please select an image under 5MB", variant: "destructive" });
+        return;
+      }
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAvatarPreview(event.target?.result as string);
+        setShowAvatarModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle avatar upload
+  const handleAvatarUpload = async () => {
+    if (!avatarPreview) return;
+    setIsUploading(true);
+    // Simulate upload - in real app, this would upload to your storage
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    toast({ title: "Profile picture updated", description: "Your new profile picture has been saved." });
+    setIsUploading(false);
+    setShowAvatarModal(false);
+    setAvatarPreview(null);
+  };
+
+  // Cancel avatar upload
+  const handleCancelUpload = () => {
+    setShowAvatarModal(false);
+    setAvatarPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const updateProfile = trpc.user.updateProfile.useMutation({
     onSuccess: () => {
@@ -175,10 +227,20 @@ export default function ProfilePage() {
             <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
               {/* Avatar */}
               <div className="relative group flex-shrink-0">
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
                 <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B]/40 to-[#9B5DE5]/40 rounded-3xl blur-xl opacity-60" />
                 <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-br from-[#CAFF4B] via-[#9B5DE5] to-[#CAFF4B] p-[2px]">
                   <div className="w-full h-full rounded-3xl bg-ink flex items-center justify-center text-3xl sm:text-4xl font-bold overflow-hidden">
-                    {displayProfile?.image ? (
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                    ) : displayProfile?.image ? (
                       <img src={displayProfile.image} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                       <span className="bg-gradient-to-br from-[#CAFF4B] to-[#9B5DE5] bg-clip-text text-transparent">
@@ -187,8 +249,11 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </div>
-                <button className="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center hover:bg-white/[0.1] transition-colors">
-                  <Camera className="w-5 h-5 text-white/70" />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center hover:bg-[#CAFF4B]/20 hover:border-[#CAFF4B]/30 transition-colors group/btn"
+                >
+                  <Camera className="w-5 h-5 text-white/70 group-hover/btn:text-[#CAFF4B]" />
                 </button>
               </div>
 
@@ -480,6 +545,91 @@ export default function ProfilePage() {
           </div>
         </motion.div>
       </div>
+
+      {/* Avatar Upload Modal */}
+      <AnimatePresence>
+        {showAvatarModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            onClick={handleCancelUpload}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md rounded-2xl bg-[#0d0d0d] border border-white/[0.08] p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={handleCancelUpload}
+                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/[0.05] transition-colors"
+              >
+                <X className="w-5 h-5 text-white/50" />
+              </button>
+
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#CAFF4B] to-[#9B5DE5] flex items-center justify-center">
+                  <ImagePlus className="w-5 h-5 text-black" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white">Update Profile Picture</h3>
+                  <p className="text-sm text-white/40">Preview your new photo</p>
+                </div>
+              </div>
+
+              {/* Preview */}
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B]/40 to-[#9B5DE5]/40 rounded-3xl blur-xl opacity-60" />
+                  <div className="relative w-40 h-40 rounded-3xl bg-gradient-to-br from-[#CAFF4B] via-[#9B5DE5] to-[#CAFF4B] p-[2px]">
+                    <div className="w-full h-full rounded-3xl bg-ink overflow-hidden">
+                      {avatarPreview && (
+                        <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-1 border-white/[0.1] bg-white/[0.02] hover:bg-white/[0.05] text-white"
+                >
+                  <Upload className="mr-2 h-4 w-4" /> Choose Different
+                </Button>
+                <Button
+                  onClick={handleAvatarUpload}
+                  disabled={isUploading}
+                  className="flex-1 bg-gradient-to-r from-[#CAFF4B] to-[#9EF01A] hover:opacity-90 text-black font-semibold"
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="mr-2 h-4 w-4" /> Save Photo
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Tip */}
+              <p className="text-xs text-white/30 text-center mt-4">
+                Recommended: Square image, at least 200x200 pixels
+              </p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

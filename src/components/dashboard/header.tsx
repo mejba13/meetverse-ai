@@ -216,7 +216,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <DropdownMenuContent
             className="w-64 bg-[#0d0d0d] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/50 p-2"
             align="end"
-            forceMount
+            sideOffset={8}
           >
             {/* User info header */}
             <div className="px-3 py-3 mb-2">
@@ -235,10 +235,10 @@ export function Header({ onMenuClick }: HeaderProps) {
 
               {/* Plan badge */}
               <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-                <Zap className="h-4 w-4 text-purple" />
+                <Zap className="h-4 w-4 text-lime" />
                 <span className="text-xs text-white/70">Free Plan</span>
-                <Link href="/#pricing" className="ml-auto">
-                  <span className="text-[10px] text-lime font-medium hover:text-lime/80 transition-colors">
+                <Link href="/#pricing" className="ml-auto z-10">
+                  <span className="text-[10px] text-lime font-medium hover:text-lime/80 transition-colors cursor-pointer">
                     Upgrade
                   </span>
                 </Link>
@@ -247,25 +247,27 @@ export function Header({ onMenuClick }: HeaderProps) {
 
             <DropdownMenuSeparator className="bg-white/[0.06] mx-2" />
 
-            <DropdownMenuItem asChild className="px-3 py-2.5 cursor-pointer text-white/70 hover:text-white hover:bg-white/[0.04] rounded-xl mx-1 my-0.5 transition-colors">
-              <Link href="/profile" className="flex items-center">
-                <User className="mr-3 h-4 w-4 text-white/40" />
-                Profile
-              </Link>
+            <DropdownMenuItem
+              className="px-3 py-2.5 cursor-pointer text-white/70 hover:text-white hover:bg-white/[0.04] rounded-xl mx-1 my-0.5 transition-colors focus:bg-white/[0.04] focus:text-white"
+              onSelect={() => window.location.href = "/profile"}
+            >
+              <User className="mr-3 h-4 w-4 text-white/40" />
+              Profile
             </DropdownMenuItem>
 
-            <DropdownMenuItem asChild className="px-3 py-2.5 cursor-pointer text-white/70 hover:text-white hover:bg-white/[0.04] rounded-xl mx-1 my-0.5 transition-colors">
-              <Link href="/settings" className="flex items-center">
-                <Settings className="mr-3 h-4 w-4 text-white/40" />
-                Settings
-              </Link>
+            <DropdownMenuItem
+              className="px-3 py-2.5 cursor-pointer text-white/70 hover:text-white hover:bg-white/[0.04] rounded-xl mx-1 my-0.5 transition-colors focus:bg-white/[0.04] focus:text-white"
+              onSelect={() => window.location.href = "/settings"}
+            >
+              <Settings className="mr-3 h-4 w-4 text-white/40" />
+              Settings
             </DropdownMenuItem>
 
             <DropdownMenuSeparator className="bg-white/[0.06] mx-2 my-2" />
 
             <DropdownMenuItem
-              className="px-3 py-2.5 cursor-pointer text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl mx-1 my-0.5 transition-colors"
-              onClick={handleSignOut}
+              className="px-3 py-2.5 cursor-pointer text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl mx-1 my-0.5 transition-colors focus:bg-rose-500/10 focus:text-rose-300"
+              onSelect={handleSignOut}
             >
               <LogOut className="mr-3 h-4 w-4" />
               Sign out
