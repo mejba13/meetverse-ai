@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Mic, MicOff } from "lucide-react";
 import {
   Video,
   MessageSquare,
@@ -202,6 +204,355 @@ function MagneticButton({ children, className = "", href }: { children: React.Re
   );
 
   return href ? <Link href={href}>{content}</Link> : content;
+}
+
+// ============================================
+// HERO VIDEO SHOWCASE COMPONENT
+// ============================================
+function HeroVideoShowcase() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showTranscript, setShowTranscript] = useState(true);
+
+  // Simulated live transcription text
+  const transcriptLines = [
+    { speaker: "Sarah", text: "Let's finalize the Q4 roadmap priorities today.", time: "0:12" },
+    { speaker: "Mike", text: "I'll handle the API integration by next Friday.", time: "0:24" },
+    { speaker: "AI", text: "Action item detected: Mike - API integration - Due: Next Friday", time: "0:25", isAI: true },
+    { speaker: "Lisa", text: "We should also discuss the security audit timeline.", time: "0:38" },
+  ];
+
+  const [currentLine, setCurrentLine] = useState(0);
+
+  useEffect(() => {
+    if (isPlaying) {
+      const interval = setInterval(() => {
+        setCurrentLine((prev) => (prev + 1) % transcriptLines.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isPlaying, transcriptLines.length]);
+
+  // Auto-play the demo after a short delay
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPlaying(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="relative">
+      {/* Glow effect behind the video */}
+      <div className="absolute -inset-4 bg-gradient-to-r from-[#CAFF4B]/20 via-[#9B5DE5]/20 to-[#CAFF4B]/20 rounded-3xl blur-3xl opacity-50" />
+
+      {/* Browser Frame */}
+      <div className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0d0d0d]/95 backdrop-blur-xl shadow-2xl shadow-black/50">
+        {/* Browser Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06] bg-[#0a0a0a]/80">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
+              <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+              <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+            </div>
+          </div>
+          <div className="flex-1 max-w-md mx-4">
+            <div className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+              <span className="text-xs text-white/40 truncate">meetverse.ai/meeting/product-sync</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-white/30">Live</span>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#28c840] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#28c840]" />
+            </span>
+          </div>
+        </div>
+
+        {/* Video Content Area */}
+        <div className="relative aspect-video bg-gradient-to-br from-[#0a0a0a] to-[#111]">
+          {/* Meeting Grid with Real Photos */}
+          <div className="absolute inset-0 p-3 sm:p-4 grid grid-cols-4 grid-rows-2 gap-2 sm:gap-3">
+            {/* Main Speaker - Sarah (Woman) - Large tile */}
+            <div className="col-span-2 row-span-2 relative rounded-xl overflow-hidden group">
+              <Image
+                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=600&fit=crop&crop=faces"
+                alt="Sarah Chen - VP of Engineering"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, 40vw"
+              />
+              {/* Gradient overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+              {/* Speaking border glow */}
+              <motion.div
+                className="absolute inset-0 rounded-xl border-2 border-[#CAFF4B]"
+                animate={isPlaying ? { opacity: [0.5, 1, 0.5] } : { opacity: 0.5 }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+
+              {/* Name tag */}
+              <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm">
+                  <Mic className="w-3 h-3 text-[#CAFF4B]" />
+                  <span className="text-xs sm:text-sm text-white font-medium">Sarah Chen</span>
+                  <span className="text-[10px] text-[#CAFF4B] font-medium">Speaking</span>
+                </div>
+              </div>
+
+              {/* Speaking indicator wave */}
+              <motion.div
+                className="absolute bottom-3 right-3 flex items-center gap-0.5 px-2 py-1.5 rounded-lg bg-black/60 backdrop-blur-sm"
+              >
+                {[...Array(5)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1 bg-[#CAFF4B] rounded-full"
+                    animate={isPlaying ? { height: [4, 12 + i * 3, 4] } : { height: 4 }}
+                    transition={{ duration: 0.4, repeat: Infinity, delay: i * 0.08 }}
+                  />
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Mike - Man */}
+            <div className="relative rounded-xl overflow-hidden group">
+              <Image
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=faces"
+                alt="Mike Roberts - Product Director"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 25vw, 20vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-white/90 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">Mike R.</span>
+                <div className="p-1 rounded bg-black/50 backdrop-blur-sm">
+                  <Mic className="w-2.5 h-2.5 text-white/60" />
+                </div>
+              </div>
+            </div>
+
+            {/* Lisa - Woman */}
+            <div className="relative rounded-xl overflow-hidden group">
+              <Image
+                src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=300&fit=crop&crop=faces"
+                alt="Lisa Watson - COO"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 25vw, 20vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-white/90 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">Lisa W.</span>
+                <div className="p-1 rounded bg-black/50 backdrop-blur-sm">
+                  <Mic className="w-2.5 h-2.5 text-white/60" />
+                </div>
+              </div>
+            </div>
+
+            {/* Alex - Man */}
+            <div className="relative rounded-xl overflow-hidden group">
+              <Image
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=faces"
+                alt="Alex Johnson - Tech Lead"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 25vw, 20vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-white/90 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">Alex J.</span>
+                <div className="p-1 rounded bg-red-500/80 backdrop-blur-sm">
+                  <MicOff className="w-2.5 h-2.5 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* You (Current User) - Woman */}
+            <div className="relative rounded-xl overflow-hidden group ring-2 ring-[#9B5DE5]/50">
+              <Image
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=300&fit=crop&crop=faces"
+                alt="You"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 25vw, 20vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+              <div className="absolute top-2 right-2">
+                <span className="text-[9px] text-white bg-[#9B5DE5] px-1.5 py-0.5 rounded font-medium">You</span>
+              </div>
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
+                <span className="text-[10px] sm:text-xs text-white/90 bg-black/50 px-2 py-0.5 rounded backdrop-blur-sm">Emma T.</span>
+                <div className="p-1 rounded bg-black/50 backdrop-blur-sm">
+                  <Mic className="w-2.5 h-2.5 text-[#CAFF4B]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* AI Transcription Panel */}
+          <AnimatePresence>
+            {showTranscript && (
+              <motion.div
+                initial={{ x: "100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "100%", opacity: 0 }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="absolute right-4 top-4 bottom-4 w-72 rounded-xl bg-[#0a0a0a]/90 backdrop-blur-xl border border-white/[0.08] overflow-hidden"
+              >
+                {/* Panel Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
+                  <div className="flex items-center gap-2">
+                    <Brain className="w-4 h-4 text-[#CAFF4B]" />
+                    <span className="text-sm font-medium text-white">AI Assistant</span>
+                  </div>
+                  <button
+                    onClick={() => setShowTranscript(false)}
+                    className="p-1 rounded hover:bg-white/5"
+                  >
+                    <X className="w-3 h-3 text-white/40" />
+                  </button>
+                </div>
+
+                {/* Live Transcript */}
+                <div className="p-4 space-y-3 h-[calc(100%-52px)] overflow-y-auto">
+                  <div className="text-[10px] text-white/30 uppercase tracking-wider mb-2">Live Transcript</div>
+                  {transcriptLines.slice(0, currentLine + 1).map((line, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`p-3 rounded-lg ${
+                        line.isAI
+                          ? "bg-[#CAFF4B]/10 border border-[#CAFF4B]/20"
+                          : "bg-white/[0.03]"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-xs font-medium ${line.isAI ? "text-[#CAFF4B]" : "text-[#9B5DE5]"}`}>
+                          {line.isAI && <Sparkles className="w-3 h-3 inline mr-1" />}
+                          {line.speaker}
+                        </span>
+                        <span className="text-[10px] text-white/30">{line.time}</span>
+                      </div>
+                      <p className={`text-xs leading-relaxed ${line.isAI ? "text-[#CAFF4B]/80" : "text-white/60"}`}>
+                        {line.text}
+                      </p>
+                    </motion.div>
+                  ))}
+
+                  {/* Typing indicator */}
+                  {isPlaying && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex items-center gap-1 px-3 py-2"
+                    >
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-white/30"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      />
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-white/30"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                      />
+                      <motion.div
+                        className="w-1.5 h-1.5 rounded-full bg-white/30"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                      />
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Bottom Controls Bar */}
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {[
+                  { icon: Video, active: true },
+                  { icon: MessageSquare, active: true },
+                  { icon: Users, active: false },
+                ].map((control, i) => (
+                  <button
+                    key={i}
+                    className={`p-2.5 rounded-xl transition-all ${
+                      control.active
+                        ? "bg-white/10 text-white"
+                        : "bg-red-500/20 text-red-400"
+                    }`}
+                  >
+                    <control.icon className="w-4 h-4" />
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowTranscript(!showTranscript)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+                    showTranscript
+                      ? "bg-[#CAFF4B]/20 text-[#CAFF4B] border border-[#CAFF4B]/30"
+                      : "bg-white/10 text-white"
+                  }`}
+                >
+                  <Brain className="w-4 h-4" />
+                  <span className="text-xs font-medium">AI Co-Pilot</span>
+                </button>
+                <button className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-medium transition-colors">
+                  End Meeting
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Play/Pause Overlay */}
+          {!isPlaying && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm cursor-pointer"
+              onClick={() => setIsPlaying(true)}
+            >
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-20 h-20 rounded-full bg-[#CAFF4B] flex items-center justify-center shadow-2xl shadow-[#CAFF4B]/30"
+              >
+                <Play className="w-8 h-8 text-black ml-1" fill="black" />
+              </motion.button>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Feature Pills */}
+        <div className="flex items-center justify-center gap-3 px-4 py-4 border-t border-white/[0.06] bg-[#0a0a0a]/80">
+          {[
+            { icon: Sparkles, label: "AI Summaries" },
+            { icon: MessageSquare, label: "Live Transcription" },
+            { icon: Zap, label: "Action Items" },
+            { icon: Shield, label: "End-to-End Encrypted" },
+          ].map((feature, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.06]"
+            >
+              <feature.icon className="w-3 h-3 text-[#CAFF4B]" />
+              <span className="text-[11px] text-white/50">{feature.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 // ============================================
@@ -651,6 +1002,16 @@ export default function LandingPage() {
                 </div>
               ))}
             </motion.div>
+          </motion.div>
+
+          {/* Hero Video Showcase */}
+          <motion.div
+            initial={{ opacity: 0, y: 60, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-20 max-w-6xl mx-auto"
+          >
+            <HeroVideoShowcase />
           </motion.div>
         </motion.div>
 

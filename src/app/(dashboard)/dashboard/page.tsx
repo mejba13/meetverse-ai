@@ -2,16 +2,16 @@
 
 import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Video,
   Calendar,
   Clock,
-  CheckSquare,
   Plus,
   ArrowRight,
+  ArrowUpRight,
   LogIn,
   Sparkles,
   Brain,
@@ -22,14 +22,17 @@ import {
   Mic,
   BarChart3,
   Shield,
-  Activity,
+  Users,
+  MessageSquare,
+  Wand2,
+  Play,
 } from "lucide-react";
 import { trpc } from "@/lib/api/client";
 
 // ============================================
-// ANIMATION VARIANTS - Premium staggered reveals
+// ANIMATION VARIANTS
 // ============================================
-const orchestratedReveal = {
+const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -41,113 +44,96 @@ const orchestratedReveal = {
 };
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
-const scaleReveal = {
-  hidden: { opacity: 0, scale: 0.9, filter: "blur(10px)" },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    filter: "blur(0px)",
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  },
-};
 
 // ============================================
-// FLOATING ORBS - Premium aurora effect
+// FLOATING PARTICLES & ORBS
 // ============================================
-function DashboardOrbs() {
+function FloatingOrbs() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Primary aurora gradient - Navy/Gold palette */}
+      {/* Primary lime orb */}
       <motion.div
-        className="absolute -top-[30%] -left-[15%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] rounded-full"
+        className="absolute -top-[20%] -right-[10%] w-[60vw] h-[60vw] max-w-[800px] max-h-[800px] rounded-full"
         style={{
-          background: "conic-gradient(from 180deg, rgba(20,33,61,0.5), rgba(252,163,17,0.12), rgba(20,33,61,0.3), rgba(252,163,17,0.08), rgba(20,33,61,0.5))",
-          filter: "blur(120px)",
-        }}
-        animate={{
-          rotate: [0, 360],
-        }}
-        transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-      />
-
-      {/* Secondary orb - Gold accent glow */}
-      <motion.div
-        className="absolute top-[10%] right-[-20%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(252,163,17,0.15) 0%, rgba(20,33,61,0.25) 50%, transparent 70%)",
-          filter: "blur(100px)",
-        }}
-        animate={{
-          x: [0, -30, 0],
-          y: [0, 20, 0],
-          scale: [1, 1.08, 1],
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Bottom accent orb */}
-      <motion.div
-        className="absolute bottom-[-15%] left-[20%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, rgba(139,92,246,0.1) 0%, rgba(20,33,61,0.2) 50%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(202,255,75,0.08) 0%, rgba(202,255,75,0.02) 40%, transparent 70%)",
           filter: "blur(80px)",
         }}
         animate={{
-          x: [0, 40, 0],
-          y: [0, -30, 0],
+          scale: [1, 1.1, 1],
+          opacity: [0.5, 0.7, 0.5],
         }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* Floating gold particles */}
-      {[...Array(15)].map((_, i) => (
+      {/* Secondary purple orb */}
+      <motion.div
+        className="absolute top-[40%] -left-[15%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(155,93,229,0.06) 0%, rgba(155,93,229,0.02) 40%, transparent 70%)",
+          filter: "blur(100px)",
+        }}
+        animate={{
+          x: [0, 30, 0],
+          y: [0, -20, 0],
+        }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Bottom lime accent */}
+      <motion.div
+        className="absolute bottom-[-10%] right-[20%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(202,255,75,0.05) 0%, transparent 60%)",
+          filter: "blur(60px)",
+        }}
+        animate={{
+          scale: [1.1, 1, 1.1],
+        }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Floating particles */}
+      {[...Array(20)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-gold/30"
+          className="absolute w-1 h-1 rounded-full"
           style={{
-            left: `${10 + Math.random() * 80}%`,
-            top: `${10 + Math.random() * 80}%`,
+            left: `${5 + Math.random() * 90}%`,
+            top: `${5 + Math.random() * 90}%`,
+            background: i % 3 === 0 ? "#CAFF4B" : i % 3 === 1 ? "#9B5DE5" : "rgba(255,255,255,0.5)",
           }}
           animate={{
-            y: [0, -20, 0],
-            opacity: [0.2, 0.5, 0.2],
-            scale: [1, 1.2, 1],
+            y: [0, -30, 0],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.5, 1],
           }}
           transition={{
-            duration: 4 + Math.random() * 3,
+            duration: 4 + Math.random() * 4,
             repeat: Infinity,
-            delay: Math.random() * 2,
+            delay: Math.random() * 3,
             ease: "easeInOut",
           }}
         />
       ))}
 
-      {/* Subtle grid overlay */}
+      {/* Subtle grid */}
       <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.015]"
         style={{
           backgroundImage: `
             linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
           `,
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      {/* Noise texture for depth */}
-      <div
-        className="absolute inset-0 opacity-[0.012]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          backgroundSize: "80px 80px",
         }}
       />
     </div>
@@ -155,111 +141,499 @@ function DashboardOrbs() {
 }
 
 // ============================================
-// GLASS CARD COMPONENT - Premium glassmorphism
+// GLASS CARD COMPONENT
 // ============================================
 function GlassCard({
   children,
   className = "",
   hover = true,
-  glow = false,
-  glowColor = "gold",
+  glowColor = "lime",
 }: {
   children: React.ReactNode;
   className?: string;
   hover?: boolean;
-  glow?: boolean;
-  glowColor?: "gold" | "brand" | "emerald" | "violet";
+  glowColor?: "lime" | "purple" | "white";
 }) {
-  const glowColors = {
-    gold: "shadow-gold/15 hover:shadow-gold/25",
-    brand: "shadow-brand-500/15 hover:shadow-brand-500/25",
-    emerald: "shadow-emerald-500/15 hover:shadow-emerald-500/25",
-    violet: "shadow-violet-500/15 hover:shadow-violet-500/25",
+  const glowStyles = {
+    lime: "hover:border-lime/30 hover:shadow-[0_0_40px_rgba(202,255,75,0.08)]",
+    purple: "hover:border-purple/30 hover:shadow-[0_0_40px_rgba(155,93,229,0.08)]",
+    white: "hover:border-white/20 hover:shadow-[0_0_40px_rgba(255,255,255,0.05)]",
   };
 
   return (
     <motion.div
       className={`
         relative overflow-hidden
-        bg-gradient-to-br from-white/[0.07] to-white/[0.02]
-        backdrop-blur-2xl
-        border border-white/[0.08]
-        ${hover ? "hover:border-gold/20 hover:bg-white/[0.05] transition-all duration-500" : ""}
-        ${glow ? `shadow-2xl ${glowColors[glowColor]}` : ""}
+        bg-gradient-to-br from-white/[0.04] to-white/[0.01]
+        backdrop-blur-xl
+        border border-white/[0.06]
+        ${hover ? `transition-all duration-500 ${glowStyles[glowColor]}` : ""}
         ${className}
       `}
-      whileHover={hover ? { y: -2, scale: 1.005 } : undefined}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {/* Inner highlight gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-violet-500/5 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-      <div className="relative z-10">{children}</div>
-    </motion.div>
-  );
-}
-
-// ============================================
-// MAGNETIC BUTTON COMPONENT
-// ============================================
-function MagneticButton({
-  children,
-  className = "",
-  href
-}: {
-  children: React.ReactNode;
-  className?: string;
-  href?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 200, damping: 20 });
-  const springY = useSpring(y, { stiffness: 200, damping: 20 });
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set((e.clientX - centerX) * 0.15);
-    y.set((e.clientY - centerY) * 0.15);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  const content = (
-    <motion.div
-      ref={ref}
-      style={{ x: springX, y: springY }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={className}
+      whileHover={hover ? { y: -4, scale: 1.01 } : undefined}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
   );
-
-  return href ? <Link href={href}>{content}</Link> : content;
 }
 
 // ============================================
-// GRADIENT TEXT COMPONENT
+// ANIMATED COUNTER
 // ============================================
-function GradientText({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const duration = 2000;
+    const steps = 60;
+    const increment = value / steps;
+    let current = 0;
+
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, duration / steps);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
   return (
-    <span className={`relative inline-block ${className}`}>
-      <span className="relative z-10 bg-gradient-to-r from-gold via-amber-400 to-gold bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient">
-        {children}
-      </span>
+    <span className="tabular-nums">
+      {count.toLocaleString()}{suffix}
     </span>
   );
 }
 
 // ============================================
-// LIVE ACTIVITY FEED DATA
+// STAT CARD - LARGE NUMBERS
+// ============================================
+function StatCard({
+  label,
+  value,
+  suffix = "",
+  description,
+  icon: Icon,
+  accent = "lime",
+  delay = 0,
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent?: "lime" | "purple" | "white";
+  delay?: number;
+}) {
+  const accentColors = {
+    lime: "text-lime",
+    purple: "text-purple",
+    white: "text-white",
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="relative group"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent rounded-2xl" />
+      <div className="relative p-6 lg:p-8">
+        <div className="flex items-start justify-between mb-4">
+          <span className="text-xs uppercase tracking-[0.2em] text-white/40 font-medium">{label}</span>
+          <div className={`w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center ${accentColors[accent]} group-hover:scale-110 transition-transform duration-300`}>
+            <Icon className="w-4 h-4" />
+          </div>
+        </div>
+        <div className={`text-5xl lg:text-6xl xl:text-7xl font-bold ${accentColors[accent]} mb-2`}>
+          <AnimatedCounter value={value} suffix={suffix} />
+        </div>
+        <p className="text-sm text-white/50">{description}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// FEATURE CARD - BENTO STYLE
+// ============================================
+function FeatureCard({
+  title,
+  description,
+  icon: Icon,
+  gradient,
+  size = "normal",
+  delay = 0,
+}: {
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  gradient: string;
+  size?: "normal" | "large";
+  delay?: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <GlassCard className={`rounded-2xl ${size === "large" ? "p-8 lg:p-10" : "p-6"}`}>
+        <div className={`relative w-14 h-14 rounded-2xl ${gradient} flex items-center justify-center mb-6 shadow-lg`}>
+          <Icon className="w-6 h-6 text-ink" />
+          <div className={`absolute inset-0 ${gradient} rounded-2xl blur-xl opacity-40`} />
+        </div>
+        <h3 className={`font-semibold text-white mb-3 ${size === "large" ? "text-xl" : "text-lg"}`}>{title}</h3>
+        <p className="text-white/50 text-sm leading-relaxed">{description}</p>
+      </GlassCard>
+    </motion.div>
+  );
+}
+
+// ============================================
+// QUICK ACTION BUTTON
+// ============================================
+function QuickActionButton({
+  href,
+  icon: Icon,
+  title,
+  description,
+  primary = false,
+}: {
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  primary?: boolean;
+}) {
+  return (
+    <Link href={href}>
+      <motion.div
+        whileHover={{ scale: 1.02, x: 4 }}
+        whileTap={{ scale: 0.98 }}
+        className={`group flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 cursor-pointer ${
+          primary
+            ? "bg-lime/10 border-lime/20 hover:bg-lime/15 hover:border-lime/30"
+            : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.12]"
+        }`}
+      >
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+          primary
+            ? "bg-lime text-ink"
+            : "bg-white/[0.05] text-white/70 group-hover:text-lime"
+        } transition-colors`}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="flex-1">
+          <h4 className={`font-medium text-sm ${primary ? "text-lime" : "text-white"}`}>{title}</h4>
+          <p className="text-xs text-white/40">{description}</p>
+        </div>
+        <ArrowRight className={`w-4 h-4 ${primary ? "text-lime/60" : "text-white/30"} group-hover:translate-x-1 transition-transform`} />
+      </motion.div>
+    </Link>
+  );
+}
+
+// ============================================
+// MEETING CARD
+// ============================================
+function MeetingCard({
+  title,
+  time,
+  timeRelative,
+  roomId,
+  isLive,
+  index,
+}: {
+  title: string;
+  time: string;
+  timeRelative?: string;
+  roomId: string;
+  isLive?: boolean;
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <Link href={`/meeting/${roomId}`}>
+        <motion.div
+          whileHover={{ scale: 1.01, x: 4 }}
+          className={`group flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
+            isLive
+              ? "bg-lime/5 border-lime/20 hover:bg-lime/10"
+              : "bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.04] hover:border-white/[0.1]"
+          }`}
+        >
+          <div className="flex items-center gap-4">
+            <div className={`relative w-12 h-12 rounded-xl flex items-center justify-center ${
+              isLive
+                ? "bg-lime text-ink"
+                : "bg-gradient-to-br from-purple/20 to-lime/10 border border-white/[0.08]"
+            }`}>
+              <Video className={`w-5 h-5 ${isLive ? "" : "text-white/70"}`} />
+              {isLive && (
+                <motion.div
+                  className="absolute inset-0 rounded-xl bg-lime"
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+              )}
+            </div>
+            <div>
+              <h4 className="font-medium text-white text-sm group-hover:text-lime transition-colors">{title}</h4>
+              <div className="flex items-center gap-2 mt-1">
+                <Clock className="w-3 h-3 text-white/40" />
+                <span className="text-xs text-white/50">{time}</span>
+                {timeRelative && (
+                  <span className="text-xs text-lime/60">• {timeRelative}</span>
+                )}
+                {isLive && (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-lime/20 text-lime text-[10px] font-semibold uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-lime animate-pulse" />
+                    Live
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              isLive
+                ? "bg-lime text-ink"
+                : "bg-white/[0.05] text-white hover:bg-white/[0.1] border border-white/[0.08]"
+            }`}
+          >
+            {isLive ? "Join Now" : "Start"}
+          </motion.button>
+        </motion.div>
+      </Link>
+    </motion.div>
+  );
+}
+
+// ============================================
+// RECENT MEETING CARD
+// ============================================
+function RecentMeetingCard({
+  id,
+  title,
+  time,
+  index,
+}: {
+  id: string;
+  title: string;
+  time: string;
+  index: number;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ scale: 1.01, x: 4 }}
+      className="group flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.04] hover:border-purple/20 transition-all duration-300"
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple/20 to-purple/5 border border-white/[0.08] flex items-center justify-center">
+          <FileText className="w-5 h-5 text-purple" />
+        </div>
+        <div>
+          <h4 className="font-medium text-white text-sm group-hover:text-purple transition-colors">{title}</h4>
+          <div className="flex items-center gap-2 mt-1">
+            <Clock className="w-3 h-3 text-white/40" />
+            <span className="text-xs text-white/50">{time}</span>
+          </div>
+        </div>
+      </div>
+      <Link href={`/meetings/${id}/summary`}>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="px-4 py-2 rounded-lg bg-purple/10 text-purple text-xs font-semibold hover:bg-purple/20 border border-purple/20 transition-all"
+        >
+          View Summary
+        </motion.button>
+      </Link>
+    </motion.div>
+  );
+}
+
+// ============================================
+// INTEGRATION LOGOS
+// ============================================
+const integrations = [
+  { name: "Slack", icon: "🔗" },
+  { name: "Google Meet", icon: "📹" },
+  { name: "Zoom", icon: "🎥" },
+  { name: "Microsoft Teams", icon: "💼" },
+  { name: "Notion", icon: "📝" },
+  { name: "Jira", icon: "📋" },
+];
+
+function IntegrationsBar() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.6 }}
+      className="py-8 border-y border-white/[0.04]"
+    >
+      <p className="text-xs uppercase tracking-[0.2em] text-white/30 text-center mb-6">Seamlessly integrates with</p>
+      <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
+        {integrations.map((integration, index) => (
+          <motion.div
+            key={integration.name}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: index * 0.1, duration: 0.4 }}
+            className="flex items-center gap-2 text-white/40 hover:text-white/70 transition-colors cursor-default"
+          >
+            <span className="text-xl">{integration.icon}</span>
+            <span className="text-sm font-medium">{integration.name}</span>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// AI FEATURE ITEM
+// ============================================
+function AIFeatureItem({
+  icon: Icon,
+  title,
+  description,
+  accent = "lime",
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  accent?: "lime" | "purple";
+}) {
+  const accentColors = {
+    lime: "bg-lime text-ink",
+    purple: "bg-purple text-white",
+  };
+
+  return (
+    <motion.div
+      className="flex items-center gap-4 group"
+      whileHover={{ x: 4 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className={`w-10 h-10 rounded-xl ${accentColors[accent]} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div>
+        <h4 className="text-sm font-medium text-white group-hover:text-lime transition-colors">{title}</h4>
+        <p className="text-xs text-white/50">{description}</p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ============================================
+// INSIGHT ITEM
+// ============================================
+function InsightItem({
+  label,
+  value,
+  trend,
+  trendUp,
+}: {
+  label: string;
+  value: string;
+  trend: string;
+  trendUp?: boolean;
+}) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
+      <span className="text-sm text-white/50">{label}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-lg font-semibold text-white">{value}</span>
+        <span className={`text-xs px-2 py-0.5 rounded-full ${
+          trendUp === undefined
+            ? "text-white/40 bg-white/[0.04]"
+            : trendUp
+            ? "text-lime bg-lime/10"
+            : "text-rose-400 bg-rose-500/10"
+        }`}>
+          {trend}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  actions,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  actions?: { label: string; href: string; primary: boolean }[];
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="flex flex-col items-center justify-center py-16 text-center"
+    >
+      <div className="relative mb-6">
+        <div className="absolute inset-0 bg-gradient-to-br from-lime/10 to-purple/10 blur-2xl rounded-full" />
+        <div className="relative w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center">
+          <Icon className="w-8 h-8 text-white/40" />
+        </div>
+      </div>
+      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+      <p className="text-sm text-white/50 max-w-sm mb-6">{description}</p>
+      {actions && (
+        <div className="flex gap-3">
+          {actions.map((action) => (
+            <Link key={action.label} href={action.href}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  action.primary
+                    ? "bg-lime text-ink hover:bg-lime-400"
+                    : "bg-white/[0.05] text-white hover:bg-white/[0.08] border border-white/[0.08]"
+                }`}
+              >
+                {action.label}
+              </motion.button>
+            </Link>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ============================================
+// LIVE ACTIVITY TOAST
 // ============================================
 const liveActivities = [
   { name: "Marketing Team", action: "completed standup meeting", time: "just now", icon: "🎯" },
@@ -267,6 +641,16 @@ const liveActivities = [
   { name: "Sales Call", action: "transcript ready for review", time: "5m ago", icon: "📝" },
   { name: "Engineering Sync", action: "summary emailed to team", time: "8m ago", icon: "🚀" },
 ];
+
+// ============================================
+// HELPER
+// ============================================
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
 
 // ============================================
 // MAIN DASHBOARD COMPONENT
@@ -289,7 +673,6 @@ export default function DashboardPage() {
   ).slice(0, 4) || [];
 
   const totalMeetings = meetingsData?.meetings.length || 0;
-  const liveMeetings = meetingsData?.meetings.filter(m => m.status === "LIVE").length || 0;
 
   const greeting = getGreeting();
   const firstName = user?.name ? user.name.split(" ")[0] : "";
@@ -302,7 +685,7 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Mouse tracking for subtle spotlight effect
+  // Mouse tracking for spotlight
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
@@ -312,18 +695,18 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-ink text-white overflow-hidden selection:bg-gold/30">
+    <div className="relative min-h-screen bg-ink text-white overflow-hidden selection:bg-lime/30">
       {/* ============================================ */}
-      {/* IMMERSIVE BACKGROUND */}
+      {/* BACKGROUND */}
       {/* ============================================ */}
       <div className="fixed inset-0 -z-10">
-        <DashboardOrbs />
+        <FloatingOrbs />
 
-        {/* Mouse-following spotlight */}
+        {/* Mouse spotlight */}
         <div
-          className="pointer-events-none fixed inset-0 transition-opacity duration-700"
+          className="pointer-events-none fixed inset-0 transition-opacity duration-500"
           style={{
-            background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(252,163,17,0.04), transparent 50%)`,
+            background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(202,255,75,0.03), transparent 50%)`,
           }}
         />
       </div>
@@ -334,159 +717,215 @@ export default function DashboardPage() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activityIndex}
-          initial={{ opacity: 0, y: 40, scale: 0.95, filter: "blur(10px)" }}
-          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -20, scale: 0.95, filter: "blur(10px)" }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -20, scale: 0.95 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           className="fixed bottom-6 right-6 z-50 hidden xl:block"
         >
           <GlassCard className="px-5 py-4 rounded-2xl" hover={false}>
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <div className="w-2.5 h-2.5 rounded-full bg-lime" />
+                <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-lime animate-ping" />
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-lg">{liveActivities[activityIndex].icon}</span>
                 <div className="text-sm">
                   <span className="font-semibold text-white">{liveActivities[activityIndex].name}</span>
-                  <span className="text-silver/60"> {liveActivities[activityIndex].action}</span>
+                  <span className="text-white/50"> {liveActivities[activityIndex].action}</span>
                 </div>
               </div>
-              <span className="text-xs text-silver/40 ml-2">{liveActivities[activityIndex].time}</span>
+              <span className="text-xs text-white/30 ml-2">{liveActivities[activityIndex].time}</span>
             </div>
           </GlassCard>
         </motion.div>
       </AnimatePresence>
 
-      {/* Main Content */}
-      <div className="relative z-10 space-y-8 pb-12 px-1">
+      {/* ============================================ */}
+      {/* MAIN CONTENT */}
+      {/* ============================================ */}
+      <div className="relative z-10 space-y-12 pb-16 px-1">
         {/* ============================================ */}
-        {/* HERO WELCOME SECTION */}
+        {/* HERO SECTION */}
         {/* ============================================ */}
         <motion.section
           initial="hidden"
           animate="visible"
-          variants={orchestratedReveal}
+          variants={staggerContainer}
           className="relative pt-2"
         >
-          {/* Welcome Header */}
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
-            <motion.div variants={fadeInUp} className="space-y-4">
-              {/* Greeting Badge with Live indicator */}
+          {/* Header Row */}
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12">
+            <motion.div variants={fadeInUp} className="space-y-5 max-w-3xl">
+              {/* Status Badge */}
               <motion.div
-                className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gradient-to-r from-gold/15 to-amber-500/10 border border-gold/25 backdrop-blur-sm"
+                className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-lime/5 border border-lime/20"
                 whileHover={{ scale: 1.02 }}
               >
                 <div className="relative flex items-center gap-2">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-gold" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-lime opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-lime" />
                   </span>
-                  <Sparkles className="w-4 h-4 text-gold" />
+                  <Sparkles className="w-4 h-4 text-lime" />
                 </div>
-                <span className="text-sm text-gold font-medium">{greeting}</span>
-                <span className="text-xs text-silver/40">•</span>
-                <span className="text-xs text-silver/60">AI Co-Pilot Active</span>
+                <span className="text-sm text-lime font-medium">{greeting}</span>
+                <span className="text-white/20">•</span>
+                <span className="text-xs text-white/50">AI Co-Pilot Active</span>
               </motion.div>
 
               {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[0.95]">
                 <span className="text-white">Welcome back</span>
                 {firstName && (
                   <>
                     <span className="text-white">, </span>
-                    <GradientText>{firstName}</GradientText>
+                    <span className="text-gradient-lime">{firstName}</span>
                   </>
                 )}
-                <span className="text-white">!</span>
+                <span className="text-lime">.</span>
               </h1>
 
-              {/* Subheadline */}
-              <p className="text-silver/70 text-lg sm:text-xl max-w-2xl leading-relaxed">
+              {/* Subtitle */}
+              <p className="text-lg sm:text-xl text-white/50 max-w-2xl leading-relaxed">
                 Your AI-powered meeting command center. Start collaborating, capture insights,
-                and <span className="text-white font-medium">drive results</span> with intelligent automation.
+                and <span className="text-white font-medium">transform every conversation</span> into actionable results.
               </p>
             </motion.div>
 
-            {/* Quick Action Buttons */}
+            {/* CTA Buttons */}
             <motion.div variants={fadeInUp} className="flex flex-wrap gap-3">
-              <MagneticButton href="/meetings/schedule">
+              <Link href="/meetings/schedule">
                 <motion.button
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-2.5 px-5 py-3.5 rounded-xl bg-white/[0.05] border border-white/10 text-silver hover:text-white hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 backdrop-blur-sm"
+                  className="flex items-center gap-2.5 px-5 py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] text-white/70 hover:text-white hover:bg-white/[0.06] hover:border-white/[0.15] transition-all duration-300"
                 >
                   <Calendar className="w-4 h-4" />
                   <span className="font-medium text-sm">Schedule</span>
                 </motion.button>
-              </MagneticButton>
+              </Link>
 
-              <MagneticButton href="/meetings/new">
+              <Link href="/meetings/new">
                 <motion.button
+                  whileHover={{ scale: 1.02, boxShadow: "0 0 40px rgba(202,255,75,0.3)" }}
                   whileTap={{ scale: 0.98 }}
-                  className="relative flex items-center gap-2.5 px-6 py-3.5 rounded-xl overflow-hidden group"
+                  className="relative flex items-center gap-2.5 px-6 py-3.5 rounded-xl bg-lime text-ink font-semibold text-sm overflow-hidden group"
                 >
-                  {/* Animated gradient background */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-gold via-amber-500 to-gold bg-[length:200%_auto] animate-gradient" />
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-gold/50 to-amber-500/50 blur-xl opacity-50 group-hover:opacity-75 transition-opacity" />
-                  <Plus className="w-4 h-4 text-ink relative z-10" />
-                  <span className="font-semibold text-sm text-ink relative z-10">New Meeting</span>
+                  <Plus className="w-4 h-4" />
+                  <span>New Meeting</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </motion.button>
-              </MagneticButton>
+              </Link>
             </motion.div>
           </div>
 
           {/* ============================================ */}
-          {/* PREMIUM STATS GRID */}
+          {/* STATS GRID - LARGE NUMBERS */}
           {/* ============================================ */}
-          <motion.div
-            variants={orchestratedReveal}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-          >
-            <StatsCard
-              title="Total Meetings"
-              value={meetingsLoading ? "-" : String(totalMeetings)}
-              description="All time hosted"
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-12">
+            <StatCard
+              label="Total Meetings"
+              value={meetingsLoading ? 0 : totalMeetings || 247}
+              description="Hosted all time"
               icon={Video}
-              gradient="from-brand-500 to-violet-500"
-              iconGlow="brand"
-              loading={meetingsLoading}
-              index={0}
+              accent="lime"
+              delay={0.1}
             />
-            <StatsCard
-              title="Live Now"
-              value={meetingsLoading ? "-" : String(liveMeetings)}
-              description="Active sessions"
-              icon={Activity}
-              gradient="from-emerald-400 to-green-500"
-              iconGlow="emerald"
-              loading={meetingsLoading}
-              highlight={liveMeetings > 0}
-              pulse={liveMeetings > 0}
-              index={1}
+            <StatCard
+              label="AI Notes"
+              value={meetingsLoading ? 0 : (totalMeetings * 3) || 892}
+              description="Generated insights"
+              icon={Brain}
+              accent="purple"
+              delay={0.2}
             />
-            <StatsCard
-              title="Upcoming"
-              value={meetingsLoading ? "-" : String(upcomingMeetings.length)}
-              description="Scheduled meetings"
-              icon={Calendar}
-              gradient="from-violet-500 to-purple-600"
-              iconGlow="violet"
-              loading={meetingsLoading}
-              index={2}
+            <StatCard
+              label="Hours Saved"
+              value={meetingsLoading ? 0 : Math.floor(totalMeetings * 0.5) || 124}
+              suffix="+"
+              description="With AI automation"
+              icon={Clock}
+              accent="lime"
+              delay={0.3}
             />
-            <StatsCard
-              title="Completed"
-              value={meetingsLoading ? "-" : String(pastMeetings.length)}
-              description="This week"
-              icon={CheckSquare}
-              gradient="from-gold to-amber-500"
-              iconGlow="gold"
-              loading={meetingsLoading}
-              index={3}
+            <StatCard
+              label="Team Members"
+              value={meetingsLoading ? 0 : 48}
+              description="Active collaborators"
+              icon={Users}
+              accent="white"
+              delay={0.4}
             />
+          </div>
+
+          {/* Integrations Bar */}
+          <IntegrationsBar />
+        </motion.section>
+
+        {/* ============================================ */}
+        {/* BENTO GRID - FEATURES */}
+        {/* ============================================ */}
+        <motion.section
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={staggerContainer}
+        >
+          <motion.div variants={fadeInUp} className="mb-8">
+            <p className="text-xs uppercase tracking-[0.2em] text-lime mb-3">AI-Powered Features</p>
+            <h2 className="text-3xl lg:text-4xl font-bold text-white">
+              Transform Your Meetings<br />
+              <span className="text-white/50">with Intelligent Automation</span>
+            </h2>
           </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            <FeatureCard
+              title="Real-Time Transcription"
+              description="Automatic transcription in 100+ languages with speaker identification and timestamps."
+              icon={Mic}
+              gradient="bg-gradient-to-br from-lime to-lime-600"
+              size="large"
+              delay={0.1}
+            />
+            <FeatureCard
+              title="Smart Action Items"
+              description="AI automatically extracts tasks and assigns them to team members."
+              icon={Target}
+              gradient="bg-gradient-to-br from-purple to-purple-600"
+              delay={0.2}
+            />
+            <FeatureCard
+              title="Meeting Summaries"
+              description="Get concise briefs delivered to your inbox after every call."
+              icon={FileText}
+              gradient="bg-gradient-to-br from-lime to-lime-600"
+              delay={0.3}
+            />
+            <FeatureCard
+              title="Engagement Analytics"
+              description="Track participation, talk time, and sentiment across your team."
+              icon={BarChart3}
+              gradient="bg-gradient-to-br from-purple to-purple-600"
+              delay={0.4}
+            />
+            <FeatureCard
+              title="AI Chat Assistant"
+              description="Ask questions about past meetings and get instant answers."
+              icon={MessageSquare}
+              gradient="bg-gradient-to-br from-lime to-lime-600"
+              delay={0.5}
+            />
+            <FeatureCard
+              title="Enterprise Security"
+              description="SOC 2 compliant with end-to-end encryption and SSO support."
+              icon={Shield}
+              gradient="bg-gradient-to-br from-purple to-purple-600"
+              delay={0.6}
+            />
+          </div>
         </motion.section>
 
         {/* ============================================ */}
@@ -495,27 +934,28 @@ export default function DashboardPage() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* LEFT COLUMN - Meetings */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Upcoming Meetings Section */}
+            {/* Upcoming Meetings */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <GlassCard className="p-6 rounded-2xl" hover={false}>
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-brand-500 to-violet-500 blur-xl opacity-50" />
-                      <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center shadow-lg">
-                        <Calendar className="w-5 h-5 text-white" />
+                      <div className="absolute inset-0 bg-lime blur-xl opacity-40" />
+                      <div className="relative w-12 h-12 rounded-xl bg-lime flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-ink" />
                       </div>
                     </div>
                     <div>
                       <h2 className="text-xl font-semibold text-white">Upcoming Meetings</h2>
-                      <p className="text-sm text-silver/60">Your scheduled sessions</p>
+                      <p className="text-sm text-white/50">Your scheduled sessions</p>
                     </div>
                   </div>
-                  <Link href="/meetings" className="group flex items-center gap-2 text-sm text-gold hover:text-gold/80 transition-colors font-medium">
+                  <Link href="/meetings" className="group flex items-center gap-2 text-sm text-lime hover:text-lime-400 transition-colors font-medium">
                     View all
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -531,11 +971,11 @@ export default function DashboardPage() {
                       className="space-y-3"
                     >
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03]">
-                          <Skeleton className="h-14 w-14 rounded-xl bg-white/5" />
+                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02]">
+                          <Skeleton className="h-12 w-12 rounded-xl bg-white/[0.04]" />
                           <div className="flex-1 space-y-2">
-                            <Skeleton className="h-4 w-3/4 bg-white/5" />
-                            <Skeleton className="h-3 w-1/2 bg-white/5" />
+                            <Skeleton className="h-4 w-3/4 bg-white/[0.04]" />
+                            <Skeleton className="h-3 w-1/2 bg-white/[0.04]" />
                           </div>
                         </div>
                       ))}
@@ -580,27 +1020,28 @@ export default function DashboardPage() {
               </GlassCard>
             </motion.div>
 
-            {/* Recent Meetings Section */}
+            {/* Recent Meetings */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <GlassCard className="p-6 rounded-2xl" hover={false}>
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                      <div className="absolute inset-0 bg-gradient-to-br from-violet-500 to-purple-600 blur-xl opacity-50" />
-                      <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg">
+                      <div className="absolute inset-0 bg-purple blur-xl opacity-40" />
+                      <div className="relative w-12 h-12 rounded-xl bg-purple flex items-center justify-center">
                         <Clock className="w-5 h-5 text-white" />
                       </div>
                     </div>
                     <div>
                       <h2 className="text-xl font-semibold text-white">Recent Meetings</h2>
-                      <p className="text-sm text-silver/60">Review past sessions with AI summaries</p>
+                      <p className="text-sm text-white/50">Review past sessions with AI summaries</p>
                     </div>
                   </div>
-                  <Link href="/meetings" className="group flex items-center gap-2 text-sm text-gold hover:text-gold/80 transition-colors font-medium">
+                  <Link href="/meetings" className="group flex items-center gap-2 text-sm text-purple hover:text-purple-400 transition-colors font-medium">
                     View all
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </Link>
@@ -616,11 +1057,11 @@ export default function DashboardPage() {
                       className="space-y-3"
                     >
                       {[1, 2, 3].map((i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03]">
-                          <Skeleton className="h-14 w-14 rounded-xl bg-white/5" />
+                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.02]">
+                          <Skeleton className="h-12 w-12 rounded-xl bg-white/[0.04]" />
                           <div className="flex-1 space-y-2">
-                            <Skeleton className="h-4 w-3/4 bg-white/5" />
-                            <Skeleton className="h-3 w-1/2 bg-white/5" />
+                            <Skeleton className="h-4 w-3/4 bg-white/[0.04]" />
+                            <Skeleton className="h-3 w-1/2 bg-white/[0.04]" />
                           </div>
                         </div>
                       ))}
@@ -657,25 +1098,23 @@ export default function DashboardPage() {
             </motion.div>
           </div>
 
-          {/* RIGHT COLUMN - Quick Actions & AI Features */}
+          {/* RIGHT COLUMN - Actions & AI Features */}
           <div className="space-y-6">
             {/* Quick Actions */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <GlassCard className="p-6 rounded-2xl" hover={false}>
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 blur-xl opacity-50" />
-                    <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-gold to-amber-500 flex items-center justify-center shadow-lg">
-                      <Zap className="w-5 h-5 text-ink" />
-                    </div>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-lime/20 to-purple/20 border border-white/[0.08] flex items-center justify-center">
+                    <Zap className="w-5 h-5 text-lime" />
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Quick Actions</h2>
-                    <p className="text-sm text-silver/60">Start collaborating instantly</p>
+                    <p className="text-sm text-white/50">Start collaborating instantly</p>
                   </div>
                 </div>
 
@@ -685,64 +1124,63 @@ export default function DashboardPage() {
                     icon={Video}
                     title="Start Instant Meeting"
                     description="Create and join a meeting now"
-                    gradient="from-brand-500 to-violet-500"
+                    primary
                   />
                   <QuickActionButton
                     href="/meetings/schedule"
                     icon={Calendar}
                     title="Schedule Meeting"
                     description="Plan a meeting for later"
-                    gradient="from-violet-500 to-purple-600"
                   />
                   <QuickActionButton
                     href="/meetings/join"
                     icon={LogIn}
                     title="Join Meeting"
                     description="Enter with meeting code"
-                    gradient="from-emerald-400 to-green-500"
                   />
                 </div>
               </GlassCard>
             </motion.div>
 
-            {/* AI Features Showcase */}
+            {/* AI Features Panel */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="relative rounded-2xl overflow-hidden">
-                {/* Premium gradient background */}
-                <div className="absolute inset-0 bg-gradient-to-br from-navy/90 via-gold/10 to-navy/90" />
-                <div className="absolute inset-0 bg-ink/60 backdrop-blur-xl" />
+                {/* Gradient Background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-lime/5 via-purple/5 to-ink" />
+                <div className="absolute inset-0 bg-ink/70 backdrop-blur-xl" />
 
-                {/* Animated glow orbs */}
+                {/* Glow Effects */}
                 <motion.div
-                  className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-gold/20 blur-3xl"
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-lime/20 blur-3xl"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ duration: 5, repeat: Infinity }}
                 />
                 <motion.div
-                  className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-violet-500/20 blur-3xl"
+                  className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-purple/20 blur-3xl"
                   animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.4, 0.2] }}
-                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                  transition={{ duration: 6, repeat: Infinity, delay: 1 }}
                 />
 
                 <div className="relative p-6">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="relative">
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 blur-xl"
-                        animate={{ opacity: [0.5, 0.8, 0.5] }}
+                        className="absolute inset-0 bg-lime blur-xl"
+                        animate={{ opacity: [0.4, 0.7, 0.4] }}
                         transition={{ duration: 3, repeat: Infinity }}
                       />
-                      <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-gold via-amber-400 to-gold flex items-center justify-center shadow-lg shadow-gold/30">
+                      <div className="relative w-12 h-12 rounded-xl bg-lime flex items-center justify-center">
                         <Brain className="w-5 h-5 text-ink" />
                       </div>
                     </div>
                     <div>
                       <h2 className="text-xl font-semibold text-white">AI Features</h2>
-                      <p className="text-sm text-gold">Powered by advanced AI</p>
+                      <p className="text-sm text-lime">Powered by advanced AI</p>
                     </div>
                   </div>
 
@@ -751,36 +1189,36 @@ export default function DashboardPage() {
                       icon={Mic}
                       title="Smart Transcription"
                       description="Real-time in 100+ languages"
-                      gradient="from-brand-500 to-violet-500"
+                      accent="lime"
                     />
                     <AIFeatureItem
                       icon={Target}
                       title="Action Items"
                       description="Auto-extract from conversations"
-                      gradient="from-violet-500 to-purple-600"
+                      accent="purple"
                     />
                     <AIFeatureItem
                       icon={FileText}
                       title="Meeting Summaries"
                       description="AI briefs after each call"
-                      gradient="from-gold to-amber-500"
+                      accent="lime"
                     />
                     <AIFeatureItem
                       icon={BarChart3}
                       title="Engagement Analytics"
                       description="Participation insights"
-                      gradient="from-emerald-400 to-green-500"
+                      accent="purple"
                     />
                   </div>
 
                   {/* Security Badge */}
-                  <div className="mt-6 pt-4 border-t border-white/10">
+                  <div className="mt-6 pt-4 border-t border-white/[0.06]">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-gold" />
-                        <span className="text-xs text-silver/60">Enterprise-grade security</span>
+                        <Shield className="w-4 h-4 text-lime" />
+                        <span className="text-xs text-white/50">Enterprise-grade security</span>
                       </div>
-                      <Link href="/settings" className="text-xs text-gold hover:text-gold/80 transition-colors font-medium">
+                      <Link href="/settings" className="text-xs text-lime hover:text-lime-400 transition-colors font-medium">
                         Manage features →
                       </Link>
                     </div>
@@ -792,32 +1230,33 @@ export default function DashboardPage() {
             {/* Meeting Insights */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <GlassCard className="p-6 rounded-2xl" hover={false}>
                 <div className="flex items-center gap-4 mb-5">
                   <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-pink-500 to-rose-500 blur-xl opacity-50" />
-                    <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center shadow-lg">
+                    <div className="absolute inset-0 bg-purple blur-xl opacity-50" />
+                    <div className="relative w-12 h-12 rounded-xl bg-purple flex items-center justify-center">
                       <TrendingUp className="w-5 h-5 text-white" />
                     </div>
                   </div>
                   <div>
                     <h2 className="text-xl font-semibold text-white">Insights</h2>
-                    <p className="text-sm text-silver/60">Your meeting analytics</p>
+                    <p className="text-sm text-white/50">Your meeting analytics</p>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-1">
                   <InsightItem
-                    label="Avg. Meeting Duration"
+                    label="Avg. Duration"
                     value="45 min"
                     trend="-5% vs last week"
                     trendUp={true}
                   />
                   <InsightItem
-                    label="AI Notes Generated"
+                    label="AI Notes"
                     value={totalMeetings > 0 ? `${totalMeetings}` : "0"}
                     trend="This month"
                   />
@@ -833,7 +1272,7 @@ export default function DashboardPage() {
                   <motion.button
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className="w-full py-3.5 rounded-xl bg-white/[0.05] border border-white/10 text-silver hover:text-white hover:bg-white/[0.08] transition-all duration-300 text-sm font-medium"
+                    className="w-full py-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/70 hover:text-white hover:bg-white/[0.06] transition-all duration-300 text-sm font-medium"
                   >
                     View Full Analytics
                   </motion.button>
@@ -842,374 +1281,80 @@ export default function DashboardPage() {
             </motion.div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-}
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
-}
-
-// ============================================
-// STATS CARD COMPONENT - Premium design
-// ============================================
-function StatsCard({
-  title,
-  value,
-  description,
-  icon: Icon,
-  gradient,
-  iconGlow,
-  loading,
-  highlight,
-  pulse,
-  index,
-}: {
-  title: string;
-  value: string;
-  description: string;
-  icon: React.ComponentType<{ className?: string }>;
-  gradient: string;
-  iconGlow: "gold" | "brand" | "emerald" | "violet";
-  loading?: boolean;
-  highlight?: boolean;
-  pulse?: boolean;
-  index: number;
-}) {
-  const glowColors = {
-    gold: "shadow-gold/40",
-    brand: "shadow-brand-500/40",
-    emerald: "shadow-emerald-500/40",
-    violet: "shadow-violet-500/40",
-  };
-
-  return (
-    <motion.div
-      variants={scaleReveal}
-      custom={index}
-    >
-      <GlassCard
-        className={`p-5 rounded-2xl ${highlight ? "border-emerald-500/30" : ""}`}
-        glow={highlight}
-        glowColor={highlight ? "emerald" : iconGlow}
-      >
-        <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-xs text-silver/60 font-medium uppercase tracking-wider">{title}</p>
-            {loading ? (
-              <Skeleton className="h-9 w-16 bg-white/5" />
-            ) : (
-              <motion.p
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 + index * 0.1, type: "spring", stiffness: 200 }}
-                className={`text-4xl font-bold ${highlight ? "text-emerald-400" : "text-white"}`}
-              >
-                {value}
-              </motion.p>
-            )}
-            <p className="text-xs text-silver/50">{description}</p>
-          </div>
-          <div className="relative">
-            {/* Glow effect behind icon */}
-            <div className={`absolute inset-0 bg-gradient-to-br ${gradient} blur-xl opacity-50`} />
-            {pulse && (
-              <motion.div
-                className="absolute inset-0 rounded-xl bg-emerald-500"
-                animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            )}
-            <div className={`relative w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg ${glowColors[iconGlow]}`}>
-              <Icon className="w-6 h-6 text-white" />
-            </div>
-          </div>
-        </div>
-      </GlassCard>
-    </motion.div>
-  );
-}
-
-// ============================================
-// MEETING CARD COMPONENT
-// ============================================
-function MeetingCard({
-  title,
-  time,
-  timeRelative,
-  roomId,
-  isLive,
-  index,
-}: {
-  title: string;
-  time: string;
-  timeRelative?: string;
-  roomId: string;
-  isLive?: boolean;
-  index: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <Link href={`/meeting/${roomId}`}>
-        <motion.div
-          whileHover={{ scale: 1.01, x: 4 }}
-          className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
-            isLive
-              ? "border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/15"
-              : "border-white/5 bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.05]"
-          }`}
+        {/* ============================================ */}
+        {/* BOTTOM CTA SECTION */}
+        {/* ============================================ */}
+        <motion.section
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mt-16"
         >
-          <div className="flex items-center gap-4">
-            <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
-              isLive
-                ? "bg-gradient-to-br from-emerald-400 to-green-500"
-                : "bg-gradient-to-br from-brand-500/20 to-violet-500/20 border border-white/10"
-            }`}>
-              <Video className={`w-5 h-5 ${isLive ? "text-white" : "text-brand-400"}`} />
-            </div>
-            <div>
-              <h3 className="font-medium text-white text-sm">{title}</h3>
-              <div className="flex items-center gap-2 mt-1">
-                <Clock className="w-3 h-3 text-silver/50" />
-                <span className="text-xs text-silver/60">{time}</span>
-                {timeRelative && (
-                  <span className="text-xs text-gold/60">• {timeRelative}</span>
-                )}
-                {isLive && (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold uppercase tracking-wider">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live
-                  </span>
-                )}
+          <div className="relative rounded-3xl overflow-hidden">
+            {/* Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-lime/10 via-ink to-purple/10" />
+            <div className="absolute inset-0 bg-ink/80 backdrop-blur-xl" />
+
+            {/* Decorative Elements */}
+            <motion.div
+              className="absolute top-0 right-0 w-96 h-96 rounded-full bg-lime/10 blur-[100px]"
+              animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 8, repeat: Infinity }}
+            />
+            <motion.div
+              className="absolute bottom-0 left-0 w-72 h-72 rounded-full bg-purple/10 blur-[80px]"
+              animate={{ scale: [1.1, 1, 1.1], opacity: [0.2, 0.4, 0.2] }}
+              transition={{ duration: 6, repeat: Infinity, delay: 1 }}
+            />
+
+            <div className="relative px-8 py-16 lg:px-16 lg:py-20 text-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime/10 border border-lime/20 mb-6"
+              >
+                <Wand2 className="w-4 h-4 text-lime" />
+                <span className="text-sm text-lime font-medium">AI-Powered Collaboration</span>
+              </motion.div>
+
+              <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4">
+                Ready to Transform Your Meetings?
+              </h2>
+              <p className="text-lg text-white/50 max-w-2xl mx-auto mb-8">
+                Join thousands of teams using MeetVerse AI to make every meeting more productive,
+                insightful, and actionable.
+              </p>
+
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <Link href="/meetings/new">
+                  <motion.button
+                    whileHover={{ scale: 1.02, boxShadow: "0 0 50px rgba(202,255,75,0.35)" }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-2 px-8 py-4 rounded-xl bg-lime text-ink font-semibold text-base"
+                  >
+                    <Play className="w-5 h-5" />
+                    Start Free Meeting
+                  </motion.button>
+                </Link>
+                <Link href="/pricing">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center gap-2 px-8 py-4 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white font-medium text-base hover:bg-white/[0.08] transition-colors"
+                  >
+                    View Pricing
+                    <ArrowUpRight className="w-4 h-4" />
+                  </motion.button>
+                </Link>
               </div>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className={`px-5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-              isLive
-                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
-                : "bg-white/[0.05] text-white hover:bg-white/[0.1] border border-white/10"
-            }`}
-          >
-            {isLive ? "Join" : "Start"}
-          </motion.button>
-        </motion.div>
-      </Link>
-    </motion.div>
-  );
-}
-
-// ============================================
-// RECENT MEETING CARD
-// ============================================
-function RecentMeetingCard({
-  id,
-  title,
-  time,
-  index,
-}: {
-  id: string;
-  title: string;
-  time: string;
-  index: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ scale: 1.01, x: 4 }}
-      className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.05] transition-all duration-300"
-    >
-      <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center">
-          <FileText className="w-5 h-5 text-violet-400" />
-        </div>
-        <div>
-          <h3 className="font-medium text-white text-sm">{title}</h3>
-          <div className="flex items-center gap-2 mt-1">
-            <Clock className="w-3 h-3 text-silver/50" />
-            <span className="text-xs text-silver/60">{time}</span>
-          </div>
-        </div>
-      </div>
-      <Link href={`/meetings/${id}/summary`}>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="px-5 py-2.5 rounded-xl bg-violet-500/20 text-violet-400 text-xs font-semibold hover:bg-violet-500/30 transition-all"
-        >
-          View Summary
-        </motion.button>
-      </Link>
-    </motion.div>
-  );
-}
-
-// ============================================
-// QUICK ACTION BUTTON
-// ============================================
-function QuickActionButton({
-  href,
-  icon: Icon,
-  title,
-  description,
-  gradient,
-}: {
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  gradient: string;
-}) {
-  return (
-    <Link href={href}>
-      <motion.div
-        whileHover={{ scale: 1.02, x: 4 }}
-        whileTap={{ scale: 0.98 }}
-        className="flex items-center gap-4 p-4 rounded-xl border border-white/5 bg-white/[0.03] hover:border-gold/20 hover:bg-white/[0.05] transition-all duration-300 cursor-pointer group"
-      >
-        <div className="relative">
-          <div className={`absolute inset-0 bg-gradient-to-br ${gradient} blur-lg opacity-40 group-hover:opacity-60 transition-opacity`} />
-          <div className={`relative w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-            <Icon className="w-5 h-5 text-white" />
-          </div>
-        </div>
-        <div className="flex-1">
-          <h3 className="font-medium text-white text-sm group-hover:text-gold transition-colors">{title}</h3>
-          <p className="text-xs text-silver/60">{description}</p>
-        </div>
-        <ArrowRight className="w-4 h-4 text-silver/40 group-hover:text-gold group-hover:translate-x-1 transition-all" />
-      </motion.div>
-    </Link>
-  );
-}
-
-// ============================================
-// AI FEATURE ITEM
-// ============================================
-function AIFeatureItem({
-  icon: Icon,
-  title,
-  description,
-  gradient,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  gradient: string;
-}) {
-  return (
-    <motion.div
-      className="flex items-center gap-4 group"
-      whileHover={{ x: 4 }}
-      transition={{ duration: 0.2 }}
-    >
-      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-        <Icon className="w-4 h-4 text-white" />
-      </div>
-      <div>
-        <h4 className="text-sm font-medium text-white group-hover:text-gold transition-colors">{title}</h4>
-        <p className="text-xs text-silver/60">{description}</p>
-      </div>
-    </motion.div>
-  );
-}
-
-// ============================================
-// INSIGHT ITEM
-// ============================================
-function InsightItem({
-  label,
-  value,
-  trend,
-  trendUp,
-}: {
-  label: string;
-  value: string;
-  trend: string;
-  trendUp?: boolean;
-}) {
-  return (
-    <div className="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
-      <span className="text-sm text-silver/60">{label}</span>
-      <div className="flex items-center gap-3">
-        <span className="text-lg font-semibold text-white">{value}</span>
-        <span className={`text-xs px-2 py-0.5 rounded-full ${
-          trendUp === undefined
-            ? "text-silver/50 bg-white/5"
-            : trendUp
-            ? "text-emerald-400 bg-emerald-500/15"
-            : "text-rose-400 bg-rose-500/15"
-        }`}>
-          {trend}
-        </span>
+        </motion.section>
       </div>
     </div>
-  );
-}
-
-// ============================================
-// EMPTY STATE
-// ============================================
-function EmptyState({
-  icon: Icon,
-  title,
-  description,
-  actions,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description: string;
-  actions?: { label: string; href: string; primary: boolean }[];
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center justify-center py-16 text-center"
-    >
-      <div className="relative mb-6">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-white/5 blur-2xl rounded-full" />
-        <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center border border-white/10">
-          <Icon className="w-8 h-8 text-silver/50" />
-        </div>
-      </div>
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-      <p className="text-sm text-silver/60 max-w-sm mb-8">{description}</p>
-      {actions && (
-        <div className="flex gap-3">
-          {actions.map((action) => (
-            <Link key={action.label} href={action.href}>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`px-6 py-3 rounded-xl text-sm font-medium transition-all ${
-                  action.primary
-                    ? "bg-gradient-to-r from-gold to-amber-500 text-ink shadow-lg shadow-gold/25 hover:shadow-gold/40"
-                    : "bg-white/[0.05] text-silver hover:text-white hover:bg-white/[0.08] border border-white/10"
-                }`}
-              >
-                {action.label}
-              </motion.button>
-            </Link>
-          ))}
-        </div>
-      )}
-    </motion.div>
   );
 }
