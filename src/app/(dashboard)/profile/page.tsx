@@ -96,6 +96,9 @@ export default function ProfilePage() {
   const [isUploading, setIsUploading] = useState(false);
   const [name, setName] = useState("");
 
+  // tRPC utilities for cache invalidation
+  const utils = trpc.useUtils();
+
   // tRPC query - renders immediately with mock data, updates when real data arrives
   const { data: profile } = trpc.user.me.useQuery(undefined, {
     retry: 1,
@@ -130,16 +133,55 @@ export default function ProfilePage() {
     }
   };
 
+  // Mutation for updating profile image
+  const updateProfileImage = trpc.user.updateProfile.useMutation({
+    onSuccess: () => {
+      utils.user.me.invalidate();
+      toast({ title: "Profile picture updated", description: "Your new profile picture has been saved." });
+      setIsUploading(false);
+      setShowAvatarModal(false);
+      setAvatarPreview(null);
+    },
+    onError: (error) => {
+      toast({ title: "Failed to update profile picture", description: error.message, variant: "destructive" });
+      setIsUploading(false);
+    },
+  });
+
   // Handle avatar upload
   const handleAvatarUpload = async () => {
     if (!avatarPreview) return;
     setIsUploading(true);
-    // Simulate upload - in real app, this would upload to your storage
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    toast({ title: "Profile picture updated", description: "Your new profile picture has been saved." });
-    setIsUploading(false);
-    setShowAvatarModal(false);
-    setAvatarPreview(null);
+
+    try {
+      // Get file type from data URL
+      const typeMatch = avatarPreview.match(/data:([^;]+);/);
+      const type = typeMatch ? typeMatch[1] : "image/jpeg";
+
+      // Upload to server
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: avatarPreview, type }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
+      }
+
+      const { url } = await response.json();
+
+      // Update profile with new image URL
+      updateProfileImage.mutate({ image: url });
+    } catch (error) {
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload image",
+        variant: "destructive",
+      });
+      setIsUploading(false);
+    }
   };
 
   // Cancel avatar upload
@@ -227,15 +269,16 @@ export default function ProfilePage() {
             <div className="flex flex-col lg:flex-row lg:items-start gap-6 lg:gap-8">
               {/* Avatar */}
               <div className="relative group flex-shrink-0">
-                {/* Hidden file input */}
+                {/* Hidden file input - placed outside for better accessibility */}
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
                   onChange={handleFileSelect}
-                  className="hidden"
+                  className="sr-only"
+                  id="avatar-upload"
                 />
-                <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B]/40 to-[#9B5DE5]/40 rounded-3xl blur-xl opacity-60" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B]/40 to-[#9B5DE5]/40 rounded-3xl blur-xl opacity-60 pointer-events-none" />
                 <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-3xl bg-gradient-to-br from-[#CAFF4B] via-[#9B5DE5] to-[#CAFF4B] p-[2px]">
                   <div className="w-full h-full rounded-3xl bg-ink flex items-center justify-center text-3xl sm:text-4xl font-bold overflow-hidden">
                     {avatarPreview ? (
@@ -249,12 +292,12 @@ export default function ProfilePage() {
                     )}
                   </div>
                 </div>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.1] flex items-center justify-center hover:bg-[#CAFF4B]/20 hover:border-[#CAFF4B]/30 transition-colors group/btn"
+                <label
+                  htmlFor="avatar-upload"
+                  className="absolute -bottom-2 -right-2 z-10 w-10 h-10 rounded-xl bg-ink/90 border border-white/[0.15] flex items-center justify-center hover:bg-[#CAFF4B]/20 hover:border-[#CAFF4B]/40 transition-all cursor-pointer shadow-lg"
                 >
-                  <Camera className="w-5 h-5 text-white/70 group-hover/btn:text-[#CAFF4B]" />
-                </button>
+                  <Camera className="w-5 h-5 text-white/80 hover:text-[#CAFF4B]" />
+                </label>
               </div>
 
               {/* Profile Info */}
