@@ -10,7 +10,8 @@ const config: Config = {
   theme: {
     extend: {
       // ============================================
-      // COLOR SYSTEM
+      // COLOR SYSTEM - PREMIUM DARK THEME
+      // Inspired by Unmarshal Design System
       // ============================================
       colors: {
         // Semantic color tokens (use these in components)
@@ -48,50 +49,63 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // Dark Theme Palette
-        // #000000, #14213d, #fca311, #e5e5e5, #ffffff
-        ink: "#000000",
-        navy: "#14213d",
-        gold: "#fca311",
-        silver: "#e5e5e5",
-        white: "#ffffff",
+        // ============================================
+        // NEW PREMIUM DARK PALETTE
+        // ============================================
 
-        // Extended neutral palette
-        charcoal: "#0a0a0a",
-        graphite: "#1a1a2e",
-        steel: "#2a2a40",
-        slate: "#52525b",
-        pearl: "#e4e4e7",
-        snow: "#fafafa",
+        // Deep blacks for backgrounds
+        ink: "#0a0a0a",
+        obsidian: "#0d0d0d",
+        carbon: "#111111",
+        graphite: "#171717",
 
-        // Primary brand color scale - Vibrant Blue (#146EF5)
-        brand: {
-          50: "#E8F1FE",
-          100: "#D4E4FD",
-          200: "#A9C9FB",
-          300: "#7EAEF9",
-          400: "#5393F7",
-          500: "#146EF5",
-          600: "#1058C4",
-          700: "#0C4293",
-          800: "#082C62",
-          900: "#041631",
-          950: "#020B19",
+        // Lime/Chartreuse accent - Primary CTA color
+        lime: {
+          DEFAULT: "#CAFF4B",
+          50: "#F7FFE5",
+          100: "#EFFFCC",
+          200: "#E0FF99",
+          300: "#D4FF66",
+          400: "#CAFF4B",
+          500: "#B8F024",
+          600: "#9ECC1F",
+          700: "#7AA319",
+          800: "#5C7A13",
+          900: "#3D510D",
+          950: "#1F2906",
         },
 
-        // Secondary accent - Electric violet for premium feel
-        violet: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          200: "#ddd6fe",
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-          800: "#5b21b6",
-          900: "#4c1d95",
-          950: "#2e1065",
+        // Purple accent - Secondary/Highlight color
+        purple: {
+          DEFAULT: "#9B5DE5",
+          50: "#F5EEFB",
+          100: "#EBDDF7",
+          200: "#D7BBEF",
+          300: "#C399E7",
+          400: "#AF77DF",
+          500: "#9B5DE5",
+          600: "#7C3AD1",
+          700: "#5E2C9E",
+          800: "#401E6B",
+          900: "#211038",
+          950: "#10081C",
+        },
+
+        // Extended neutral palette for dark mode
+        neutral: {
+          50: "#fafafa",
+          100: "#f5f5f5",
+          200: "#e5e5e5",
+          300: "#d4d4d4",
+          400: "#a3a3a3",
+          500: "#737373",
+          600: "#525252",
+          700: "#404040",
+          800: "#262626",
+          850: "#1a1a1a",
+          900: "#171717",
+          925: "#141414",
+          950: "#0a0a0a",
         },
 
         // Semantic colors
@@ -117,26 +131,25 @@ const config: Config = {
           600: "#DC2626",
         },
         info: {
-          DEFAULT: "#146EF5",
-          50: "#E8F1FE",
-          100: "#D4E4FD",
-          500: "#146EF5",
-          600: "#1058C4",
+          DEFAULT: "#3B82F6",
+          50: "#EFF6FF",
+          100: "#DBEAFE",
+          500: "#3B82F6",
+          600: "#2563EB",
         },
       },
 
       // ============================================
-      // MODERN TYPOGRAPHY - WEBFLOW STYLE
+      // MODERN TYPOGRAPHY
       // ============================================
       fontFamily: {
-        // Primary Font: Inter (similar to WF Visual Sans Variable)
-        // Fallback: Arial, sans-serif as per brand guidelines
+        // Primary Font: Inter
         sans: [
           "var(--font-sans)",
           "Arial",
           "sans-serif",
         ],
-        // Display/Heading uses same font stack
+        // Display uses same font stack
         display: [
           "var(--font-sans)",
           "Arial",
@@ -152,7 +165,7 @@ const config: Config = {
         ],
       },
 
-      // Fluid typography scale with optical sizing
+      // Fluid typography scale
       fontSize: {
         // ============================================
         // DISPLAY SIZES - For hero headlines
@@ -279,7 +292,7 @@ const config: Config = {
         ],
 
         // ============================================
-        // UTILITY SIZES - For labels, badges, etc.
+        // UTILITY SIZES
         // ============================================
         caption: [
           "0.75rem",
@@ -342,22 +355,25 @@ const config: Config = {
         lg: "0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)",
         xl: "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)",
         "2xl": "0 25px 50px rgba(0, 0, 0, 0.25)",
-        // Brand blue glow effects
-        glow: "0 0 20px rgba(20, 110, 245, 0.25)",
-        "glow-lg": "0 0 40px rgba(20, 110, 245, 0.35)",
-        "glow-brand": "0 0 30px rgba(20, 110, 245, 0.4)",
-        "glow-violet": "0 0 30px rgba(139, 92, 246, 0.3)",
-        "inner-glow": "inset 0 0 20px rgba(20, 110, 245, 0.1)",
-        // Gold glow effects for dark mode
-        "glow-gold": "0 0 20px rgba(252, 163, 17, 0.3)",
-        "glow-gold-lg": "0 0 40px rgba(252, 163, 17, 0.4)",
+
+        // Lime glow effects
+        "glow-lime": "0 0 20px rgba(202, 255, 75, 0.25)",
+        "glow-lime-lg": "0 0 40px rgba(202, 255, 75, 0.35)",
+        "glow-lime-xl": "0 0 60px rgba(202, 255, 75, 0.4)",
+
+        // Purple glow effects
+        "glow-purple": "0 0 20px rgba(155, 93, 229, 0.25)",
+        "glow-purple-lg": "0 0 40px rgba(155, 93, 229, 0.35)",
+
+        // Inner glows
+        "inner-glow-lime": "inset 0 0 20px rgba(202, 255, 75, 0.1)",
+        "inner-glow-purple": "inset 0 0 20px rgba(155, 93, 229, 0.1)",
+
         // Premium elevation shadows
         "elevation-1": "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
         "elevation-2": "0 3px 6px rgba(0,0,0,0.15), 0 2px 4px rgba(0,0,0,0.08)",
         "elevation-3": "0 10px 20px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.10)",
         "elevation-4": "0 15px 25px rgba(0,0,0,0.15), 0 5px 10px rgba(0,0,0,0.05)",
-        // Navy card shadows for dark mode
-        "navy": "0 4px 20px rgba(20, 33, 61, 0.5)",
       },
 
       // ============================================
@@ -414,11 +430,11 @@ const config: Config = {
         "pulse-glow": {
           "0%, 100%": {
             opacity: "1",
-            boxShadow: "0 0 20px rgba(20, 110, 245, 0.3)",
+            boxShadow: "0 0 20px rgba(202, 255, 75, 0.3)",
           },
           "50%": {
             opacity: "0.8",
-            boxShadow: "0 0 40px rgba(20, 110, 245, 0.5)",
+            boxShadow: "0 0 40px rgba(202, 255, 75, 0.5)",
           },
         },
         float: {
@@ -437,6 +453,14 @@ const config: Config = {
           "0%": { transform: "scale(1)", opacity: "1" },
           "100%": { transform: "scale(1.5)", opacity: "0" },
         },
+        "rotate-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "counter-rotate": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(-360deg)" },
+        },
       },
 
       animation: {
@@ -453,6 +477,8 @@ const config: Config = {
         "text-shimmer": "text-shimmer 3s ease-in-out infinite",
         gradient: "gradient 3s ease infinite",
         "pulse-ring": "pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "rotate-slow": "rotate-slow 60s linear infinite",
+        "counter-rotate": "counter-rotate 40s linear infinite",
       },
 
       // ============================================

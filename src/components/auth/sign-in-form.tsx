@@ -42,7 +42,7 @@ export function SignInForm() {
             type="button"
             disabled={isLoading}
             onClick={() => signInWithProvider("google")}
-            className="w-full h-12 bg-white/[0.03] hover:bg-white/[0.06] border-white/10 hover:border-white/20 text-white rounded-xl transition-all duration-300"
+            className="w-full h-12 bg-white/[0.02] hover:bg-white/[0.05] border-white/[0.08] hover:border-white/[0.15] text-white rounded-xl transition-all duration-300"
           >
             <Chrome className="mr-3 h-5 w-5" />
             Continue with Google
@@ -54,7 +54,7 @@ export function SignInForm() {
             type="button"
             disabled={isLoading}
             onClick={() => signInWithProvider("github")}
-            className="w-full h-12 bg-white/[0.03] hover:bg-white/[0.06] border-white/10 hover:border-white/20 text-white rounded-xl transition-all duration-300"
+            className="w-full h-12 bg-white/[0.02] hover:bg-white/[0.05] border-white/[0.08] hover:border-white/[0.15] text-white rounded-xl transition-all duration-300"
           >
             <Github className="mr-3 h-5 w-5" />
             Continue with GitHub
@@ -65,10 +65,10 @@ export function SignInForm() {
       {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/10" />
+          <div className="w-full border-t border-white/[0.08]" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-[#030014] px-4 text-white/40 tracking-wider">
+          <span className="bg-[#0a0a0a] px-4 text-white/30 tracking-wider">
             Or continue with email
           </span>
         </div>
@@ -77,11 +77,11 @@ export function SignInForm() {
       {/* Email/Password Form */}
       <form onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-white/70 text-sm font-medium">
+          <Label htmlFor="email" className="text-white/60 text-sm font-medium">
             Email address
           </Label>
           <div className="relative group">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-brand-400 transition-colors" />
+            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25 group-focus-within:text-[#CAFF4B] transition-colors" />
             <Input
               id="email"
               type="email"
@@ -90,24 +90,24 @@ export function SignInForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
-              className="h-12 pl-11 bg-white/[0.03] border-white/10 focus:border-brand-500/50 focus:ring-brand-500/20 text-white placeholder:text-white/30 rounded-xl transition-all duration-300"
+              className="h-12 pl-11 bg-white/[0.02] border-white/[0.08] focus:border-[#CAFF4B]/50 focus:ring-[#CAFF4B]/20 text-white placeholder:text-white/25 rounded-xl transition-all duration-300"
             />
           </div>
         </div>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-white/70 text-sm font-medium">
+            <Label htmlFor="password" className="text-white/60 text-sm font-medium">
               Password
             </Label>
             <a
               href="/forgot-password"
-              className="text-sm text-brand-400 hover:text-brand-300 transition-colors"
+              className="text-sm text-[#CAFF4B] hover:text-[#d8ff7a] transition-colors"
             >
               Forgot password?
             </a>
           </div>
           <div className="relative group">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30 group-focus-within:text-brand-400 transition-colors" />
+            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-white/25 group-focus-within:text-[#CAFF4B] transition-colors" />
             <Input
               id="password"
               type="password"
@@ -116,7 +116,7 @@ export function SignInForm() {
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
-              className="h-12 pl-11 bg-white/[0.03] border-white/10 focus:border-brand-500/50 focus:ring-brand-500/20 text-white placeholder:text-white/30 rounded-xl transition-all duration-300"
+              className="h-12 pl-11 bg-white/[0.02] border-white/[0.08] focus:border-[#CAFF4B]/50 focus:ring-[#CAFF4B]/20 text-white placeholder:text-white/25 rounded-xl transition-all duration-300"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ export function SignInForm() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-12 bg-gradient-to-r from-brand-500 via-violet-500 to-purple-500 hover:opacity-90 text-white font-medium rounded-xl shadow-lg shadow-violet-500/25 transition-all duration-300"
+            className="w-full h-12 bg-[#CAFF4B] hover:bg-[#d8ff7a] text-black font-medium rounded-xl shadow-lg shadow-[#CAFF4B]/20 transition-all duration-300"
           >
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
