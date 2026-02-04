@@ -37,7 +37,7 @@ export default function DashboardLayout({
   }, [sidebarOpen]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-white dark:bg-ink">
+    <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-ink">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block lg:w-64 lg:flex-shrink-0">
         <Sidebar />

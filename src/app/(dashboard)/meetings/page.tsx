@@ -4,10 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { format, addDays, addHours, subDays, subHours } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   Video,
   Plus,
@@ -233,30 +230,115 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: 0.06,
       delayChildren: 0.1,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 24, filter: "blur(12px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
 const scaleIn = {
-  hidden: { opacity: 0, scale: 0.95 },
+  hidden: { opacity: 0, scale: 0.92 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
+
+// ============================================
+// AURORA BACKGROUND
+// ============================================
+function AuroraBackground() {
+  return (
+    <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+      {/* Primary aurora orb - gold */}
+      <motion.div
+        className="absolute -top-[30%] -left-[15%] w-[70vw] h-[70vw] max-w-[900px] max-h-[900px] rounded-full"
+        style={{
+          background: "conic-gradient(from 180deg, rgba(20,33,61,0.6), rgba(252,161,17,0.12), rgba(20,33,61,0.4), rgba(252,161,17,0.06), rgba(20,33,61,0.6))",
+          filter: "blur(140px)",
+        }}
+        animate={{ rotate: [0, 360] }}
+        transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
+      />
+
+      {/* Secondary orb - navy/gold blend */}
+      <motion.div
+        className="absolute top-[15%] right-[-20%] w-[50vw] h-[50vw] max-w-[700px] max-h-[700px] rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(252,161,17,0.08) 0%, rgba(20,33,61,0.25) 50%, transparent 70%)",
+          filter: "blur(100px)",
+        }}
+        animate={{ x: [0, -30, 0], y: [0, 30, 0] }}
+        transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Bottom accent */}
+      <motion.div
+        className="absolute bottom-[-10%] left-[20%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full"
+        style={{
+          background: "radial-gradient(circle, rgba(252,161,17,0.06) 0%, rgba(20,33,61,0.15) 60%, transparent 80%)",
+          filter: "blur(80px)",
+        }}
+        animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Subtle grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.015]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(252,161,17,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(252,161,17,0.3) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
+    </div>
+  );
+}
+
+// ============================================
+// GLASS CARD COMPONENT
+// ============================================
+function GlassCard({
+  children,
+  className = "",
+  hover = true,
+  glow = false,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  hover?: boolean;
+  glow?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-2xl",
+        "bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.02]",
+        "backdrop-blur-2xl",
+        "border border-white/[0.08]",
+        "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
+        hover && "hover:border-gold/30 hover:shadow-[0_8px_40px_rgba(252,161,17,0.08)] transition-all duration-500",
+        glow && "ring-1 ring-gold/20",
+        className
+      )}
+    >
+      {/* Inner glow effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent pointer-events-none" />
+      {children}
+    </div>
+  );
+}
 
 // ============================================
 // STATUS BADGE COMPONENT
@@ -265,29 +347,29 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; className: string; icon?: React.ReactNode }> = {
     SCHEDULED: {
       label: "Scheduled",
-      className: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+      className: "bg-gold/10 text-gold border-gold/30",
       icon: <Calendar className="w-3 h-3" />,
     },
     LIVE: {
       label: "Live Now",
-      className: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 animate-pulse",
-      icon: <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />,
+      className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40",
+      icon: <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />,
     },
     ENDED: {
       label: "Completed",
-      className: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+      className: "bg-white/5 text-silver/70 border-white/10",
       icon: <CheckCircle2 className="w-3 h-3" />,
     },
     CANCELLED: {
       label: "Cancelled",
-      className: "bg-red-500/10 text-red-400 border-red-500/20",
+      className: "bg-red-500/10 text-red-400 border-red-500/30",
       icon: <Trash2 className="w-3 h-3" />,
     },
   };
   const { label, className, icon } = config[status] || config.SCHEDULED;
 
   return (
-    <Badge variant="outline" className={cn("gap-1.5 font-medium", className)}>
+    <Badge variant="outline" className={cn("gap-1.5 font-medium text-xs px-2.5 py-1", className)}>
       {icon}
       {label}
     </Badge>
@@ -309,74 +391,77 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
   return (
     <motion.div
       variants={itemVariants}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      whileHover={{ y: -6, transition: { duration: 0.3, ease: "easeOut" } }}
       className="group"
     >
-      <Card className={cn(
-        "relative overflow-hidden border-gray-200 dark:border-navy/50 bg-white dark:bg-navy",
-        "hover:border-gray-300 dark:hover:border-gold/20 hover:shadow-xl dark:hover:shadow-gold/5 transition-all duration-300",
-        isLive && "border-emerald-500/30 shadow-lg shadow-emerald-500/10",
-        isCancelled && "opacity-60"
-      )}>
+      <GlassCard
+        className={cn(
+          isLive && "border-emerald-500/40 shadow-[0_8px_40px_rgba(16,185,129,0.15)]",
+          isCancelled && "opacity-50"
+        )}
+        glow={isLive}
+      >
         {/* Live indicator glow */}
         {isLive && (
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent pointer-events-none" />
         )}
 
-        {/* Top gradient line */}
+        {/* Top gradient accent line */}
         <div className={cn(
           "absolute top-0 left-0 right-0 h-[2px]",
-          isLive ? "bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-300" :
-          isCancelled ? "bg-gradient-to-r from-red-500/50 to-transparent" :
-          "bg-gradient-to-r from-brand-500/50 via-violet-500/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+          isLive
+            ? "bg-gradient-to-r from-emerald-500 via-emerald-400 to-emerald-300"
+            : isCancelled
+            ? "bg-gradient-to-r from-red-500/50 to-transparent"
+            : "bg-gradient-to-r from-gold via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
         )} />
 
-        <CardContent className="p-5">
+        <div className="p-6">
           {/* Header */}
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
                 <StatusBadge status={meeting.status} />
                 {meeting.hasAI && (
-                  <Badge variant="outline" className="bg-violet-500/10 text-violet-400 border-violet-500/20 gap-1">
+                  <Badge variant="outline" className="bg-violet-500/10 text-violet-400 border-violet-500/30 gap-1.5 text-xs px-2.5 py-1">
                     <Sparkles className="w-3 h-3" />
                     AI
                   </Badge>
                 )}
                 {(meeting as typeof seedMeetings.upcoming[0]).recurring && (
-                  <Badge variant="outline" className="bg-amber-500/10 text-amber-400 border-amber-500/20 gap-1">
+                  <Badge variant="outline" className="bg-gold/10 text-gold border-gold/30 gap-1.5 text-xs px-2.5 py-1">
                     <TrendingUp className="w-3 h-3" />
                     Weekly
                   </Badge>
                 )}
               </div>
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate group-hover:text-brand-500 dark:group-hover:text-gold transition-colors">
+              <h3 className="font-semibold text-lg text-white truncate group-hover:text-gold transition-colors duration-300">
                 {meeting.title}
               </h3>
-              <p className="text-sm text-gray-500 dark:text-silver line-clamp-1 mt-1">
+              <p className="text-sm text-silver/70 line-clamp-1 mt-1.5">
                 {meeting.description}
               </p>
             </div>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 dark:text-silver hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-ink">
+                <button className="p-2.5 rounded-xl text-silver/50 hover:text-white hover:bg-white/[0.06] transition-all duration-200">
                   <MoreVertical className="h-4 w-4" />
-                </Button>
+                </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-white dark:bg-navy border-gray-200 dark:border-white/10">
-                <DropdownMenuItem onClick={copyMeetingLink} className="text-gray-600 dark:text-silver hover:text-gray-900 dark:hover:text-white focus:text-gray-900 dark:focus:text-white">
+              <DropdownMenuContent align="end" className="bg-ink/95 backdrop-blur-xl border-white/[0.08] rounded-xl shadow-2xl">
+                <DropdownMenuItem onClick={copyMeetingLink} className="text-silver hover:text-white hover:bg-white/[0.06] rounded-lg mx-1 cursor-pointer">
                   <Copy className="mr-2 h-4 w-4" />
                   Copy Link
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-gray-600 dark:text-silver hover:text-gray-900 dark:hover:text-white focus:text-gray-900 dark:focus:text-white">
+                <DropdownMenuItem asChild className="text-silver hover:text-white hover:bg-white/[0.06] rounded-lg mx-1 cursor-pointer">
                   <Link href={`/meeting/${meeting.roomId}`} target="_blank">
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Open in New Tab
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-gray-200 dark:bg-white/10" />
-                <DropdownMenuItem className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 focus:text-red-600 dark:focus:text-red-300">
+                <DropdownMenuSeparator className="bg-white/[0.06]" />
+                <DropdownMenuItem className="text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg mx-1 cursor-pointer">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Cancel Meeting
                 </DropdownMenuItem>
@@ -386,75 +471,73 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
 
           {/* Live Meeting Info */}
           {isLive && 'currentSpeaker' in meeting && (
-            <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+            <div className="mb-4 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center">
-                    <Mic className="w-4 h-4 text-white" />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                    <Mic className="w-5 h-5 text-white" />
                   </div>
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse" />
+                  <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full animate-ping" />
+                  <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full" />
                 </div>
                 <div>
-                  <p className="text-xs text-emerald-400 font-medium">Currently Speaking</p>
-                  <p className="text-sm text-white">{meeting.currentSpeaker}</p>
+                  <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wide">Currently Speaking</p>
+                  <p className="text-sm text-white font-medium">{meeting.currentSpeaker}</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Meeting Details */}
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-silver">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-brand-500 dark:text-gold" />
-                {meeting.scheduledStart && format(new Date(meeting.scheduledStart), "MMM d, yyyy")}
+          <div className="space-y-3 mb-5">
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-gold/10 flex items-center justify-center">
+                  <Calendar className="w-3.5 h-3.5 text-gold" />
+                </div>
+                <span className="text-white/90 font-medium">{meeting.scheduledStart && format(new Date(meeting.scheduledStart), "MMM d, yyyy")}</span>
               </div>
-              <span className="text-gray-300 dark:text-silver/30">•</span>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-violet-500 dark:text-violet-400" />
-                {meeting.scheduledStart && format(new Date(meeting.scheduledStart), "h:mm a")}
+              <span className="text-white/20">•</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                  <Clock className="w-3.5 h-3.5 text-violet-400" />
+                </div>
+                <span className="text-white/90 font-medium">{meeting.scheduledStart && format(new Date(meeting.scheduledStart), "h:mm a")}</span>
               </div>
             </div>
 
             {/* Duration */}
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-silver">
-              <Zap className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-              <span>{meeting.duration} minutes</span>
+            <div className="flex items-center gap-2.5 text-sm">
+              <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+              </div>
+              <span className="text-white/80">{meeting.duration} minutes</span>
             </div>
           </div>
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {meeting.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 text-xs rounded-md bg-gray-100 dark:bg-ink text-gray-600 dark:text-silver border border-gray-200 dark:border-white/5"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
           {/* Participants */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-5">
             <div className="flex items-center">
-              <div className="flex -space-x-2">
+              <div className="flex -space-x-2.5">
                 {meeting.participants.slice(0, 4).map((p, i) => (
-                  <div
+                  <motion.div
                     key={i}
-                    className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center text-xs font-medium text-white border-2 border-white dark:border-ink ring-0"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: i * 0.1, duration: 0.3 }}
+                    className="w-9 h-9 rounded-full bg-gradient-to-br from-gold via-amber-500 to-orange-500 flex items-center justify-center text-xs font-bold text-ink border-2 border-ink ring-0 shadow-lg"
                     title={p.name}
                   >
                     {p.avatar}
-                  </div>
+                  </motion.div>
                 ))}
                 {meeting.participants.length > 4 && (
-                  <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-ink flex items-center justify-center text-xs font-medium text-gray-500 dark:text-silver border-2 border-white dark:border-ink">
+                  <div className="w-9 h-9 rounded-full bg-white/[0.08] backdrop-blur-sm flex items-center justify-center text-xs font-semibold text-white/70 border-2 border-ink">
                     +{meeting.participants.length - 4}
                   </div>
                 )}
               </div>
-              <span className="ml-3 text-sm text-gray-400 dark:text-silver/60">
+              <span className="ml-4 text-sm text-silver/70">
                 {meeting.participants.length} participant{meeting.participants.length > 1 ? 's' : ''}
               </span>
             </div>
@@ -462,19 +545,19 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
 
           {/* Past Meeting Summary */}
           {isPast && pastMeeting.summary && (
-            <div className="mb-4 p-3 rounded-xl bg-gray-50 dark:bg-ink border border-gray-200 dark:border-white/5">
-              <div className="grid grid-cols-3 gap-3 text-center">
+            <div className="mb-5 p-4 rounded-xl bg-white/[0.04] border border-white/[0.06]">
+              <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-lg font-bold text-brand-500 dark:text-gold">{pastMeeting.summary.actionItems}</p>
-                  <p className="text-xs text-gray-400 dark:text-silver/60">Action Items</p>
+                  <p className="text-xl font-bold text-gold">{pastMeeting.summary.actionItems}</p>
+                  <p className="text-xs text-silver/60 mt-1">Action Items</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-violet-500 dark:text-violet-400">{pastMeeting.summary.keyDecisions}</p>
-                  <p className="text-xs text-gray-400 dark:text-silver/60">Decisions</p>
+                  <p className="text-xl font-bold text-violet-400">{pastMeeting.summary.keyDecisions}</p>
+                  <p className="text-xs text-silver/60 mt-1">Decisions</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-emerald-500 dark:text-emerald-400">{pastMeeting.summary.duration}</p>
-                  <p className="text-xs text-gray-400 dark:text-silver/60">Duration</p>
+                  <p className="text-xl font-bold text-emerald-400">{pastMeeting.summary.duration}</p>
+                  <p className="text-xs text-silver/60 mt-1">Duration</p>
                 </div>
               </div>
             </div>
@@ -482,49 +565,50 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
 
           {/* Action Button */}
           {!isCancelled && (
-            <Button
-              asChild
-              className={cn(
-                "w-full font-medium transition-all duration-300",
-                isLive
-                  ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white shadow-lg shadow-emerald-500/25"
-                  : isPast
-                  ? "bg-gray-100 dark:bg-ink hover:bg-gray-200 dark:hover:bg-ink/80 text-gray-700 dark:text-white border border-gray-200 dark:border-white/10"
-                  : "bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white shadow-lg shadow-brand-500/20"
-              )}
-            >
-              <Link href={isPast ? `/meetings/${meeting.id}/summary` : `/meeting/${meeting.roomId}`}>
+            <Link href={isPast ? `/meetings/${meeting.id}/summary` : `/meeting/${meeting.roomId}`}>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className={cn(
+                  "w-full py-3.5 px-5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-300",
+                  isLive
+                    ? "bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white shadow-lg shadow-emerald-500/30"
+                    : isPast
+                    ? "bg-white/[0.04] hover:bg-white/[0.08] text-white/80 hover:text-white border border-white/[0.08] hover:border-white/[0.15]"
+                    : "bg-gradient-to-r from-gold via-amber-500 to-gold bg-[length:200%_auto] hover:bg-right text-ink shadow-lg shadow-gold/25"
+                )}
+              >
                 {isLive ? (
                   <>
-                    <span className="relative flex h-2 w-2 mr-2">
+                    <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
                     </span>
                     Join Live Meeting
                   </>
                 ) : isPast ? (
                   <>
-                    <FileText className="mr-2 h-4 w-4" />
-                    View Summary & Transcript
+                    <FileText className="h-4 w-4" />
+                    View Summary
                   </>
                 ) : (
                   <>
-                    <Play className="mr-2 h-4 w-4" />
+                    <Play className="h-4 w-4" />
                     Start Meeting
                   </>
                 )}
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </Link>
           )}
 
           {isCancelled && (
-            <div className="text-center py-2 text-sm text-white/40">
+            <div className="text-center py-3 text-sm text-silver/40">
               {(meeting as typeof seedMeetings.past[0]).cancelReason || "This meeting was cancelled"}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }
@@ -532,36 +616,34 @@ function MeetingCard({ meeting, isPast = false }: { meeting: typeof seedMeetings
 // ============================================
 // STATS CARD COMPONENT
 // ============================================
-function StatsCard({ icon: Icon, label, value, trend, color }: {
+function StatsCard({ icon: Icon, label, value, trend, gradient }: {
   icon: React.ElementType;
   label: string;
   value: string | number;
   trend?: string;
-  color: string;
+  gradient: string;
 }) {
   return (
     <motion.div variants={itemVariants}>
-      <Card className="border-gray-200 dark:border-navy/50 bg-white dark:bg-navy hover:border-gray-300 dark:hover:border-gold/20 transition-all duration-300">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-3">
-            <div className={cn(
-              "w-10 h-10 rounded-xl flex items-center justify-center",
-              color
-            )}>
-              <Icon className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
-              <p className="text-xs text-gray-500 dark:text-silver">{label}</p>
-            </div>
-            {trend && (
-              <Badge className="ml-auto bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border-emerald-500/20">
-                {trend}
-              </Badge>
-            )}
+      <GlassCard className="p-5">
+        <div className="flex items-center gap-4">
+          <div className={cn(
+            "w-12 h-12 rounded-xl flex items-center justify-center shadow-lg",
+            gradient
+          )}>
+            <Icon className="w-5 h-5 text-white" />
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex-1 min-w-0">
+            <p className="text-2xl font-bold text-white tracking-tight">{value}</p>
+            <p className="text-xs text-silver/60 truncate">{label}</p>
+          </div>
+          {trend && (
+            <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-xs font-semibold">
+              {trend}
+            </Badge>
+          )}
+        </div>
+      </GlassCard>
     </motion.div>
   );
 }
@@ -596,51 +678,68 @@ export default function MeetingsPage() {
   const aiEnabledMeetings = [...upcomingMeetings, ...pastMeetings].filter((m) => m.hasAI).length;
 
   return (
-    <div className="min-h-screen">
-      {/* Background Effects - Only in light mode */}
-      <div className="fixed inset-0 -z-10 pointer-events-none dark:hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-500/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-violet-500/5 rounded-full blur-[100px]" />
-      </div>
+    <div className="min-h-screen text-white">
+      <AuroraBackground />
 
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="space-y-8"
+        className="relative z-10 space-y-8"
       >
         {/* Page Header */}
         <motion.div variants={itemVariants} className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
           <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center">
-                <Video className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-4 mb-3">
+              <motion.div
+                className="relative"
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 blur-xl opacity-60" />
+                <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-gold via-amber-500 to-orange-500 flex items-center justify-center shadow-2xl shadow-gold/30">
+                  <Video className="w-7 h-7 text-ink" />
+                </div>
+              </motion.div>
+              <div>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl font-bold text-white tracking-tight">Meetings</h1>
+                  {liveMeetings > 0 && (
+                    <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/40 animate-pulse text-xs font-semibold">
+                      {liveMeetings} Live
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-silver/70 text-sm mt-0.5">
+                  Manage your AI-powered video meetings with real-time transcription and smart insights
+                </p>
               </div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Meetings</h1>
-              {liveMeetings > 0 && (
-                <Badge className="bg-emerald-500/20 text-emerald-500 dark:text-emerald-400 border-emerald-500/30 animate-pulse">
-                  {liveMeetings} Live
-                </Badge>
-              )}
             </div>
-            <p className="text-gray-500 dark:text-silver">
-              Manage your AI-powered video meetings with real-time transcription and smart insights
-            </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" asChild className="border-gray-200 dark:border-navy bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-navy/80 text-gray-700 dark:text-white">
-              <Link href="/meetings/schedule">
-                <Calendar className="mr-2 h-4 w-4 text-brand-500 dark:text-gold" />
-                Schedule
-              </Link>
-            </Button>
-            <Button asChild className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white shadow-lg shadow-brand-500/25">
-              <Link href="/meetings/new">
-                <Plus className="mr-2 h-4 w-4" />
-                New Meeting
-              </Link>
-            </Button>
+            <Link href="/meetings/schedule">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-2.5 px-5 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-300"
+              >
+                <Calendar className="h-4 w-4 text-gold" />
+                <span className="font-medium">Schedule</span>
+              </motion.button>
+            </Link>
+            <Link href="/meetings/new">
+              <motion.button
+                whileHover={{ scale: 1.02, boxShadow: "0 0 40px rgba(252,161,17,0.3)" }}
+                whileTap={{ scale: 0.98 }}
+                className="relative flex items-center gap-2.5 px-6 py-3 rounded-xl overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-gold via-amber-500 to-gold bg-[length:200%_auto] animate-gradient" />
+                <div className="absolute inset-0 bg-gradient-to-r from-gold/50 to-amber-500/50 blur-xl opacity-50 group-hover:opacity-70 transition-opacity" />
+                <Plus className="h-4 w-4 text-ink relative z-10" />
+                <span className="font-semibold text-ink relative z-10">New Meeting</span>
+              </motion.button>
+            </Link>
           </div>
         </motion.div>
 
@@ -650,40 +749,40 @@ export default function MeetingsPage() {
             icon={Video}
             label="Upcoming Meetings"
             value={upcomingMeetings.length}
-            color="bg-gradient-to-br from-cyan-500 to-cyan-600"
+            gradient="bg-gradient-to-br from-gold to-amber-600 shadow-gold/30"
           />
           <StatsCard
             icon={Users}
             label="Total Participants"
             value={totalParticipants}
-            color="bg-gradient-to-br from-violet-500 to-violet-600"
+            gradient="bg-gradient-to-br from-violet-500 to-violet-700 shadow-violet-500/30"
           />
           <StatsCard
             icon={Brain}
             label="AI-Powered Meetings"
             value={aiEnabledMeetings}
             trend="+23%"
-            color="bg-gradient-to-br from-amber-500 to-orange-600"
+            gradient="bg-gradient-to-br from-cyan-500 to-cyan-700 shadow-cyan-500/30"
           />
           <StatsCard
             icon={BarChart3}
             label="Hours This Week"
             value="12.5"
-            color="bg-gradient-to-br from-emerald-500 to-emerald-600"
+            gradient="bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-emerald-500/30"
           />
         </motion.div>
 
         {/* Filters & Search */}
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
           {/* Tabs */}
-          <div className="flex p-1 rounded-xl bg-gray-100 dark:bg-navy border border-gray-200 dark:border-white/5">
+          <div className="flex p-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
             <button
               onClick={() => setActiveTab("upcoming")}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                "px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300",
                 activeTab === "upcoming"
-                  ? "bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg"
-                  : "text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-ink"
+                  ? "bg-gradient-to-r from-gold to-amber-500 text-ink shadow-lg shadow-gold/25"
+                  : "text-silver/70 hover:text-white hover:bg-white/[0.04]"
               )}
             >
               Upcoming ({upcomingMeetings.length})
@@ -691,10 +790,10 @@ export default function MeetingsPage() {
             <button
               onClick={() => setActiveTab("past")}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                "px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300",
                 activeTab === "past"
-                  ? "bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-lg"
-                  : "text-gray-500 dark:text-silver hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-ink"
+                  ? "bg-gradient-to-r from-gold to-amber-500 text-ink shadow-lg shadow-gold/25"
+                  : "text-silver/70 hover:text-white hover:bg-white/[0.04]"
               )}
             >
               Past ({pastMeetings.length})
@@ -702,23 +801,24 @@ export default function MeetingsPage() {
           </div>
 
           {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-silver/50" />
-            <Input
+          <div className="relative flex-1 max-w-md group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-silver/40 group-focus-within:text-gold transition-colors" />
+            <input
+              type="text"
               placeholder="Search meetings, participants, or tags..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white dark:bg-navy border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-silver/50 focus:border-brand-500/50 focus:ring-brand-500/20"
+              className="w-full pl-11 pr-4 py-3 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white placeholder:text-silver/40 focus:outline-none focus:ring-2 focus:ring-gold/30 focus:border-gold/30 transition-all text-sm backdrop-blur-sm"
             />
           </div>
 
           {/* View Toggle */}
-          <div className="flex p-1 rounded-lg bg-gray-100 dark:bg-navy border border-gray-200 dark:border-white/5">
+          <div className="flex p-1.5 rounded-xl bg-white/[0.04] border border-white/[0.06] backdrop-blur-sm">
             <button
               onClick={() => setViewMode("grid")}
               className={cn(
-                "p-2 rounded-md transition-colors",
-                viewMode === "grid" ? "bg-white dark:bg-ink text-gray-900 dark:text-white" : "text-gray-400 dark:text-silver hover:text-gray-900 dark:hover:text-white"
+                "p-2.5 rounded-lg transition-all",
+                viewMode === "grid" ? "bg-white/[0.08] text-white shadow-sm" : "text-silver/50 hover:text-white"
               )}
             >
               <Grid3X3 className="w-4 h-4" />
@@ -726,8 +826,8 @@ export default function MeetingsPage() {
             <button
               onClick={() => setViewMode("list")}
               className={cn(
-                "p-2 rounded-md transition-colors",
-                viewMode === "list" ? "bg-white dark:bg-ink text-gray-900 dark:text-white" : "text-gray-400 dark:text-silver hover:text-gray-900 dark:hover:text-white"
+                "p-2.5 rounded-lg transition-all",
+                viewMode === "list" ? "bg-white/[0.08] text-white shadow-sm" : "text-silver/50 hover:text-white"
               )}
             >
               <List className="w-4 h-4" />
@@ -750,23 +850,26 @@ export default function MeetingsPage() {
           >
             {filteredMeetings.length === 0 ? (
               <motion.div variants={scaleIn} className="col-span-full">
-                <Card className="border-gray-200 dark:border-navy/50 bg-white dark:bg-navy">
-                  <CardContent className="flex flex-col items-center justify-center py-16">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500/20 to-violet-500/20 flex items-center justify-center mb-6">
-                      {activeTab === "upcoming" ? (
-                        <Video className="w-10 h-10 text-brand-500 dark:text-gold" />
-                      ) : (
-                        <Clock className="w-10 h-10 text-violet-500 dark:text-violet-400" />
-                      )}
+                <GlassCard hover={false}>
+                  <div className="flex flex-col items-center justify-center py-20 px-4">
+                    <div className="relative mb-8">
+                      <div className="absolute inset-0 bg-gradient-to-br from-gold/30 to-violet-500/30 blur-3xl rounded-full" />
+                      <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-gold/20 to-violet-500/20 flex items-center justify-center border border-white/10 backdrop-blur-sm">
+                        {activeTab === "upcoming" ? (
+                          <Video className="w-12 h-12 text-gold" />
+                        ) : (
+                          <Clock className="w-12 h-12 text-violet-400" />
+                        )}
+                      </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    <h3 className="text-2xl font-bold text-white mb-3">
                       {searchQuery
                         ? "No meetings found"
                         : activeTab === "upcoming"
                         ? "No upcoming meetings"
                         : "No past meetings"}
                     </h3>
-                    <p className="text-gray-500 dark:text-silver text-center max-w-sm mb-6">
+                    <p className="text-silver/60 text-center max-w-md mb-8">
                       {searchQuery
                         ? "Try adjusting your search terms"
                         : activeTab === "upcoming"
@@ -774,17 +877,29 @@ export default function MeetingsPage() {
                         : "Your completed meetings will appear here with AI-generated summaries"}
                     </p>
                     {!searchQuery && activeTab === "upcoming" && (
-                      <div className="flex gap-3">
-                        <Button variant="outline" asChild className="border-gray-200 dark:border-navy bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-ink text-gray-700 dark:text-white">
-                          <Link href="/meetings/schedule">Schedule Meeting</Link>
-                        </Button>
-                        <Button asChild className="bg-gradient-to-r from-brand-500 to-brand-600 text-white">
-                          <Link href="/meetings/new">Start Now</Link>
-                        </Button>
+                      <div className="flex gap-4">
+                        <Link href="/meetings/schedule">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-6 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08] transition-all text-sm font-semibold"
+                          >
+                            Schedule Meeting
+                          </motion.button>
+                        </Link>
+                        <Link href="/meetings/new">
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="px-6 py-3 rounded-xl bg-gradient-to-r from-gold to-amber-500 text-ink font-semibold text-sm shadow-lg shadow-gold/25"
+                          >
+                            Start Now
+                          </motion.button>
+                        </Link>
                       </div>
                     )}
-                  </CardContent>
-                </Card>
+                  </div>
+                </GlassCard>
               </motion.div>
             ) : (
               filteredMeetings.map((meeting) => (
@@ -798,39 +913,51 @@ export default function MeetingsPage() {
           </motion.div>
         </AnimatePresence>
 
-        {/* Quick Actions */}
+        {/* AI Features Banner */}
         <motion.div variants={itemVariants}>
-          <Card className="border-gray-200 dark:border-navy/50 bg-gradient-to-r from-brand-500/5 via-violet-500/5 to-brand-500/5 dark:from-gold/5 dark:via-navy dark:to-gold/5">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-violet-500 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white" />
-                  </div>
+          <GlassCard hover={false} className="overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-violet-500/5" />
+            <div className="relative p-8">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <motion.div
+                    className="relative"
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 blur-2xl opacity-50" />
+                    <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-gold via-amber-500 to-orange-500 flex items-center justify-center shadow-2xl shadow-gold/40">
+                      <Sparkles className="w-8 h-8 text-ink" />
+                    </div>
+                  </motion.div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">AI Meeting Assistant</h3>
-                    <p className="text-sm text-gray-500 dark:text-silver">
+                    <h3 className="text-xl font-bold text-white mb-1">AI Meeting Assistant</h3>
+                    <p className="text-sm text-silver/70">
                       Get real-time transcription, smart summaries, and action item detection
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                  <Button variant="outline" className="border-gray-200 dark:border-navy bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-ink text-gray-700 dark:text-white">
-                    <Globe className="mr-2 h-4 w-4 text-brand-500 dark:text-gold" />
-                    100+ Languages
-                  </Button>
-                  <Button variant="outline" className="border-gray-200 dark:border-navy bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-ink text-gray-700 dark:text-white">
-                    <MessageSquare className="mr-2 h-4 w-4 text-violet-500 dark:text-violet-400" />
-                    Live Captions
-                  </Button>
-                  <Button variant="outline" className="border-gray-200 dark:border-navy bg-white dark:bg-navy hover:bg-gray-50 dark:hover:bg-ink text-gray-700 dark:text-white">
-                    <Star className="mr-2 h-4 w-4 text-amber-500 dark:text-amber-400" />
-                    99% Accuracy
-                  </Button>
+                  {[
+                    { icon: Globe, label: "100+ Languages", color: "text-gold" },
+                    { icon: MessageSquare, label: "Live Captions", color: "text-violet-400" },
+                    { icon: Star, label: "99% Accuracy", color: "text-amber-400" },
+                  ].map((feature, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 + i * 0.1 }}
+                      className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:border-white/[0.12] transition-all"
+                    >
+                      <feature.icon className={cn("h-4 w-4", feature.color)} />
+                      <span className="text-sm text-silver/80 font-medium">{feature.label}</span>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </GlassCard>
         </motion.div>
       </motion.div>
     </div>

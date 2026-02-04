@@ -104,19 +104,19 @@ const features = [
     icon: Mic,
     title: "Live Transcription",
     description: "Real-time speech-to-text in 100+ languages",
-    color: "from-cyan-500 to-cyan-600",
+    color: "from-gold to-amber-500",
   },
   {
     icon: Brain,
     title: "AI Co-Pilot",
     description: "Smart suggestions and meeting insights",
-    color: "from-violet-500 to-violet-600",
+    color: "from-amber-500 to-orange-500",
   },
   {
     icon: Shield,
     title: "End-to-End Encryption",
     description: "Enterprise-grade security for all meetings",
-    color: "from-emerald-500 to-emerald-600",
+    color: "from-emerald-500 to-green-600",
   },
 ];
 
@@ -129,7 +129,7 @@ function FloatingParticles() {
       {[...Array(12)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-cyan-400/30"
+          className="absolute w-1 h-1 rounded-full bg-gold/30"
           style={{
             left: `${10 + Math.random() * 80}%`,
             top: `${10 + Math.random() * 80}%`,
@@ -215,8 +215,8 @@ export default function JoinMeetingPage() {
     <div className="min-h-[calc(100vh-8rem)] relative">
       {/* Background Effects */}
       <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-violet-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-navy/10 rounded-full blur-[120px]" />
         <FloatingParticles />
       </div>
 
@@ -231,7 +231,7 @@ export default function JoinMeetingPage() {
           <Button
             variant="ghost"
             asChild
-            className="text-white/50 hover:text-white hover:bg-white/5 mb-8"
+            className="text-gray-500 dark:text-silver/70 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 mb-8"
           >
             <Link href="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -251,16 +251,16 @@ export default function JoinMeetingPage() {
                   animate={{ rotate: [0, 5, -5, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-violet-500 rounded-2xl blur-xl opacity-50" />
-                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500 via-violet-500 to-purple-500 flex items-center justify-center shadow-lg shadow-violet-500/25">
-                    <LogIn className="w-8 h-8 text-white" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-gold to-amber-500 rounded-2xl blur-xl opacity-50" />
+                  <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-gold via-amber-400 to-gold flex items-center justify-center shadow-lg shadow-gold/25">
+                    <LogIn className="w-8 h-8 text-ink" />
                   </div>
                 </motion.div>
                 <div>
-                  <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+                  <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
                     Join a Meeting
                   </h1>
-                  <p className="text-white/50 mt-1">
+                  <p className="text-gray-500 dark:text-silver mt-1">
                     Enter your meeting code or paste the invite link
                   </p>
                 </div>
@@ -270,12 +270,12 @@ export default function JoinMeetingPage() {
             {/* Join Form Card */}
             <motion.div variants={scaleIn}>
               <Card className={cn(
-                "relative overflow-hidden border-white/[0.08] bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-xl",
+                "relative overflow-hidden border-gray-200 dark:border-white/[0.08] bg-white dark:bg-gradient-to-br dark:from-white/[0.06] dark:to-white/[0.02] backdrop-blur-xl",
                 "transition-all duration-500",
-                isFocused && "border-cyan-500/30 shadow-lg shadow-cyan-500/10"
+                isFocused && "border-gold/30 shadow-lg shadow-gold/10"
               )}>
                 {/* Top gradient line */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500" />
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold via-amber-500 to-orange-500" />
 
                 <CardContent className="p-6 sm:p-8 space-y-6">
                   {/* Error Message */}
@@ -292,7 +292,7 @@ export default function JoinMeetingPage() {
                             <AlertCircle className="h-4 w-4 text-red-400" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-red-400">Unable to Join</p>
+                            <p className="text-sm font-medium text-red-500 dark:text-red-400">Unable to Join</p>
                             <p className="text-sm text-red-400/70 mt-0.5">{error}</p>
                           </div>
                         </div>
@@ -302,19 +302,19 @@ export default function JoinMeetingPage() {
 
                   {/* Input Section */}
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm text-white/60">
-                      <LinkIcon className="w-4 h-4 text-cyan-400" />
+                    <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-silver/70">
+                      <LinkIcon className="w-4 h-4 text-gold" />
                       <span>Meeting Code or Invite Link</span>
                     </div>
 
                     <div className="relative group">
                       <div className={cn(
-                        "absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/20 via-violet-500/20 to-purple-500/20 blur-xl opacity-0 transition-opacity duration-500",
+                        "absolute inset-0 rounded-xl bg-gradient-to-r from-gold/20 via-amber-500/20 to-orange-500/20 blur-xl opacity-0 transition-opacity duration-500",
                         isFocused && "opacity-100"
                       )} />
                       <div className="relative flex items-center">
                         <div className="absolute left-4 flex items-center pointer-events-none">
-                          <Hash className="w-5 h-5 text-white/30" />
+                          <Hash className="w-5 h-5 text-gray-400 dark:text-silver/50" />
                         </div>
                         <Input
                           id="roomCode"
@@ -328,13 +328,13 @@ export default function JoinMeetingPage() {
                           onBlur={() => setIsFocused(false)}
                           onKeyDown={handleKeyDown}
                           disabled={isJoining}
-                          className="h-14 pl-12 pr-4 text-lg bg-white/[0.03] border-white/[0.08] text-white placeholder:text-white/30 focus:border-cyan-500/50 focus:ring-cyan-500/20 rounded-xl transition-all duration-300"
+                          className="h-14 pl-12 pr-4 text-lg bg-gray-50 dark:bg-white/[0.03] border-gray-200 dark:border-white/[0.08] text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-silver/50 focus:border-gold/50 focus:ring-gold/20 rounded-xl transition-all duration-300"
                         />
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-white/40">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-silver/60">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                       <span>Supports meeting codes, full URLs, and invite links</span>
                     </div>
                   </div>
@@ -347,9 +347,9 @@ export default function JoinMeetingPage() {
                     <Button
                       className={cn(
                         "w-full h-14 text-lg font-medium rounded-xl transition-all duration-300",
-                        "bg-gradient-to-r from-cyan-500 via-violet-500 to-purple-500",
-                        "hover:from-cyan-400 hover:via-violet-400 hover:to-purple-400",
-                        "shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40",
+                        "bg-gradient-to-r from-gold via-amber-500 to-gold bg-[length:200%_auto] animate-gradient",
+                        "text-ink",
+                        "shadow-lg shadow-gold/25 hover:shadow-gold/40",
                         "disabled:opacity-50 disabled:cursor-not-allowed"
                       )}
                       onClick={handleJoin}
@@ -374,15 +374,15 @@ export default function JoinMeetingPage() {
                   <div className="flex items-center justify-center gap-6 pt-2">
                     <Link
                       href="/meetings/new"
-                      className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5"
+                      className="text-sm text-gold hover:text-amber-400 transition-colors flex items-center gap-1.5"
                     >
                       <Zap className="w-4 h-4" />
                       Start instant meeting
                     </Link>
-                    <span className="text-white/20">|</span>
+                    <span className="text-gray-300 dark:text-white/20">|</span>
                     <Link
                       href="/meetings/schedule"
-                      className="text-sm text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1.5"
+                      className="text-sm text-gold hover:text-amber-400 transition-colors flex items-center gap-1.5"
                     >
                       <Clock className="w-4 h-4" />
                       Schedule for later
@@ -396,7 +396,7 @@ export default function JoinMeetingPage() {
             <motion.div variants={containerVariants} className="grid sm:grid-cols-3 gap-4">
               {features.map((feature, i) => (
                 <motion.div key={i} variants={itemVariants}>
-                  <Card className="border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300">
+                  <Card className="border-gray-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:border-gray-300 dark:hover:border-gold/20 transition-all duration-300">
                     <CardContent className="p-4">
                       <div className="flex items-start gap-3">
                         <div className={cn(
@@ -406,8 +406,8 @@ export default function JoinMeetingPage() {
                           <feature.icon className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-white">{feature.title}</h3>
-                          <p className="text-xs text-white/40 mt-0.5">{feature.description}</p>
+                          <h3 className="text-sm font-medium text-gray-900 dark:text-white">{feature.title}</h3>
+                          <p className="text-xs text-gray-500 dark:text-silver/70 mt-0.5">{feature.description}</p>
                         </div>
                       </div>
                     </CardContent>
@@ -421,8 +421,8 @@ export default function JoinMeetingPage() {
           <div className="lg:col-span-2 space-y-6">
             <motion.div variants={itemVariants}>
               <div className="flex items-center gap-2 mb-4">
-                <History className="w-5 h-5 text-white/40" />
-                <h2 className="text-lg font-semibold text-white">Recent Meetings</h2>
+                <History className="w-5 h-5 text-gray-400 dark:text-silver/60" />
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Recent Meetings</h2>
               </div>
 
               <div className="space-y-3">
@@ -433,22 +433,22 @@ export default function JoinMeetingPage() {
                     custom={i}
                     whileHover={{ x: 4 }}
                   >
-                    <Card className="border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300 cursor-pointer group">
+                    <Card className="border-gray-200 dark:border-white/[0.06] bg-white dark:bg-white/[0.02] hover:bg-gray-50 dark:hover:bg-white/[0.04] hover:border-gray-300 dark:hover:border-gold/20 transition-all duration-300 cursor-pointer group">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-sm font-medium text-white truncate group-hover:text-cyan-400 transition-colors">
+                              <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-gold transition-colors">
                                 {meeting.title}
                               </h3>
                               {meeting.isLive && (
-                                <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px] px-1.5 py-0">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse" />
+                                <Badge className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] px-1.5 py-0">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse" />
                                   Live
                                 </Badge>
                               )}
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-white/40">
+                            <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-silver/70">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {meeting.lastJoined}
@@ -463,7 +463,7 @@ export default function JoinMeetingPage() {
                             <Button
                               size="sm"
                               variant="ghost"
-                              className="h-8 w-8 p-0 text-white/40 hover:text-white hover:bg-white/10"
+                              className="h-8 w-8 p-0 text-gray-400 dark:text-silver/60 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 navigator.clipboard.writeText(`${window.location.origin}/meeting/${meeting.roomId}`);
@@ -477,7 +477,7 @@ export default function JoinMeetingPage() {
                                 "h-8 px-3 text-xs",
                                 meeting.isLive
                                   ? "bg-emerald-500 hover:bg-emerald-400 text-white"
-                                  : "bg-white/10 hover:bg-white/20 text-white"
+                                  : "bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-700 dark:text-white"
                               )}
                               onClick={() => quickJoin(meeting.roomId)}
                             >
@@ -495,22 +495,22 @@ export default function JoinMeetingPage() {
 
             {/* Tips Card */}
             <motion.div variants={itemVariants}>
-              <Card className="border-white/[0.06] bg-gradient-to-br from-cyan-500/5 via-violet-500/5 to-purple-500/5">
+              <Card className="border-gray-200 dark:border-white/[0.06] bg-gradient-to-br from-gold/5 via-amber-500/5 to-orange-500/5">
                 <CardContent className="p-5">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-amber-500 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-5 h-5 text-ink" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-white mb-2">Pro Tips</h3>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Pro Tips</h3>
                       <ul className="space-y-2">
                         {[
                           "Paste any meeting link format - we'll extract the code",
                           "Test your camera and mic before joining",
                           "Enable AI transcription for automatic notes",
                         ].map((tip, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs text-white/50">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 mt-0.5 flex-shrink-0" />
+                          <li key={i} className="flex items-start gap-2 text-xs text-gray-500 dark:text-silver">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
                             {tip}
                           </li>
                         ))}
@@ -523,14 +523,14 @@ export default function JoinMeetingPage() {
 
             {/* AI Features Promo */}
             <motion.div variants={itemVariants}>
-              <Card className="border-violet-500/20 bg-gradient-to-br from-violet-500/10 to-purple-500/5 overflow-hidden">
+              <Card className="border-gold/20 bg-gradient-to-br from-gold/10 to-amber-500/5 overflow-hidden">
                 <CardContent className="p-5 relative">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl" />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 rounded-full blur-3xl" />
                   <div className="relative">
                     <div className="flex items-center gap-2 mb-3">
-                      <Brain className="w-5 h-5 text-violet-400" />
-                      <span className="text-sm font-semibold text-white">AI Meeting Features</span>
-                      <Badge className="bg-violet-500/20 text-violet-300 border-violet-500/30 text-[10px]">
+                      <Brain className="w-5 h-5 text-gold" />
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">AI Meeting Features</span>
+                      <Badge className="bg-gold/20 text-gold border-gold/30 text-[10px]">
                         Included
                       </Badge>
                     </div>
@@ -541,8 +541,8 @@ export default function JoinMeetingPage() {
                         { icon: Globe, label: "100+ Languages" },
                         { icon: Star, label: "Action Items" },
                       ].map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-white/50">
-                          <item.icon className="w-3.5 h-3.5 text-violet-400" />
+                        <div key={i} className="flex items-center gap-2 text-xs text-gray-500 dark:text-silver">
+                          <item.icon className="w-3.5 h-3.5 text-gold" />
                           {item.label}
                         </div>
                       ))}
