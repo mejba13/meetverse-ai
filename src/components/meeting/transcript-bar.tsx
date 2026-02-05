@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 
 const transcriptLines = [
   { speaker: "Sarah Chen", text: "Let's review the progress on the API integration." },
@@ -13,7 +14,6 @@ export function TranscriptBar() {
   const [currentLine, setCurrentLine] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
-  // Simulate live transcript updates
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentLine((prev) => (prev + 1) % transcriptLines.length);
@@ -27,50 +27,45 @@ export function TranscriptBar() {
   if (!isVisible) return null;
 
   return (
-    <div className="relative border-t bg-card/80 backdrop-blur-sm">
-      <div className="flex items-center gap-3 px-6 py-3">
+    <div className="relative border-t border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
+      <div className="flex items-center gap-3 px-5 py-2.5">
         {/* Live indicator */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#CAFF4B] opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#CAFF4B]" />
           </span>
-          <span className="text-xs font-medium text-primary">LIVE</span>
+          <span className="text-[10px] font-semibold text-[#CAFF4B] uppercase tracking-wider">LIVE</span>
         </div>
+
+        <div className="w-px h-4 bg-white/[0.08]" />
 
         {/* Transcript text */}
         <div className="flex-1 overflow-hidden">
-          <div
-            className={cn(
-              "transition-all duration-300",
-              "animate-fade-in"
-            )}
-          >
-            <span className="font-medium text-primary">{current.speaker}: </span>
-            <span className="text-foreground">{current.text}</span>
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentLine}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+              className="text-sm"
+            >
+              <span className="font-medium text-[#CAFF4B]">{current.speaker}: </span>
+              <span className="text-white/70">{current.text}</span>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Close button */}
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsVisible(false)}
-          className="text-muted-foreground hover:text-foreground"
+          className="w-6 h-6 rounded-md flex items-center justify-center text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors flex-shrink-0"
         >
-          <span className="sr-only">Close transcript bar</span>
-          <svg
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
+          <X className="h-3 w-3" />
+        </motion.button>
       </div>
     </div>
   );

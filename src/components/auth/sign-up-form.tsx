@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
 import { Chrome, Github, Loader2, Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export function SignUpForm() {
@@ -14,6 +16,7 @@ export function SignUpForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   // Password strength checker
   const getPasswordStrength = (pass: string) => {
@@ -39,19 +42,80 @@ export function SignUpForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // TODO: Implement actual sign up logic
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-    setIsLoading(false);
-    router.push("/dashboard");
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 409) {
+          setError("An account with this email already exists. Please sign in instead.");
+        } else if (res.status === 400 && data.error?.details) {
+          const details = data.error.details;
+          const messages = Object.values(details).flat() as string[];
+          setError(messages[0] || "Invalid input. Please check your details.");
+        } else {
+          setError(data.error?.message || "Failed to create account. Please try again.");
+        }
+        toast({
+          title: "Registration failed",
+          description: data.error?.message || "Could not create your account.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Auto sign-in after successful registration
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (signInResult?.error) {
+        toast({
+          title: "Account created",
+          description: "Your account was created. Please sign in.",
+        });
+        router.push("/sign-in");
+      } else {
+        toast({
+          title: "Welcome to MeetVerse!",
+          description: "Your account has been created successfully.",
+        });
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function signUpWithProvider(provider: "google" | "github") {
     setIsLoading(true);
-    // TODO: Implement OAuth sign up
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
+    try {
+      await signIn(provider, { callbackUrl: "/dashboard" });
+    } catch {
+      toast({
+        title: "Error",
+        description: `Failed to sign up with ${provider}. Please try again.`,
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -95,6 +159,17 @@ export function SignUpForm() {
           </span>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-3 text-sm text-rose-400"
+        >
+          {error}
+        </motion.div>
+      )}
 
       {/* Email/Password Form */}
       <form onSubmit={onSubmit} className="space-y-5">

@@ -1,17 +1,28 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Header } from "@/components/dashboard/header";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { status } = useSession();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Redirect to sign-in if unauthenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/sign-in");
+    }
+  }, [status, router]);
 
   // Close sidebar on route change
   useEffect(() => {
@@ -35,6 +46,27 @@ export default function DashboardLayout({
       document.body.style.overflow = "";
     };
   }, [sidebarOpen]);
+
+  // Show loading state while checking session
+  if (status === "loading") {
+    return (
+      <div className="flex h-screen items-center justify-center bg-ink">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <Loader2 className="h-8 w-8 animate-spin text-[#CAFF4B]" />
+          <p className="text-sm text-white/40">Loading...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // Don't render dashboard content if not authenticated
+  if (status === "unauthenticated") {
+    return null;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-ink">

@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
 import { Chrome, Github, Loader2, Mail, Lock, ArrowRight } from "lucide-react";
 
 export function SignInForm() {
@@ -13,23 +15,59 @@ export function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
 
-    // TODO: Implement actual sign in logic with NextAuth
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    setIsLoading(false);
-    router.push("/dashboard");
+      if (result?.error) {
+        setError("Invalid email or password");
+        toast({
+          title: "Sign in failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Welcome back!",
+          description: "You have been signed in successfully.",
+        });
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function signInWithProvider(provider: "google" | "github") {
     setIsLoading(true);
-    // TODO: Implement OAuth sign in
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
+    try {
+      await signIn(provider, { callbackUrl: "/dashboard" });
+    } catch {
+      toast({
+        title: "Error",
+        description: `Failed to sign in with ${provider}. Please try again.`,
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -73,6 +111,17 @@ export function SignInForm() {
           </span>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-xl bg-rose-500/10 border border-rose-500/20 px-4 py-3 text-sm text-rose-400"
+        >
+          {error}
+        </motion.div>
+      )}
 
       {/* Email/Password Form */}
       <form onSubmit={onSubmit} className="space-y-5">

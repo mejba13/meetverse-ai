@@ -17,6 +17,7 @@ const credentialsSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt",
@@ -82,6 +83,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       : []),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      // Allow OAuth sign-ins unconditionally
+      if (account?.provider !== "credentials") return true;
+      // Allow credentials sign-in if authorize returned a user
+      return !!user;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
