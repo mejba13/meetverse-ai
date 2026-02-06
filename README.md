@@ -51,7 +51,7 @@ MeetVerse AI is a next-generation video conferencing platform that transforms ho
 | **Frontend** | Next.js 15 (App Router), React 19, TypeScript |
 | **Styling** | Tailwind CSS, Shadcn/ui, Framer Motion |
 | **State** | Zustand (client), TanStack Query (server) |
-| **API** | tRPC for type-safe internal APIs |
+| **API** | tRPC (web), REST v1 (mobile) |
 | **Database** | PostgreSQL via Neon, Prisma ORM |
 | **Cache** | Redis via Upstash |
 | **Auth** | NextAuth.js v5 |
@@ -63,20 +63,20 @@ MeetVerse AI is a next-generation video conferencing platform that transforms ho
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        Client (Next.js)                         │
+│              Clients (Next.js Web + Mobile Apps)                 │
 ├─────────────────────────────────────────────────────────────────┤
 │  React Components │ Zustand Stores │ TanStack Query │ LiveKit  │
 └─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                      API Layer (tRPC)                           │
-├─────────────────────────────────────────────────────────────────┤
-│    Auth Router │ Meeting Router │ AI Router │ User Router      │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-          ┌───────────────────┼───────────────────┐
-          ▼                   ▼                   ▼
+                       │                    │
+                       ▼                    ▼
+┌─────────────────────────────┐ ┌─────────────────────────────────┐
+│     tRPC API (Web)          │ │    REST API v1 (Mobile)          │
+├─────────────────────────────┤ ├─────────────────────────────────┤
+│  Meeting │ AI │ User │ ...  │ │  /api/v1/auth │ meetings │ ai   │
+└─────────────────────────────┘ │  users │ action-items │ search  │
+                       │        └─────────────────────────────────┘
+          ┌────────────┴──────────────────┐
+          ▼                   ▼           ▼
 ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
 │   PostgreSQL    │ │   LiveKit SFU   │ │   AI Services   │
 │     (Neon)      │ │   (WebRTC)      │ │ Claude/Deepgram │
@@ -180,7 +180,19 @@ src/
 │   ├── (dashboard)/         # Protected dashboard routes
 │   ├── (marketing)/         # Public marketing pages
 │   ├── meeting/[roomId]/    # Meeting room
-│   └── api/                 # API routes
+│   └── api/
+│       ├── trpc/            # tRPC handler
+│       ├── livekit/         # LiveKit token endpoint
+│       └── v1/              # Mobile REST API
+│           ├── _lib/        # Shared utils (response, auth, pagination)
+│           ├── auth/        # Login, register, social, refresh, logout
+│           ├── users/       # Profile, preferences, stats, avatar
+│           ├── meetings/    # CRUD, join/leave, start/end, chat, transcript
+│           ├── action-items/# CRUD, my-pending, complete
+│           ├── ai/          # Status, copilot, summary, highlights, process
+│           ├── notifications/# List, unread-count, mark-read, devices
+│           ├── organizations/# Details, members, settings
+│           └── search/      # Global search
 ├── components/
 │   ├── ui/                  # Shadcn/ui base components
 │   ├── meeting/             # Meeting room components
@@ -195,6 +207,52 @@ src/
 │   ├── db/                  # Prisma client
 │   └── services/            # Business logic services
 └── types/                   # TypeScript types
+```
+
+## Mobile REST API
+
+The platform includes a comprehensive REST API at `/api/v1/` designed for mobile clients (iOS/Android). The API provides JWT Bearer token authentication, consistent JSON response envelopes, pagination, and push notification support.
+
+### Authentication
+
+```bash
+# Register
+POST /api/v1/auth/register   { email, password, name }
+
+# Login → returns accessToken (15min) + refreshToken (30 days)
+POST /api/v1/auth/login       { email, password }
+
+# Refresh tokens (rotation)
+POST /api/v1/auth/refresh     { refreshToken }
+
+# All authenticated requests use:
+Authorization: Bearer <accessToken>
+```
+
+### API Endpoints (52 routes)
+
+| Domain | Routes | Description |
+|--------|--------|-------------|
+| **Auth** | 7 | Login, register, social OAuth, token refresh, logout, forgot/reset password |
+| **Users** | 6 | Profile (GET/PATCH), preferences (GET/PATCH), stats, avatar upload |
+| **Meetings** | 17 | CRUD, join/leave, start/end, participants, transcript, chat, recording, room lookup |
+| **Action Items** | 7 | CRUD, my-pending, quick-complete, filtered listing |
+| **AI** | 9 | Status, co-pilot, summary, highlights, process, extract actions, reprocess |
+| **Notifications** | 5 | List, unread count, mark read, push device register/unregister |
+| **Organizations** | 4 | Details, members, settings (GET/PATCH) |
+| **Search** | 1 | Global search across meetings, transcripts, action items |
+
+### Response Format
+
+```json
+// Success
+{ "success": true, "data": { ... } }
+
+// Paginated
+{ "success": true, "data": [...], "meta": { "page": 1, "limit": 20, "total": 147, "totalPages": 8, "hasNext": true, "hasPrev": false } }
+
+// Error
+{ "success": false, "error": { "code": "NOT_FOUND", "message": "Meeting not found" } }
 ```
 
 ## Documentation

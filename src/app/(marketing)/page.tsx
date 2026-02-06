@@ -39,6 +39,7 @@ import {
   Layers,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ChatbotWidget } from "@/components/chatbot/chatbot-widget";
 
 // ============================================
 // ANIMATION VARIANTS
@@ -1833,6 +1834,11 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ============================================ */}
+      {/* CHATBOT WIDGET */}
+      {/* ============================================ */}
+      <ChatbotWidget />
 
       {/* ============================================ */}
       {/* FOOTER */}
