@@ -33,6 +33,8 @@ import {
   MicOff,
   Pin,
   MoreVertical,
+  VideoOff,
+  Volume2,
 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -696,122 +698,182 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
         <div className="flex flex-1 flex-col">
           {/* Demo Video Grid - 6 participants, 3 columns */}
           <div className="flex-1 overflow-hidden p-3">
-            <div className="grid h-full gap-3 auto-rows-fr grid-cols-3">
-              {participants.map((p, i) => (
-                <motion.div
-                  key={p.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="relative rounded-2xl overflow-hidden bg-[#0d0d0d] border border-white/[0.08] group"
-                >
-                  {/* Speaking ring */}
-                  {activeSpeakerId === p.id && !p.isMuted && (
-                    <>
-                      <motion.div
-                        className="absolute inset-0 rounded-2xl ring-2 ring-[#CAFF4B]/60 z-10 pointer-events-none"
-                        animate={{ opacity: [0.6, 1, 0.6] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                      />
-                      <motion.div
-                        className="absolute -inset-1 rounded-2xl border-2 border-[#CAFF4B]/20 z-10 pointer-events-none"
-                        animate={{ opacity: [0, 0.5, 0], scale: [1, 1.02, 1] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                      />
-                    </>
-                  )}
+            <div className="grid h-full gap-2.5 auto-rows-fr grid-cols-3 p-0.5">
+              {participants.map((p, i) => {
+                const speaking = activeSpeakerId === p.id && !p.isMuted;
+                return (
+                  <motion.div
+                    key={p.id}
+                    initial={{ opacity: 0, scale: 0.92, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{
+                      delay: i * 0.06,
+                      duration: 0.5,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="group relative rounded-xl md:rounded-2xl overflow-hidden bg-obsidian border border-white/[0.06] transition-all duration-300 hover:border-white/[0.12]"
+                  >
+                    {/* Speaking indicator — animated glow ring */}
+                    {speaking && (
+                      <>
+                        <motion.div
+                          className="absolute inset-0 rounded-xl md:rounded-2xl z-10 pointer-events-none"
+                          style={{
+                            boxShadow: "inset 0 0 0 2px rgba(202,255,75,0.5), 0 0 20px rgba(202,255,75,0.15)",
+                          }}
+                          animate={{
+                            boxShadow: [
+                              "inset 0 0 0 2px rgba(202,255,75,0.3), 0 0 15px rgba(202,255,75,0.1)",
+                              "inset 0 0 0 2px rgba(202,255,75,0.6), 0 0 25px rgba(202,255,75,0.2)",
+                              "inset 0 0 0 2px rgba(202,255,75,0.3), 0 0 15px rgba(202,255,75,0.1)",
+                            ],
+                          }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                        {/* Audio wave bars */}
+                        <div className="absolute top-3 right-3 z-20 flex items-end gap-[2px] h-4">
+                          {[0, 1, 2, 3].map((j) => (
+                            <motion.div
+                              key={j}
+                              className="w-[3px] rounded-full bg-lime"
+                              animate={{ height: ["30%", "100%", "50%", "80%", "30%"] }}
+                              transition={{
+                                duration: 0.8,
+                                repeat: Infinity,
+                                delay: j * 0.1,
+                                ease: "easeInOut",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
 
-                  {/* Video or Avatar */}
-                  {p.isVideoEnabled && i === 0 ? (
-                    <>
-                      <video
-                        ref={videoRef}
-                        autoPlay
-                        playsInline
-                        muted
-                        className="absolute inset-0 h-full w-full object-cover scale-x-[-1]"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-                    </>
-                  ) : p.isVideoEnabled ? (
-                    <div className={cn("absolute inset-0 bg-gradient-to-br", p.accentColor || "from-[#CAFF4B]/30 to-[#9EF01A]/20")}>
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        {p.avatarUrl ? (
-                          <img
-                            src={p.avatarUrl}
-                            alt={p.name}
-                            className="h-20 w-20 rounded-full object-cover border-2 border-white/[0.1]"
-                          />
-                        ) : (
-                          <div className="h-20 w-20 rounded-full bg-white/10 flex items-center justify-center text-2xl text-white border-2 border-white/[0.1]">
-                            {getInitials(p.name)}
+                    {/* Video or Avatar */}
+                    {p.isVideoEnabled && i === 0 ? (
+                      <div className="absolute inset-0">
+                        <video
+                          ref={videoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          className="absolute inset-0 h-full w-full object-cover scale-x-[-1]"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    ) : p.isVideoEnabled ? (
+                      <div className="absolute inset-0">
+                        <div className={cn("absolute inset-0 bg-gradient-to-br", p.accentColor || "from-lime/20 to-lime/5")} />
+                        {/* Noise texture */}
+                        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay"
+                          style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                          }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          {p.avatarUrl ? (
+                            <div className="relative">
+                              <div className="h-[5.5rem] w-[5.5rem] rounded-full overflow-hidden border-[2.5px] border-white/[0.12] shadow-xl">
+                                <img
+                                  src={p.avatarUrl}
+                                  alt={p.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                              <div className="absolute -inset-2 rounded-full bg-white/[0.04] blur-md -z-10" />
+                            </div>
+                          ) : (
+                            <div className="h-[5.5rem] w-[5.5rem] rounded-full bg-gradient-to-br from-white/[0.08] to-white/[0.03] flex items-center justify-center text-2xl font-semibold text-white/80 border-[2.5px] border-white/[0.08] shadow-xl">
+                              {getInitials(p.name)}
+                            </div>
+                          )}
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    ) : (
+                      <div className="absolute inset-0 bg-carbon">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/[0.01] to-transparent" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            {p.avatarUrl ? (
+                              <div className="h-[4.5rem] w-[4.5rem] rounded-full overflow-hidden border-[2.5px] border-white/[0.06] mx-auto">
+                                <img
+                                  src={p.avatarUrl}
+                                  alt={p.name}
+                                  className="h-full w-full object-cover opacity-50 grayscale-[30%]"
+                                />
+                              </div>
+                            ) : (
+                              <div className="mx-auto h-[4.5rem] w-[4.5rem] rounded-full bg-gradient-to-br from-white/[0.06] to-white/[0.02] flex items-center justify-center text-xl text-white/40 border-[2.5px] border-white/[0.05]">
+                                {getInitials(p.name)}
+                              </div>
+                            )}
+                            <div className="flex items-center justify-center gap-1.5 mt-2.5">
+                              <VideoOff className="w-3 h-3 text-white/25" />
+                              <p className="text-[11px] text-white/25 font-medium">Camera off</p>
+                            </div>
                           </div>
+                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+                      </div>
+                    )}
+
+                    {/* Role badge */}
+                    {p.role && p.role !== "attendee" && (
+                      <div className="absolute top-2.5 left-2.5 z-10">
+                        <span
+                          className={cn(
+                            "px-2 py-[3px] rounded-md text-[9px] font-bold uppercase tracking-wider border backdrop-blur-md",
+                            roleColors[p.role]
+                          )}
+                        >
+                          {p.role}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Bottom info bar */}
+                    <div className="absolute bottom-0 left-0 right-0 z-10">
+                      <div className="flex items-center justify-between px-3 py-2.5">
+                        <div className="flex items-center gap-2">
+                          {p.isMuted ? (
+                            <div className="w-6 h-6 rounded-full bg-red-500/20 backdrop-blur-sm flex items-center justify-center border border-red-500/20">
+                              <MicOff className="h-3 w-3 text-red-400" />
+                            </div>
+                          ) : (
+                            <div className={cn(
+                              "w-6 h-6 rounded-full backdrop-blur-sm flex items-center justify-center border",
+                              speaking
+                                ? "bg-lime/20 border-lime/30"
+                                : "bg-white/[0.08] border-white/[0.06]"
+                            )}>
+                              <Mic className={cn("h-3 w-3", speaking ? "text-lime" : "text-white/70")} />
+                            </div>
+                          )}
+                          <span className="text-[13px] font-medium text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+                            {p.name}{i === 0 ? " (You)" : ""}
+                          </span>
+                        </div>
+                        {p.status === "active" && (
+                          <Volume2 className="w-3 h-3 text-white/20" />
                         )}
                       </div>
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                     </div>
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#111111]">
-                      <div className="text-center">
-                        {p.avatarUrl ? (
-                          <img
-                            src={p.avatarUrl}
-                            alt={p.name}
-                            className="mx-auto h-20 w-20 rounded-full object-cover border-2 border-white/[0.08] opacity-60"
-                          />
-                        ) : (
-                          <div className="mx-auto h-20 w-20 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-2xl text-white/60 border-2 border-white/[0.08]">
-                            {getInitials(p.name)}
-                          </div>
-                        )}
-                        <p className="mt-2 text-xs text-white/30">Camera off</p>
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Role badge */}
-                  {p.role && p.role !== "attendee" && (
-                    <div className="absolute top-3 left-3 z-10">
-                      <span
-                        className={cn(
-                          "px-2 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider border backdrop-blur-sm",
-                          roleColors[p.role]
-                        )}
-                      >
-                        {p.role}
-                      </span>
+                    {/* Hover actions */}
+                    <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-all duration-200 group-hover:opacity-100 z-10 translate-y-1 group-hover:translate-y-0">
+                      <button className="rounded-lg bg-black/60 backdrop-blur-md p-1.5 text-white/80 hover:bg-black/80 border border-white/[0.08] transition-colors hover:text-white">
+                        <Pin className="h-3.5 w-3.5" />
+                      </button>
+                      <button className="rounded-lg bg-black/60 backdrop-blur-md p-1.5 text-white/80 hover:bg-black/80 border border-white/[0.08] transition-colors hover:text-white">
+                        <MoreVertical className="h-3.5 w-3.5" />
+                      </button>
                     </div>
-                  )}
-
-                  {/* Participant info overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between p-3">
-                    <div className="flex items-center gap-2">
-                      {p.isMuted ? (
-                        <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center">
-                          <MicOff className="h-3 w-3 text-red-400" />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                          <Mic className={cn("h-3 w-3", activeSpeakerId === p.id ? "text-[#CAFF4B]" : "text-white")} />
-                        </div>
-                      )}
-                      <span className="text-sm font-medium text-white drop-shadow-lg">
-                        {p.name}{i === 0 ? " (You)" : ""}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Hover actions */}
-                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 z-10">
-                    <button className="rounded-lg bg-black/50 backdrop-blur-sm p-1.5 text-white hover:bg-black/70 border border-white/[0.1]">
-                      <Pin className="h-3.5 w-3.5" />
-                    </button>
-                    <button className="rounded-lg bg-black/50 backdrop-blur-sm p-1.5 text-white hover:bg-black/70 border border-white/[0.1]">
-                      <MoreVertical className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
