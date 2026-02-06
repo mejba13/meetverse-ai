@@ -20,7 +20,7 @@
 
 MeetVerse AI is a next-generation video conferencing platform that transforms how teams collaborate. Powered by advanced AI capabilities, it provides real-time transcription, smart action item detection, intelligent meeting summaries, and engagement analytics—making every meeting more productive and actionable.
 
-<img width="1566" height="1272" alt="CleanShot 2026-02-01 at 5  33 07" src="https://github.com/user-attachments/assets/a29647ea-1b9e-4d7d-ae00-28863a70bf0a" />
+<img width="1891" height="1427" alt="landing-page" src="https://github.com/user-attachments/assets/8277c5f4-3848-4aed-bd2e-ecc2aa0ec36e" />
 
 
 ## Features
