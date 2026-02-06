@@ -29,6 +29,7 @@ import {
   Users,
 } from "lucide-react";
 import { useDevices, useDevicePermissions } from "@/lib/hooks/use-livekit";
+import { mockParticipants } from "./mock-data";
 
 interface PreJoinProps {
   roomId: string;
@@ -382,13 +383,48 @@ export function PreJoin({
                   </motion.button>
                 </div>
 
-                {/* Connection status badge */}
+                {/* Enhanced Ready badge with signal strength */}
                 <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/[0.08]">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  </span>
+                  <div className="flex items-end gap-[2px] h-3">
+                    <motion.div
+                      className="w-[3px] rounded-full bg-emerald-400"
+                      animate={{ height: ["3px", "5px", "3px"] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                    <motion.div
+                      className="w-[3px] rounded-full bg-emerald-400"
+                      animate={{ height: ["5px", "8px", "5px"] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+                    />
+                    <motion.div
+                      className="w-[3px] rounded-full bg-emerald-400"
+                      animate={{ height: ["8px", "12px", "8px"] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                    />
+                  </div>
                   <span className="text-xs text-white/70 font-medium">Ready</span>
+                </div>
+              </div>
+
+              {/* Already in this meeting */}
+              <div className="px-4 py-3 border-t border-white/[0.06] bg-white/[0.01]">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-white/40">Already in this meeting</span>
+                    <div className="flex -space-x-2">
+                      {mockParticipants.filter(p => p.avatarUrl).slice(0, 3).map((p, i) => (
+                        <div key={p.id} className="relative" style={{ zIndex: 3 - i }}>
+                          <img
+                            src={p.avatarUrl!}
+                            alt={p.name}
+                            className="w-7 h-7 rounded-full object-cover border-2 border-[#0d0d0d]"
+                          />
+                          <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 border border-[#0d0d0d]" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-white/30">+3 more</span>
                 </div>
               </div>
             </div>

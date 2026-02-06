@@ -2,71 +2,116 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, ChevronUp, ChevronDown } from "lucide-react";
+import { mockTranscriptBarLines } from "./mock-data";
 
-const transcriptLines = [
-  { speaker: "Sarah Chen", text: "Let's review the progress on the API integration." },
-  { speaker: "Marcus Johnson", text: "I've completed the payment endpoints and added the webhook handlers." },
-  { speaker: "Alex Rivera", text: "That's great. Do we have the test coverage for those?" },
-];
+function WaveformVisualizer() {
+  return (
+    <div className="flex items-center gap-[3px] h-4">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <motion.div
+          key={i}
+          className="w-[3px] rounded-full bg-[#CAFF4B]"
+          animate={{
+            height: ["4px", "14px", "6px", "12px", "4px"],
+          }}
+          transition={{
+            duration: 1.2,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: i * 0.15,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
 export function TranscriptBar() {
   const [currentLine, setCurrentLine] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentLine((prev) => (prev + 1) % transcriptLines.length);
+      setCurrentLine((prev) => (prev + 1) % mockTranscriptBarLines.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
-  const current = transcriptLines[currentLine];
-
   if (!isVisible) return null;
 
+  const current = mockTranscriptBarLines[currentLine];
+  const recentLines = isExpanded
+    ? [
+        mockTranscriptBarLines[(currentLine - 2 + mockTranscriptBarLines.length) % mockTranscriptBarLines.length],
+        mockTranscriptBarLines[(currentLine - 1 + mockTranscriptBarLines.length) % mockTranscriptBarLines.length],
+        current,
+      ]
+    : [current];
+
   return (
-    <div className="relative border-t border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
-      <div className="flex items-center gap-3 px-5 py-2.5">
-        {/* Live indicator */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#CAFF4B] opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#CAFF4B]" />
-          </span>
-          <span className="text-[10px] font-semibold text-[#CAFF4B] uppercase tracking-wider">LIVE</span>
+    <motion.div
+      initial={{ y: 10, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className="mx-4 mb-1 rounded-xl bg-[#111111]/80 backdrop-blur-xl border border-white/[0.06] overflow-hidden"
+    >
+      <div className="flex items-start gap-3 px-4 py-2.5">
+        {/* Left accent bar */}
+        <div className="w-[2px] self-stretch min-h-[20px] rounded-full bg-gradient-to-b from-[#CAFF4B] to-[#9B5DE5] flex-shrink-0 mt-0.5" />
+
+        {/* Waveform */}
+        <div className="flex-shrink-0 mt-0.5">
+          <WaveformVisualizer />
         </div>
 
-        <div className="w-px h-4 bg-white/[0.08]" />
-
         {/* Transcript text */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentLine}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
-              className="text-sm"
+              key={isExpanded ? "expanded" : currentLine}
+              initial={{ opacity: 0, filter: "blur(4px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(4px)" }}
+              transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-              <span className="font-medium text-[#CAFF4B]">{current.speaker}: </span>
-              <span className="text-white/70">{current.text}</span>
+              {recentLines.map((line, i) => (
+                <div
+                  key={`${i}-${line.speaker}`}
+                  className={`text-sm ${i < recentLines.length - 1 ? "mb-1.5 opacity-40" : ""}`}
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full bg-[#CAFF4B]/10 border border-[#CAFF4B]/20 text-[#CAFF4B] text-[11px] font-medium">
+                      {line.speaker}
+                    </span>
+                  </span>
+                  <span className="text-white/70 ml-2">{line.text}</span>
+                </div>
+              ))}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Close button */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsVisible(false)}
-          className="w-6 h-6 rounded-md flex items-center justify-center text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors flex-shrink-0"
-        >
-          <X className="h-3 w-3" />
-        </motion.button>
+        {/* Controls */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-6 h-6 rounded-md flex items-center justify-center text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors"
+          >
+            {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsVisible(false)}
+            className="w-6 h-6 rounded-md flex items-center justify-center text-white/30 hover:text-white hover:bg-white/[0.06] transition-colors"
+          >
+            <X className="h-3 w-3" />
+          </motion.button>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

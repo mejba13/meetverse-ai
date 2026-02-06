@@ -92,12 +92,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.name = user.name || null;
+        token.email = user.email || null;
+        // Drop inline/base64 avatars to keep the session token small enough for cookies
+        token.picture =
+          user.image && user.image.startsWith("data:") ? null : user.image ?? null;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.name = (token.name as string | null) ?? session.user.name;
+        session.user.email = (token.email as string | null) ?? session.user.email;
+        session.user.image = (token.picture as string | null) ?? null;
       }
       return session;
     },

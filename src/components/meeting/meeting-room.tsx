@@ -19,6 +19,7 @@ import { TranscriptBar } from "./transcript-bar";
 import { PreJoin } from "./pre-join";
 import { trpc } from "@/lib/api/client";
 import { useLiveKitToken } from "@/lib/hooks/use-livekit";
+import { mockParticipants, type Participant, roleColors } from "./mock-data";
 import {
   Loader2,
   AlertCircle,
@@ -30,8 +31,9 @@ import {
   Shield,
   Mic,
   MicOff,
+  Pin,
+  MoreVertical,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -41,15 +43,22 @@ interface MeetingRoomProps {
 
 type MeetingState = "loading" | "pre-join" | "connecting" | "connected" | "demo" | "error";
 
+const loadingMessages = [
+  "Initializing encryption...",
+  "Preparing AI co-pilot...",
+  "Setting up media channels...",
+  "Connecting to servers...",
+  "Almost ready...",
+];
+
 export function MeetingRoom({ roomId }: MeetingRoomProps) {
   const router = useRouter();
   const [state, setState] = useState<MeetingState>("loading");
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [displayName, setDisplayName] = useState("");
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
 
-  // Try to get meeting title from sessionStorage (set by new meeting page)
   const [meetingTitle, setMeetingTitle] = useState("Meeting");
 
   useEffect(() => {
@@ -64,25 +73,20 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
     }
   }, [roomId]);
 
-  // Fetch meeting data
   const { data: meeting, isLoading: meetingLoading, error: meetingError } =
     trpc.meeting.getByRoomId.useQuery({ roomId });
 
-  // LiveKit token hook
   const {
     token,
     serverUrl,
-    isLoading: tokenLoading,
     error: tokenError,
     refetch: refetchToken,
   } = useLiveKitToken({ roomId, displayName });
 
-  // Determine state based on loading/data
   useEffect(() => {
     if (meetingLoading) {
       setState("loading");
     } else if (meetingError) {
-      // If the tRPC fails (no backend), go straight to pre-join with fallback
       setState("pre-join");
     } else if (meeting) {
       if (meeting.title) setMeetingTitle(meeting.title);
@@ -112,10 +116,8 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
     [refetchToken]
   );
 
-  // Auto-detect when LiveKit isn't available and switch to demo mode
   useEffect(() => {
     if (state === "connecting") {
-      // Give LiveKit token 3 seconds, then fallback to demo mode
       const timeout = setTimeout(() => {
         if (!token || !serverUrl) {
           setState("demo");
@@ -125,7 +127,6 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
     }
   }, [state, token, serverUrl]);
 
-  // Also switch to demo if token error occurs while connecting
   useEffect(() => {
     if (state === "connecting" && tokenError) {
       setState("demo");
@@ -138,92 +139,17 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
 
   const handleError = useCallback((error: Error) => {
     console.error("LiveKit error:", error);
-    // Instead of showing error, go to demo mode
     setState("demo");
   }, []);
 
   // Loading state
   if (state === "loading") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-ink relative overflow-hidden">
-        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-ink" />
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(202,255,75,0.08) 0%, transparent 60%)",
-              filter: "blur(60px)",
-            }}
-            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="relative w-16 h-16 mx-auto mb-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B] to-[#9B5DE5] rounded-2xl blur-xl opacity-50 animate-pulse" />
-            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#CAFF4B] to-[#9EF01A] flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-black animate-spin" />
-            </div>
-          </div>
-          <p className="text-white/50 text-sm">Loading meeting...</p>
-        </motion.div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // Error state
   if (state === "error") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-ink relative overflow-hidden">
-        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-ink" />
-          <div
-            className="absolute inset-0 opacity-[0.012]"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(202,255,75,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(202,255,75,0.3) 1px, transparent 1px)",
-              backgroundSize: "60px 60px",
-            }}
-          />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center max-w-md px-6"
-        >
-          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle className="w-8 h-8 text-red-400" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Unable to Join Meeting</h2>
-          <p className="text-sm text-white/40 mb-8">
-            {error || "An unexpected error occurred"}
-          </p>
-          <div className="flex gap-3 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => router.push("/dashboard")}
-              className="px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/70 hover:text-white hover:bg-white/[0.08] transition-all text-sm font-medium"
-            >
-              <ArrowLeft className="w-4 h-4 inline mr-2" />
-              Back to Dashboard
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(202,255,75,0.3)" }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => window.location.reload()}
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#CAFF4B] to-[#9EF01A] text-black font-bold text-sm shadow-lg shadow-[#CAFF4B]/20"
-            >
-              Try Again
-            </motion.button>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return <ErrorState error={error} />;
   }
 
   // Pre-join state
@@ -239,7 +165,7 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
     );
   }
 
-  // Demo mode - show full meeting room UI without LiveKit
+  // Demo mode
   if (state === "demo") {
     return (
       <DemoMeetingRoom
@@ -267,45 +193,15 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
           dynacast: true,
         }}
       >
-        <MeetingRoomContent
-          meetingTitle={meetingTitle}
-        />
+        <MeetingRoomContent meetingTitle={meetingTitle} />
         <RoomAudioRenderer />
       </LiveKitRoom>
     );
   }
 
-  // Waiting for token (shows briefly before demo mode kicks in)
+  // Waiting for token (connecting state)
   if (state === "connecting") {
-    return (
-      <div className="flex h-screen items-center justify-center bg-ink relative overflow-hidden">
-        <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-          <div className="absolute inset-0 bg-ink" />
-          <motion.div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
-            style={{
-              background: "radial-gradient(circle, rgba(155,93,229,0.08) 0%, transparent 60%)",
-              filter: "blur(60px)",
-            }}
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="relative w-16 h-16 mx-auto mb-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#9B5DE5] to-[#CAFF4B] rounded-2xl blur-xl opacity-50 animate-pulse" />
-            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#9B5DE5] to-[#7B2FD4] flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-white animate-spin" />
-            </div>
-          </div>
-          <p className="text-white/50 text-sm">Connecting to meeting...</p>
-        </motion.div>
-      </div>
-    );
+    return <ConnectingState />;
   }
 
   // Fallback loading
@@ -322,22 +218,363 @@ export function MeetingRoom({ roomId }: MeetingRoomProps) {
 }
 
 // ============================================
-// DEMO MEETING ROOM (works without LiveKit)
+// LOADING STATE
 // ============================================
 
-const mockParticipants = [
-  { id: "1", name: "You", isMuted: false, isVideoEnabled: true },
-  { id: "2", name: "Sarah Chen", isMuted: false, isVideoEnabled: true },
-  { id: "3", name: "Marcus Johnson", isMuted: true, isVideoEnabled: false },
-  { id: "4", name: "Alex Rivera", isMuted: false, isVideoEnabled: true },
-];
+function LoadingState() {
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
 
-const participantColors = [
-  "from-[#CAFF4B]/30 to-[#9EF01A]/20",
-  "from-[#9B5DE5]/30 to-violet-600/20",
-  "from-cyan-500/30 to-blue-600/20",
-  "from-amber-500/30 to-orange-600/20",
-];
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => Math.min(prev + 2, 90));
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex h-screen items-center justify-center bg-ink relative overflow-hidden">
+      {/* Ambient background */}
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-ink" />
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #CAFF4B 0%, transparent 60%)" }}
+          animate={{ scale: [1, 1.3, 1], x: [0, 30, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 left-1/4 w-[400px] h-[400px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #9B5DE5 0%, transparent 60%)" }}
+          animate={{ scale: [1, 1.2, 1], y: [0, -20, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <div
+          className="absolute inset-0 opacity-[0.012]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(202,255,75,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(202,255,75,0.3) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        {/* Logo with rotating ring */}
+        <div className="relative w-20 h-20 mx-auto mb-8">
+          <motion.div
+            className="absolute -inset-2 rounded-2xl"
+            style={{
+              background: "conic-gradient(from 0deg, #CAFF4B, #9B5DE5, #CAFF4B)",
+              filter: "blur(8px)",
+              opacity: 0.4,
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B] to-[#9B5DE5] rounded-2xl blur-xl opacity-30 animate-pulse" />
+          <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-[#CAFF4B] to-[#9EF01A] flex items-center justify-center">
+            <Sparkles className="w-10 h-10 text-black" />
+          </div>
+        </div>
+
+        {/* Cycling status messages */}
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={messageIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="text-white/50 text-sm mb-6"
+          >
+            {loadingMessages[messageIndex]}
+          </motion.p>
+        </AnimatePresence>
+
+        {/* Progress bar */}
+        <div className="w-48 h-1 bg-white/[0.06] rounded-full mx-auto overflow-hidden">
+          <motion.div
+            className="h-full rounded-full bg-gradient-to-r from-[#CAFF4B] to-[#9B5DE5]"
+            style={{ width: `${progress}%` }}
+            transition={{ duration: 0.1 }}
+          />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================
+// CONNECTING STATE
+// ============================================
+
+function ConnectingState() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-ink relative overflow-hidden">
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-ink" />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full"
+          style={{
+            background: "radial-gradient(circle, rgba(155,93,229,0.08) 0%, transparent 60%)",
+            filter: "blur(60px)",
+          }}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Floating particles */}
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-[#9B5DE5]/30"
+            style={{
+              left: `${20 + Math.random() * 60}%`,
+              top: `${20 + Math.random() * 60}%`,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              opacity: [0.3, 0.8, 0.3],
+            }}
+            transition={{
+              duration: 2 + Math.random() * 2,
+              repeat: Infinity,
+              delay: i * 0.3,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="text-center"
+      >
+        <div className="relative w-16 h-16 mx-auto mb-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#9B5DE5] to-[#CAFF4B] rounded-2xl blur-xl opacity-50 animate-pulse" />
+          <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#9B5DE5] to-[#7B2FD4] flex items-center justify-center">
+            {/* Waveform animation */}
+            <div className="flex items-center gap-[3px]">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-[3px] rounded-full bg-white"
+                  animate={{ height: ["6px", "16px", "8px", "14px", "6px"] }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: i * 0.12,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+        <p className="text-white/50 text-sm">Connecting to meeting...</p>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================
+// ERROR STATE
+// ============================================
+
+function ErrorState({ error }: { error: string | null }) {
+  const router = useRouter();
+
+  return (
+    <div className="flex h-screen items-center justify-center bg-ink relative overflow-hidden">
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-ink" />
+        <div
+          className="absolute inset-0 opacity-[0.012]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(202,255,75,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(202,255,75,0.3) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="text-center max-w-md px-6"
+      >
+        {/* Glass card */}
+        <div className="relative rounded-2xl overflow-hidden bg-white/[0.02] backdrop-blur-xl border border-white/[0.06] p-8">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-500 via-red-400 to-red-500" />
+
+          {/* Red glow orb behind icon */}
+          <div className="relative w-16 h-16 mx-auto mb-6">
+            <div className="absolute inset-0 bg-red-500 rounded-2xl blur-xl opacity-20" />
+            <div className="relative w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+              <AlertCircle className="w-8 h-8 text-red-400" />
+            </div>
+          </div>
+
+          <h2 className="text-xl font-bold text-white mb-2">Unable to Join Meeting</h2>
+          <p className="text-sm text-white/40 mb-8">
+            {error || "An unexpected error occurred"}
+          </p>
+          <div className="flex gap-3 justify-center">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push("/dashboard")}
+              className="px-6 py-3 rounded-xl bg-white/[0.05] border border-white/[0.1] text-white/70 hover:text-white hover:bg-white/[0.08] transition-all text-sm font-medium"
+            >
+              <ArrowLeft className="w-4 h-4 inline mr-2" />
+              Back to Dashboard
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(202,255,75,0.3)" }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#CAFF4B] to-[#9EF01A] text-black font-bold text-sm shadow-lg shadow-[#CAFF4B]/20"
+            >
+              Try Again
+            </motion.button>
+          </div>
+
+          <p className="mt-6 text-[11px] text-white/20">
+            Need help? Contact support@meetverse.ai
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================
+// MEETING HEADER (shared between Demo & Live)
+// ============================================
+
+interface MeetingHeaderProps {
+  meetingTitle: string;
+  isRecording: boolean;
+  elapsedTime: number;
+  participantCount: number;
+  isDemo?: boolean;
+  isLive?: boolean;
+}
+
+function MeetingHeader({
+  meetingTitle,
+  isRecording,
+  elapsedTime,
+  participantCount,
+  isDemo,
+  isLive,
+}: MeetingHeaderProps) {
+  const formatTime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <header className="relative flex h-14 items-center justify-between px-4 bg-white/[0.02] backdrop-blur-xl border-b border-white/[0.06]">
+      {/* Bottom gradient accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#CAFF4B]/20 to-transparent" />
+
+      <div className="flex items-center gap-4">
+        <motion.div
+          className="flex items-center gap-2 cursor-pointer"
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="relative w-7 h-7 rounded-lg bg-gradient-to-br from-[#CAFF4B] to-[#9EF01A] flex items-center justify-center">
+            <Sparkles className="w-3.5 h-3.5 text-black" />
+          </div>
+          <span className="text-sm font-semibold text-white hidden sm:block">MeetVerse</span>
+        </motion.div>
+
+        <div className="w-px h-5 bg-white/[0.08]" />
+        <h1 className="text-sm font-medium text-white truncate max-w-[200px]">{meetingTitle}</h1>
+
+        <AnimatePresence>
+          {isRecording && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="flex items-center gap-2 rounded-full bg-red-500/10 border border-red-500/20 px-3 py-1 shadow-[0_0_10px_rgba(239,68,68,0.15)]"
+            >
+              <motion.span
+                className="h-2 w-2 rounded-full bg-red-500"
+                animate={{ opacity: [1, 0.4, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+              <span className="text-xs font-medium text-red-400">REC</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* LIVE badge */}
+        {(isLive || isDemo) && (
+          <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1">
+            <motion.span
+              className="h-1.5 w-1.5 rounded-full bg-emerald-400"
+              animate={{ opacity: [1, 0.3, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+            <span className="text-[10px] font-medium text-emerald-400">LIVE</span>
+          </div>
+        )}
+
+        {isDemo && (
+          <div className="flex items-center gap-1.5 rounded-full bg-[#9B5DE5]/10 border border-[#9B5DE5]/20 px-2.5 py-1">
+            <span className="text-[10px] font-medium text-[#9B5DE5]">DEMO</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3">
+        {/* Network quality indicator */}
+        <div className="flex items-center gap-1 text-white/30">
+          <div className="flex items-end gap-[2px] h-3">
+            <div className="w-[3px] h-[5px] rounded-full bg-emerald-400" />
+            <div className="w-[3px] h-[8px] rounded-full bg-emerald-400" />
+            <div className="w-[3px] h-[12px] rounded-full bg-emerald-400" />
+          </div>
+        </div>
+        <div className="w-px h-4 bg-white/[0.08]" />
+        <div className="flex items-center gap-1.5 text-[#CAFF4B]/60">
+          <Clock className="w-3.5 h-3.5" />
+          <span className="text-xs font-mono tabular-nums">{formatTime(elapsedTime)}</span>
+        </div>
+        <div className="w-px h-4 bg-white/[0.08]" />
+        <div className="flex items-center gap-1.5 text-white/40">
+          <Users className="w-3.5 h-3.5" />
+          <span className="text-xs">{participantCount}</span>
+        </div>
+        <div className="w-px h-4 bg-white/[0.08]" />
+        <div className="flex items-center gap-1 text-white/30">
+          <Shield className="w-3 h-3" />
+          <span className="text-[10px]">E2E</span>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// ============================================
+// DEMO MEETING ROOM (works without LiveKit)
+// ============================================
 
 interface DemoMeetingRoomProps {
   meetingTitle: string;
@@ -358,6 +595,7 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [activeSpeakerId, setActiveSpeakerId] = useState("1");
 
   // Meeting timer
   useEffect(() => {
@@ -367,7 +605,17 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
     return () => clearInterval(interval);
   }, []);
 
-  // Manage local camera stream for "You" tile
+  // Random speaking simulation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const speakerIds = mockParticipants.filter(p => !p.isMuted).map(p => p.id);
+      const randomId = speakerIds[Math.floor(Math.random() * speakerIds.length)];
+      setActiveSpeakerId(randomId);
+    }, 4000 + Math.random() * 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Manage local camera stream
   useEffect(() => {
     if (isVideoEnabled) {
       navigator.mediaDevices
@@ -378,9 +626,7 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
             videoRef.current.srcObject = stream;
           }
         })
-        .catch(() => {
-          // Camera not available
-        });
+        .catch(() => {});
     } else {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop());
@@ -398,14 +644,6 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
     };
   }, [isVideoEnabled]);
 
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
   const handleLeave = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((t) => t.stop());
@@ -413,7 +651,7 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
     router.push("/dashboard");
   };
 
-  const participants = mockParticipants.map((p, i) => ({
+  const participants: Participant[] = mockParticipants.map((p, i) => ({
     ...p,
     name: i === 0 ? (displayName || "You") : p.name,
     isMuted: i === 0 ? isMuted : p.isMuted,
@@ -430,81 +668,59 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
   }
 
   return (
-    <div className="flex h-screen flex-col bg-ink overflow-hidden">
+    <div className="flex h-screen flex-col bg-ink overflow-hidden relative">
+      {/* Ambient background orbs */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div
+          className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #CAFF4B 0%, transparent 60%)" }}
+        />
+        <div
+          className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #9B5DE5 0%, transparent 60%)" }}
+        />
+      </div>
+
       {/* Meeting Header */}
-      <header className="flex h-14 items-center justify-between px-4 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#CAFF4B] to-[#9EF01A] flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-black" />
-            </div>
-            <span className="text-sm font-semibold text-white hidden sm:block">MeetVerse</span>
-          </div>
-
-          <div className="w-px h-5 bg-white/[0.08]" />
-          <h1 className="text-sm font-medium text-white truncate max-w-[200px]">{meetingTitle}</h1>
-
-          <AnimatePresence>
-            {isRecording && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex items-center gap-2 rounded-full bg-red-500/10 border border-red-500/20 px-3 py-1"
-              >
-                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-                <span className="text-xs font-medium text-red-400">REC</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* LIVE badge */}
-          <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            <span className="text-[10px] font-medium text-emerald-400">LIVE</span>
-          </div>
-
-          {/* Demo badge */}
-          <div className="flex items-center gap-1.5 rounded-full bg-[#9B5DE5]/10 border border-[#9B5DE5]/20 px-2.5 py-1">
-            <span className="text-[10px] font-medium text-[#9B5DE5]">DEMO</span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-white/40">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="text-xs font-mono tabular-nums">{formatTime(elapsedTime)}</span>
-          </div>
-          <div className="w-px h-4 bg-white/[0.08]" />
-          <div className="flex items-center gap-1.5 text-white/40">
-            <Users className="w-3.5 h-3.5" />
-            <span className="text-xs">{participants.length}</span>
-          </div>
-          <div className="w-px h-4 bg-white/[0.08]" />
-          <div className="flex items-center gap-1 text-white/30">
-            <Shield className="w-3 h-3" />
-            <span className="text-[10px]">E2E</span>
-          </div>
-        </div>
-      </header>
+      <MeetingHeader
+        meetingTitle={meetingTitle}
+        isRecording={isRecording}
+        elapsedTime={elapsedTime}
+        participantCount={participants.length}
+        isDemo
+        isLive
+      />
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         <div className="flex flex-1 flex-col">
-          {/* Demo Video Grid */}
+          {/* Demo Video Grid - 6 participants, 3 columns */}
           <div className="flex-1 overflow-hidden p-3">
-            <div className="grid h-full gap-3 auto-rows-fr grid-cols-2">
+            <div className="grid h-full gap-3 auto-rows-fr grid-cols-3">
               {participants.map((p, i) => (
                 <motion.div
                   key={p.id}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                  className={cn(
-                    "relative rounded-2xl overflow-hidden bg-[#0d0d0d] border border-white/[0.06]",
-                    !p.isMuted && i === 0 && "ring-2 ring-[#CAFF4B]/50 ring-offset-2 ring-offset-[#0a0a0a]"
-                  )}
+                  transition={{ delay: i * 0.08 }}
+                  className="relative rounded-2xl overflow-hidden bg-[#0d0d0d] border border-white/[0.08] group"
                 >
+                  {/* Speaking ring */}
+                  {activeSpeakerId === p.id && !p.isMuted && (
+                    <>
+                      <motion.div
+                        className="absolute inset-0 rounded-2xl ring-2 ring-[#CAFF4B]/60 z-10 pointer-events-none"
+                        animate={{ opacity: [0.6, 1, 0.6] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                      <motion.div
+                        className="absolute -inset-1 rounded-2xl border-2 border-[#CAFF4B]/20 z-10 pointer-events-none"
+                        animate={{ opacity: [0, 0.5, 0], scale: [1, 1.02, 1] }}
+                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                    </>
+                  )}
+
                   {/* Video or Avatar */}
                   {p.isVideoEnabled && i === 0 ? (
                     <>
@@ -518,26 +734,52 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                     </>
                   ) : p.isVideoEnabled ? (
-                    <div className={cn("absolute inset-0 bg-gradient-to-br", participantColors[i % participantColors.length])}>
+                    <div className={cn("absolute inset-0 bg-gradient-to-br", p.accentColor || "from-[#CAFF4B]/30 to-[#9EF01A]/20")}>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <Avatar className="h-20 w-20 border-2 border-white/[0.1]">
-                          <AvatarFallback className="text-2xl bg-white/10 text-white">
+                        {p.avatarUrl ? (
+                          <img
+                            src={p.avatarUrl}
+                            alt={p.name}
+                            className="h-20 w-20 rounded-full object-cover border-2 border-white/[0.1]"
+                          />
+                        ) : (
+                          <div className="h-20 w-20 rounded-full bg-white/10 flex items-center justify-center text-2xl text-white border-2 border-white/[0.1]">
                             {getInitials(p.name)}
-                          </AvatarFallback>
-                        </Avatar>
+                          </div>
+                        )}
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                     </div>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center bg-[#111111]">
                       <div className="text-center">
-                        <Avatar className="mx-auto h-20 w-20 border-2 border-white/[0.08]">
-                          <AvatarFallback className="text-2xl bg-gradient-to-br from-white/10 to-white/5 text-white/60">
+                        {p.avatarUrl ? (
+                          <img
+                            src={p.avatarUrl}
+                            alt={p.name}
+                            className="mx-auto h-20 w-20 rounded-full object-cover border-2 border-white/[0.08] opacity-60"
+                          />
+                        ) : (
+                          <div className="mx-auto h-20 w-20 rounded-full bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-2xl text-white/60 border-2 border-white/[0.08]">
                             {getInitials(p.name)}
-                          </AvatarFallback>
-                        </Avatar>
+                          </div>
+                        )}
                         <p className="mt-2 text-xs text-white/30">Camera off</p>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Role badge */}
+                  {p.role && p.role !== "attendee" && (
+                    <div className="absolute top-3 left-3 z-10">
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider border backdrop-blur-sm",
+                          roleColors[p.role]
+                        )}
+                      >
+                        {p.role}
+                      </span>
                     </div>
                   )}
 
@@ -550,13 +792,23 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
                         </div>
                       ) : (
                         <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center">
-                          <Mic className="h-3 w-3 text-white" />
+                          <Mic className={cn("h-3 w-3", activeSpeakerId === p.id ? "text-[#CAFF4B]" : "text-white")} />
                         </div>
                       )}
                       <span className="text-sm font-medium text-white drop-shadow-lg">
                         {p.name}{i === 0 ? " (You)" : ""}
                       </span>
                     </div>
+                  </div>
+
+                  {/* Hover actions */}
+                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 z-10">
+                    <button className="rounded-lg bg-black/50 backdrop-blur-sm p-1.5 text-white hover:bg-black/70 border border-white/[0.1]">
+                      <Pin className="h-3.5 w-3.5" />
+                    </button>
+                    <button className="rounded-lg bg-black/50 backdrop-blur-sm p-1.5 text-white hover:bg-black/70 border border-white/[0.1]">
+                      <MoreVertical className="h-3.5 w-3.5" />
+                    </button>
                   </div>
                 </motion.div>
               ))}
@@ -591,9 +843,9 @@ function DemoMeetingRoom({ meetingTitle, displayName, initialAudioEnabled, initi
           {isSidebarOpen && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 340, opacity: 1 }}
+              animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="overflow-hidden"
             >
               <MeetingSidebar
@@ -631,7 +883,6 @@ function MeetingRoomContent({ meetingTitle }: MeetingRoomContentProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
 
-  // Meeting timer
   useEffect(() => {
     const interval = setInterval(() => {
       setElapsedTime((prev) => prev + 1);
@@ -639,15 +890,6 @@ function MeetingRoomContent({ meetingTitle }: MeetingRoomContentProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) return `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
-  // Sync with room state
   useEffect(() => {
     if (room) {
       const localParticipant = room.localParticipant;
@@ -695,7 +937,7 @@ function MeetingRoomContent({ meetingTitle }: MeetingRoomContentProps) {
     router.push("/dashboard");
   };
 
-  const participants = room?.remoteParticipants
+  const participants: Participant[] = room?.remoteParticipants
     ? Array.from(room.remoteParticipants.values()).map((p) => ({
         id: p.sid,
         name: p.name || "Participant",
@@ -724,23 +966,7 @@ function MeetingRoomContent({ meetingTitle }: MeetingRoomContentProps) {
 
   // Show connecting state
   if (connectionState === ConnectionState.Connecting) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-ink">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <div className="relative w-16 h-16 mx-auto mb-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#CAFF4B] to-[#9B5DE5] rounded-2xl blur-xl opacity-50 animate-pulse" />
-            <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#CAFF4B] to-[#9EF01A] flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-black animate-spin" />
-            </div>
-          </div>
-          <p className="text-white/50 text-sm">Connecting to meeting...</p>
-        </motion.div>
-      </div>
-    );
+    return <ConnectingState />;
   }
 
   // Show reconnecting state
@@ -762,62 +988,30 @@ function MeetingRoomContent({ meetingTitle }: MeetingRoomContentProps) {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-ink overflow-hidden">
+    <div className="flex h-screen flex-col bg-ink overflow-hidden relative">
+      {/* Ambient background orbs */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div
+          className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #CAFF4B 0%, transparent 60%)" }}
+        />
+        <div
+          className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, #9B5DE5 0%, transparent 60%)" }}
+        />
+      </div>
+
       {/* Meeting Header */}
-      <header className="flex h-14 items-center justify-between px-4 border-b border-white/[0.06] bg-white/[0.02] backdrop-blur-xl">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#CAFF4B] to-[#9EF01A] flex items-center justify-center">
-              <Sparkles className="w-3.5 h-3.5 text-black" />
-            </div>
-            <span className="text-sm font-semibold text-white hidden sm:block">MeetVerse</span>
-          </div>
-
-          <div className="w-px h-5 bg-white/[0.08]" />
-          <h1 className="text-sm font-medium text-white truncate max-w-[200px]">{meetingTitle}</h1>
-
-          <AnimatePresence>
-            {isRecording && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                className="flex items-center gap-2 rounded-full bg-red-500/10 border border-red-500/20 px-3 py-1"
-              >
-                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-                <span className="text-xs font-medium text-red-400">REC</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {connectionState === ConnectionState.Connected && (
-            <div className="flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span className="text-[10px] font-medium text-emerald-400">LIVE</span>
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-white/40">
-            <Clock className="w-3.5 h-3.5" />
-            <span className="text-xs font-mono tabular-nums">{formatTime(elapsedTime)}</span>
-          </div>
-          <div className="w-px h-4 bg-white/[0.08]" />
-          <div className="flex items-center gap-1.5 text-white/40">
-            <Users className="w-3.5 h-3.5" />
-            <span className="text-xs">{participants.length}</span>
-          </div>
-          <div className="w-px h-4 bg-white/[0.08]" />
-          <div className="flex items-center gap-1 text-white/30">
-            <Shield className="w-3 h-3" />
-            <span className="text-[10px]">E2E</span>
-          </div>
-        </div>
-      </header>
+      <MeetingHeader
+        meetingTitle={meetingTitle}
+        isRecording={isRecording}
+        elapsedTime={elapsedTime}
+        participantCount={participants.length}
+        isLive={connectionState === ConnectionState.Connected}
+      />
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative z-10">
         <div className="flex flex-1 flex-col">
           <div className="flex-1 overflow-hidden p-3">
             <LiveKitVideoGrid />
@@ -846,9 +1040,9 @@ function MeetingRoomContent({ meetingTitle }: MeetingRoomContentProps) {
           {isSidebarOpen && (
             <motion.div
               initial={{ width: 0, opacity: 0 }}
-              animate={{ width: 340, opacity: 1 }}
+              animate={{ width: 380, opacity: 1 }}
               exit={{ width: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: "easeInOut" }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="overflow-hidden"
             >
               <MeetingSidebar
