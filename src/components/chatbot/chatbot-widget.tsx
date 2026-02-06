@@ -603,7 +603,7 @@ export function ChatbotWidget() {
                   Quick actions
                 </span>
               </div>
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-1 px-1">
                 {quickActions.map((action) => (
                   <motion.button
                     key={action.label}
